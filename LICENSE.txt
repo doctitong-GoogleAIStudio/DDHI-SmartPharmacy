@@ -1,0 +1,5 @@
+DDHI Smart Pharmacy Barcode Manager - evaluation build 0.1.0
+Copyright 2026 Digos Doctors Hospital, Inc.
+Developer: Vicente C. Cavalida Jr. MD
+Hospital internal evaluation only. Production deployment requires hospital IT and pharmacy leadership acceptance. No claim of clinical validation or legal compliance certification is made by this release. Distribution and ownership terms beyond hospital evaluation require the rights holder's approval.
+Third-party dependencies retain their original licenses. See THIRD_PARTY_NOTICES.md and package metadata.

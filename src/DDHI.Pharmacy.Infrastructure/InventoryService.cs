@@ -1,0 +1,87 @@
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using DDHI.Pharmacy.Domain;
+using DDHI.Pharmacy.Application;
+using DDHI.Pharmacy.Contracts;
+using DDHI.Pharmacy.Barcode;
+using Microsoft.EntityFrameworkCore;
+namespace DDHI.Pharmacy.Infrastructure;
+public sealed class InventoryService(PharmacyDb db) {
+ public static string Hash(string v)=>Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(v)));
+ public static string AuditHash(AuditEvent e)=>Hash($"{e.PreviousHash}|{e.Id}|{e.CreatedAt:O}|{e.Actor}|{e.Role}|{e.Workstation}|{e.Action}|{e.RecordId}|{e.Detail}");
+ public async Task Audit(Actor actor,string action,string record,string detail) {
+  var previous=await db.AuditEvents.OrderByDescending(e=>e.CreatedAt).ThenByDescending(e=>e.Id).Select(e=>e.Hash).FirstOrDefaultAsync()??"GENESIS";
+  var lastTime=await db.AuditEvents.MaxAsync(e=>(DateTime?)e.CreatedAt);
+  var e=new AuditEvent{Actor=actor.UserId,Role=actor.Role,Workstation=actor.Workstation,Action=action,RecordId=record,Detail=detail,PreviousHash=previous,CreatedAt=DateTime.UtcNow};
+  // PostgreSQL timestamp resolution is one microsecond. Preserve a strict chain ordering.
+  e.CreatedAt=new DateTime(e.CreatedAt.Ticks-e.CreatedAt.Ticks%10,DateTimeKind.Utc);if(lastTime>=e.CreatedAt)e.CreatedAt=lastTime.Value.AddTicks(10);
+  e.Hash=AuditHash(e);db.AuditEvents.Add(e);
+ }
+ public async Task<string> Execute(string key,Actor actor,object request,Func<Task<object>> action) {
+  Safety.Require(Guid.TryParse(key,out _),"A UUID Idempotency-Key header is required.");
+  Safety.Require(!string.IsNullOrWhiteSpace(actor.Workstation)&&actor.Workstation.Length<=128,"Workstation identity required.");
+  var fingerprint=Hash(JsonSerializer.Serialize(request));
+  await using var tx=await db.Database.BeginTransactionAsync();
+  await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(772991001)");
+  var old=await db.OperationKeys.SingleOrDefaultAsync(x=>x.Key==key);
+  if(old!=null){Safety.Require(old.PayloadHash==fingerprint&&old.Actor==actor.UserId,"Idempotency key reused for a different request.");return old.Result;}
+  var result=JsonSerializer.Serialize(await action());
+  var detail=JsonSerializer.Serialize(new{request,result});
+  if(detail.Length>1800)detail=JsonSerializer.Serialize(new{Path=request.GetType().GetProperty("Path")?.GetValue(request)?.ToString(),RequestSha256=fingerprint,ResultSha256=Hash(result),Note="Large payload summarized; approved source and operation result retained separately."});
+  await Audit(actor,request.GetType().Name,key,detail);
+  db.OperationKeys.Add(new OperationKey{Key=key,Actor=actor.UserId,PayloadHash=fingerprint,Result=result});
+  await db.SaveChangesAsync();await tx.CommitAsync();return result;
+ }
+ static void Confirm(bool c)=>Safety.Require(c,"Explicit confirmation is required.");
+ static string Text(string value,string name){Safety.Require(!string.IsNullOrWhiteSpace(value)&&value.Length<=200,$"{name} is required (max 200 characters).");return value.Trim();}
+ async Task<InventoryBalance> Balance(Guid id)=>await db.InventoryBalances.Include(x=>x.Batch).Include(x=>x.Location).SingleAsync(x=>x.Id==id);
+ async Task<InventoryBalance> Target(InventoryBalance source,Guid location,StockStatus status){
+  Safety.Require(await db.InventoryLocations.AnyAsync(x=>x.Id==location),"Unknown location.");
+  var b=await db.InventoryBalances.SingleOrDefaultAsync(x=>x.BatchId==source.BatchId&&x.LocationId==location&&x.Status==status);
+  if(b==null){b=new InventoryBalance{BatchId=source.BatchId,LocationId=location,Status=status};db.InventoryBalances.Add(b);}return b;
+ }
+ void Movement(InventoryBalance b,decimal delta,string kind,string reference,string actor,string reason="") {b.Quantity+=delta;Safety.Require(b.Quantity>=0,"Negative stock blocked.");db.StockMovements.Add(new StockMovement{Balance=b,Delta=delta,Kind=kind,Reference=reference,Actor=actor,Reason=reason});}
+ async Task<decimal> Reserved(Guid balance,Guid? except=null)=>await db.StockReservations.Where(x=>x.BalanceId==balance&&!x.Released&&x.ExpiresAt>DateTime.UtcNow&&(except==null||x.OrderId!=except)).SumAsync(x=>x.Quantity);
+ public async Task<object> Receive(ReceiveInput r,Actor a) {
+  Confirm(r.Confirmed);Safety.Positive(r.Quantity);Safety.Positive(r.ConversionFactor);Safety.Require(r.UnitCost>=0,"Cost cannot be negative.");Text(r.Reference,"Delivery reference");Text(r.Lot,"Lot");
+  var med=await db.Medicines.SingleAsync(x=>x.Id==r.MedicineId);Safety.Require(med.ActiveStatus,"Inactive medicine.");
+  Safety.Require(await db.InventoryLocations.AnyAsync(x=>x.Id==r.LocationId)&&await db.Suppliers.AnyAsync(x=>x.Id==r.SupplierId),"Select a valid supplier and location.");
+  Safety.Require(!await db.GoodsReceipts.AnyAsync(x=>x.SupplierId==r.SupplierId&&x.Reference==r.Reference),"Duplicate delivery reference. Use a unique delivery-line reference for partial receipts.");
+  if(r.PurchaseOrderId!=null){var po=await db.PurchaseOrders.SingleAsync(x=>x.Id==r.PurchaseOrderId);Safety.Require(po.SupplierId==r.SupplierId,"Purchase-order supplier mismatch.");}
+  Safety.Require(r.Expiration>=Safety.Today,"Expired receiving requires a separately approved quarantine workflow.");
+  var batch=await db.InventoryBatchs.SingleOrDefaultAsync(x=>x.MedicineId==r.MedicineId&&x.Lot==r.Lot&&x.Expiration==r.Expiration);
+  if(batch==null){batch=new InventoryBatch{MedicineId=r.MedicineId,Lot=r.Lot,Expiration=r.Expiration,UnitCost=r.UnitCost};db.InventoryBatchs.Add(batch);}
+  Safety.Require(!await db.RecallAffectedBatchs.AnyAsync(x=>x.BatchId==batch.Id),"Recalled batch cannot be received routinely.");
+  var b=await db.InventoryBalances.SingleOrDefaultAsync(x=>x.BatchId==batch.Id&&x.LocationId==r.LocationId&&x.Status==StockStatus.Available);
+  if(b==null){b=new InventoryBalance{Batch=batch,LocationId=r.LocationId,Status=StockStatus.Available};db.InventoryBalances.Add(b);}
+  var quantity=r.Quantity*r.ConversionFactor;Safety.Positive(quantity);Movement(b,quantity,"Receiving",r.Reference,a.UserId);
+  var movement=db.ChangeTracker.Entries<StockMovement>().Last().Entity;
+  db.GoodsReceipts.Add(new GoodsReceipt{Reference=r.Reference,SupplierId=r.SupplierId,PurchaseOrderId=r.PurchaseOrderId,Movement=movement});return new{batch.Id,BalanceId=b.Id,Quantity=b.Quantity};
+ }
+ public async Task<object> RegisterBarcode(BarcodeInput r,Actor a){Confirm(r.Confirmed);var data=BarcodeParser.Parse(r.Barcode);Safety.Positive(r.ConversionFactor);Safety.Require(await db.Medicines.AnyAsync(x=>x.Id==r.MedicineId&&x.ActiveStatus),"Medicine not active.");var code=data.Gtin??data.Raw;
+  Safety.Require(!await db.MedicineBarcodes.AnyAsync(x=>x.Barcode==code),"Barcode already mapped. Ambiguous mapping blocked.");var b=new MedicineBarcode{MedicineId=r.MedicineId,Barcode=code,Packaging=Text(r.Packaging,"Packaging"),ConversionFactor=r.ConversionFactor,ApprovedBy=a.UserId};db.MedicineBarcodes.Add(b);return b;
+ }
+ public async Task<object> CreateOrder(OrderInput r){Confirm(r.Confirmed);Safety.Positive(r.Quantity);Text(r.Reference,"Order reference");Text(r.EncounterReference,"Encounter reference");Safety.Require(await db.Medicines.AnyAsync(x=>x.Id==r.MedicineId&&x.ActiveStatus),"Medicine inactive.");var o=new DispenseOrder{Reference=r.Reference,EncounterReference=r.EncounterReference,MedicineId=r.MedicineId,Quantity=r.Quantity};db.DispenseOrders.Add(o);return o;}
+ public async Task<object> Dispense(DispenseInput r,Actor a){
+  Confirm(r.Confirmed);Safety.Require(Roles.Clinical.Contains(a.Role),"Pharmacist authorization required.");Safety.Require(r.PatientVerified,"Patient identity confirmation required.");Safety.Positive(r.Quantity);
+  Safety.Require(r.VerificationMode is "ManualSelection" or "ManualBarcode" or "HidUnverified","Physical-device provenance is not available in this build; cannot attest a physical scan.");
+  Safety.Require(await db.SystemSettings.AnyAsync(x=>x.Name=="ManualDispensingApproved"&&x.Value=="true"),"Hospital-approved manual dispensing policy is disabled.");Text(r.OverrideReason,"Manual verification reason / approval reference");
+  var order=await db.DispenseOrders.SingleAsync(x=>x.Id==r.OrderId);Safety.Require(order.Active&&order.Dispensed+r.Quantity<=order.Quantity,"Order inactive or quantity exceeds remaining order.");
+  var b=await Balance(r.BalanceId);Safety.CanDispense(b,r.Quantity,Safety.Today);Safety.Require(b.Batch.MedicineId==order.MedicineId,"Wrong medicine, strength, or dosage form.");
+  Safety.Require(await db.Medicines.AnyAsync(x=>x.Id==order.MedicineId&&x.ActiveStatus),"Medicine inactive.");
+  Safety.Require(!await db.RecallAffectedBatchs.AnyAsync(x=>x.BatchId==b.BatchId),"Recalled batch blocked.");Safety.Require(b.Quantity-r.Quantity>=await Reserved(b.Id,order.Id),"Stock reserved for another order.");
+  if(r.VerificationMode!="ManualSelection") {var data=BarcodeParser.Parse(r.Barcode);var mapping=await db.MedicineBarcodes.SingleOrDefaultAsync(x=>x.Barcode==(data.Gtin??data.Raw));Safety.Require(mapping?.MedicineId==order.MedicineId,"Barcode medicine mismatch.");if(data.Lot!=null)Safety.Require(data.Lot==b.Batch.Lot,"Barcode lot mismatch.");if(data.Expiration!=null)Safety.Require(data.Expiration==b.Batch.Expiration,"Barcode expiry mismatch.");}
+  var transaction=new DispenseTransaction{Order=order,Reference=Guid.NewGuid().ToString(),Pharmacist=a.UserId,Verification=Enum.Parse<VerificationMode>(r.VerificationMode),OverrideReason=r.OverrideReason};
+  db.DispenseTransactions.Add(transaction);db.DispenseTransactionLines.Add(new DispenseTransactionLine{Transaction=transaction,Balance=b,Quantity=r.Quantity});
+  Movement(b,-r.Quantity,"Dispensing",transaction.Reference,a.UserId,r.OverrideReason);order.Dispensed+=r.Quantity;
+  foreach(var reserve in await db.StockReservations.Where(x=>x.OrderId==order.Id&&x.BalanceId==b.Id&&!x.Released).ToListAsync())reserve.Released=true;
+  db.IntegrationOutboxs.Add(new IntegrationOutbox{Transaction=transaction});return new{transaction.Id,transaction.Reference,Remaining=order.Quantity-order.Dispensed};
+ }
+ public async Task<object> Transfer(MoveInput r,Actor a){Confirm(r.Confirmed);Text(r.Reference,"Reference");Text(r.Reason,"Reason");Safety.Positive(r.Quantity);Safety.Require(!await db.StockMovements.AnyAsync(x=>x.Reference==r.Reference&&(x.Kind=="TransferIn"||x.Kind=="TransferOut")),"Duplicate transfer reference.");var source=await Balance(r.BalanceId);Safety.Require(source.LocationId!=r.DestinationId,"Choose a different destination.");Safety.Require(source.Quantity-r.Quantity>=await Reserved(source.Id),"Insufficient unreserved stock.");var target=await Target(source,r.DestinationId,source.Status);Movement(source,-r.Quantity,"TransferOut",r.Reference,a.UserId,r.Reason);Movement(target,r.Quantity,"TransferIn",r.Reference,a.UserId,r.Reason);return new{source.Id,DestinationBalance=target.Id};}
+ public async Task<object> Count(CountInput r,Actor a){Confirm(r.Confirmed);Text(r.Reference,"Reference");Text(r.Reason,"Adjustment reason");Safety.Require(r.CountedQuantity>=0&&r.CountedQuantity<=100000000&&decimal.Round(r.CountedQuantity,4)==r.CountedQuantity,"Invalid counted quantity.");var b=await Balance(r.BalanceId);Safety.Require(r.CountedQuantity>=await Reserved(b.Id),"Cannot adjust below reserved stock.");var delta=r.CountedQuantity-b.Quantity;Movement(b,delta,"CountAdjustment",r.Reference,a.UserId,r.Reason);db.StockAdjustments.Add(new StockAdjustment{Movement=db.ChangeTracker.Entries<StockMovement>().Last().Entity,Counted=r.CountedQuantity,Reason=r.Reason});return new{b.Id,b.Quantity,Delta=delta};}
+ public async Task<object> Return(ReturnInput r,Actor a){Confirm(r.Confirmed);Text(r.Reference,"Return reference");Text(r.Reason,"Return reason");Safety.Positive(r.Quantity);var line=await db.DispenseTransactionLines.SingleAsync(x=>x.Id==r.DispenseLineId);var returned=await db.Returns.Where(x=>x.DispenseLineId==line.Id).SumAsync(x=>x.Quantity);Safety.Require(returned+r.Quantity<=line.Quantity,"Return exceeds dispensed quantity.");var source=await Balance(line.BalanceId);var quarantine=await Target(source,source.LocationId,StockStatus.Quarantined);Movement(quarantine,r.Quantity,"ReturnQuarantine",r.Reference,a.UserId,r.Reason);var ret=new Return{DispenseLineId=line.Id,Quantity=r.Quantity,Reason=r.Reason};db.Returns.Add(ret);return new{ret.Id,Status="Quarantined; requires approved quality review before any release"};}
+ public async Task<object> Recall(RecallInput r){Confirm(r.Confirmed);Text(r.Reference,"Recall reference");Text(r.Reason,"Recall reason");Safety.Require(await db.InventoryBatchs.AnyAsync(x=>x.Id==r.BatchId),"Unknown batch.");var recall=new RecallNotice{Reference=r.Reference,Reason=r.Reason};db.RecallNotices.Add(recall);db.RecallAffectedBatchs.Add(new RecallAffectedBatch{Recall=recall,BatchId=r.BatchId});return new{recall.Id,Status="Blocked by server recall check; balances preserved for traceability"};}
+ public async Task<object> Reserve(ReserveInput r){Confirm(r.Confirmed);Safety.Positive(r.Quantity);var b=await Balance(r.BalanceId);Safety.CanDispense(b,r.Quantity,Safety.Today);var order=await db.DispenseOrders.SingleAsync(x=>x.Id==r.OrderId);Safety.Require(order.Active&&order.MedicineId==b.Batch.MedicineId&&r.Quantity<=order.Quantity-order.Dispensed,"Order mismatch.");Safety.Require(!await db.RecallAffectedBatchs.AnyAsync(x=>x.BatchId==b.BatchId),"Recalled batch.");Safety.Require(b.Quantity-r.Quantity>=await Reserved(b.Id),"Insufficient unreserved stock.");Safety.Require(!await db.StockReservations.AnyAsync(x=>x.OrderId==order.Id&&!x.Released&&x.ExpiresAt>DateTime.UtcNow),"Order already reserved.");var reservation=new StockReservation{BalanceId=b.Id,OrderId=order.Id,Quantity=r.Quantity,ExpiresAt=DateTime.UtcNow.AddMinutes(15)};db.StockReservations.Add(reservation);return reservation;}
+ public async Task<object> Reconcile(Actor a){var run=new ReconciliationRun{Reference=Guid.NewGuid().ToString(),Actor=a.UserId};db.ReconciliationRuns.Add(run);foreach(var b in await db.InventoryBalances.ToListAsync()){var expected=await db.StockMovements.Where(x=>x.BalanceId==b.Id).SumAsync(x=>x.Delta);if(expected!=b.Quantity)db.ReconciliationDiscrepancys.Add(new ReconciliationDiscrepancy{Run=run,Balance=b,Expected=expected,Actual=b.Quantity});}return new{run.Id,run.Reference};}
+}

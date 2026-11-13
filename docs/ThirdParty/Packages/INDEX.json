@@ -1,0 +1,758 @@
+[
+  {
+    "file": "NuGet-2cf7d01e6796c89c.nuspec",
+    "originalPackagePath": "zxing.net/0.16.11/zxing.net.nuspec"
+  },
+  {
+    "file": "NuGet-95dc23ef9d659503.nuspec",
+    "originalPackagePath": "xunit.runner.visualstudio/3.1.5/xunit.runner.visualstudio.nuspec"
+  },
+  {
+    "file": "NuGet-8b269c5ec575ab54.nuspec",
+    "originalPackagePath": "xunit.extensibility.execution/2.9.3/xunit.extensibility.execution.nuspec"
+  },
+  {
+    "file": "NuGet-57b33556e03e99c9.nuspec",
+    "originalPackagePath": "xunit.extensibility.core/2.9.3/xunit.extensibility.core.nuspec"
+  },
+  {
+    "file": "NuGet-2f2ecb8e6a5ad460.nuspec",
+    "originalPackagePath": "xunit.core/2.9.3/xunit.core.nuspec"
+  },
+  {
+    "file": "NuGet-359eb20f3ee6ca72.nuspec",
+    "originalPackagePath": "xunit.assert/2.9.3/xunit.assert.nuspec"
+  },
+  {
+    "file": "NuGet-d35b24271aa074d8.nuspec",
+    "originalPackagePath": "xunit.analyzers/1.18.0/xunit.analyzers.nuspec"
+  },
+  {
+    "file": "NuGet-43e29349c00a10fe.nuspec",
+    "originalPackagePath": "xunit.abstractions/2.0.3/xunit.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-ba507f728630038c.nuspec",
+    "originalPackagePath": "xunit/2.9.3/xunit.nuspec"
+  },
+  {
+    "file": "NuGet-9a42a25a2181d18b.nuspec",
+    "originalPackagePath": "system.serviceprocess.servicecontroller/10.0.0/system.serviceprocess.servicecontroller.nuspec"
+  },
+  {
+    "file": "NuGet-0814b39fb08308c9.nuspec",
+    "originalPackagePath": "system.serviceprocess.servicecontroller/10.0.15/system.serviceprocess.servicecontroller.nuspec"
+  },
+  {
+    "file": "NuGet-ed0982f136b318ca.nuspec",
+    "originalPackagePath": "system.io.ports/10.0.0/system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-982102c95815e48a.nuspec",
+    "originalPackagePath": "system.io.ports/10.0.15/system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-1a12de5a929686a1.nuspec",
+    "originalPackagePath": "system.diagnostics.eventlog/10.0.0/system.diagnostics.eventlog.nuspec"
+  },
+  {
+    "file": "NuGet-5881ffdcc683ee44.nuspec",
+    "originalPackagePath": "system.diagnostics.eventlog/10.0.15/system.diagnostics.eventlog.nuspec"
+  },
+  {
+    "file": "NuGet-fad0b75364d37579.TXT",
+    "originalPackagePath": "system.composition.typedparts/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-bea0ab0333f034c5.nuspec",
+    "originalPackagePath": "system.composition.typedparts/9.0.0/system.composition.typedparts.nuspec"
+  },
+  {
+    "file": "NuGet-6b026c01c775247a.TXT",
+    "originalPackagePath": "system.composition.runtime/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-866a9a3b74302dd4.nuspec",
+    "originalPackagePath": "system.composition.runtime/9.0.0/system.composition.runtime.nuspec"
+  },
+  {
+    "file": "NuGet-9238269757e4066c.TXT",
+    "originalPackagePath": "system.composition.hosting/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-7fea00389e93f72f.nuspec",
+    "originalPackagePath": "system.composition.hosting/9.0.0/system.composition.hosting.nuspec"
+  },
+  {
+    "file": "NuGet-ec898ac1cb515e79.TXT",
+    "originalPackagePath": "system.composition.convention/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-72e895fda717dd36.nuspec",
+    "originalPackagePath": "system.composition.convention/9.0.0/system.composition.convention.nuspec"
+  },
+  {
+    "file": "NuGet-5b741ce569c90480.TXT",
+    "originalPackagePath": "system.composition.attributedmodel/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-3842a414b17b332a.nuspec",
+    "originalPackagePath": "system.composition.attributedmodel/9.0.0/system.composition.attributedmodel.nuspec"
+  },
+  {
+    "file": "NuGet-c52b884ec4ee2dd1.TXT",
+    "originalPackagePath": "system.composition/9.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-c418829b60dec892.nuspec",
+    "originalPackagePath": "system.composition/9.0.0/system.composition.nuspec"
+  },
+  {
+    "file": "NuGet-f8f3c36a2fcc50ea.TXT",
+    "originalPackagePath": "system.codedom/6.0.0/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-0831580c818b7345.nuspec",
+    "originalPackagePath": "system.codedom/6.0.0/system.codedom.nuspec"
+  },
+  {
+    "file": "NuGet-22ab9a05224cfa1f.nuspec",
+    "originalPackagePath": "serilog.sinks.file/7.0.0/serilog.sinks.file.nuspec"
+  },
+  {
+    "file": "NuGet-4cb4fad3eab48021.nuspec",
+    "originalPackagePath": "serilog.sinks.debug/3.0.0/serilog.sinks.debug.nuspec"
+  },
+  {
+    "file": "NuGet-59406b9b9377ec90.nuspec",
+    "originalPackagePath": "serilog.sinks.console/6.1.1/serilog.sinks.console.nuspec"
+  },
+  {
+    "file": "NuGet-1bd7b0647950f7dc.nuspec",
+    "originalPackagePath": "serilog.settings.configuration/10.0.0/serilog.settings.configuration.nuspec"
+  },
+  {
+    "file": "NuGet-1dff3286237dcfd0.nuspec",
+    "originalPackagePath": "serilog.formatting.compact/3.0.0/serilog.formatting.compact.nuspec"
+  },
+  {
+    "file": "NuGet-b96c3bc3e3d75ec6.nuspec",
+    "originalPackagePath": "serilog.extensions.logging/10.0.0/serilog.extensions.logging.nuspec"
+  },
+  {
+    "file": "NuGet-258255ab6f51a75b.nuspec",
+    "originalPackagePath": "serilog.extensions.hosting/10.0.0/serilog.extensions.hosting.nuspec"
+  },
+  {
+    "file": "NuGet-90015bf6ce8ccdfe.nuspec",
+    "originalPackagePath": "serilog.aspnetcore/10.0.0/serilog.aspnetcore.nuspec"
+  },
+  {
+    "file": "NuGet-f9365752f6bf61fb.nuspec",
+    "originalPackagePath": "serilog/4.0.0/serilog.nuspec"
+  },
+  {
+    "file": "NuGet-375bf5afb74f0669.nuspec",
+    "originalPackagePath": "serilog/4.2.0/serilog.nuspec"
+  },
+  {
+    "file": "NuGet-bfdbfc1356dab438.nuspec",
+    "originalPackagePath": "serilog/4.3.0/serilog.nuspec"
+  },
+  {
+    "file": "NuGet-47103faebec1e8d8.nuspec",
+    "originalPackagePath": "runtime.osx-x64.runtime.native.system.io.ports/10.0.0/runtime.osx-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-3dfdfe0e2443e263.nuspec",
+    "originalPackagePath": "runtime.osx-x64.runtime.native.system.io.ports/10.0.15/runtime.osx-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-a6af6043be767721.nuspec",
+    "originalPackagePath": "runtime.osx-arm64.runtime.native.system.io.ports/10.0.0/runtime.osx-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-dd75d88b44fe9e2c.nuspec",
+    "originalPackagePath": "runtime.osx-arm64.runtime.native.system.io.ports/10.0.15/runtime.osx-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-7e91bf698183242c.nuspec",
+    "originalPackagePath": "runtime.native.system.io.ports/10.0.0/runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-9af762f4f918b707.nuspec",
+    "originalPackagePath": "runtime.native.system.io.ports/10.0.15/runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-2c435abdcd04b6ab.nuspec",
+    "originalPackagePath": "runtime.maccatalyst-x64.runtime.native.system.io.ports/10.0.0/runtime.maccatalyst-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-deec8a954c41a9a3.nuspec",
+    "originalPackagePath": "runtime.maccatalyst-x64.runtime.native.system.io.ports/10.0.15/runtime.maccatalyst-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-9cdfde8f4688f64f.nuspec",
+    "originalPackagePath": "runtime.maccatalyst-arm64.runtime.native.system.io.ports/10.0.0/runtime.maccatalyst-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-308f83ec16061734.nuspec",
+    "originalPackagePath": "runtime.maccatalyst-arm64.runtime.native.system.io.ports/10.0.15/runtime.maccatalyst-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-e3eb2cacafe05b4f.nuspec",
+    "originalPackagePath": "runtime.linux-x64.runtime.native.system.io.ports/10.0.0/runtime.linux-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-8315a58a250cb875.nuspec",
+    "originalPackagePath": "runtime.linux-x64.runtime.native.system.io.ports/10.0.15/runtime.linux-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-4bcabe9d8f64b66c.nuspec",
+    "originalPackagePath": "runtime.linux-musl-x64.runtime.native.system.io.ports/10.0.0/runtime.linux-musl-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-7c6187dadabac161.nuspec",
+    "originalPackagePath": "runtime.linux-musl-x64.runtime.native.system.io.ports/10.0.15/runtime.linux-musl-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-3aec89b444397849.nuspec",
+    "originalPackagePath": "runtime.linux-musl-arm64.runtime.native.system.io.ports/10.0.0/runtime.linux-musl-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-b88da53a97af8fec.nuspec",
+    "originalPackagePath": "runtime.linux-musl-arm64.runtime.native.system.io.ports/10.0.15/runtime.linux-musl-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-a8a85f3526eb30a5.nuspec",
+    "originalPackagePath": "runtime.linux-musl-arm.runtime.native.system.io.ports/10.0.0/runtime.linux-musl-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-1f416a5002952ad9.nuspec",
+    "originalPackagePath": "runtime.linux-musl-arm.runtime.native.system.io.ports/10.0.15/runtime.linux-musl-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-67a6fb2aaa353835.nuspec",
+    "originalPackagePath": "runtime.linux-bionic-x64.runtime.native.system.io.ports/10.0.0/runtime.linux-bionic-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-d5e26b91f312620e.nuspec",
+    "originalPackagePath": "runtime.linux-bionic-x64.runtime.native.system.io.ports/10.0.15/runtime.linux-bionic-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-69f814e068b9bc2c.nuspec",
+    "originalPackagePath": "runtime.linux-bionic-arm64.runtime.native.system.io.ports/10.0.0/runtime.linux-bionic-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-52e9590d812f1e82.nuspec",
+    "originalPackagePath": "runtime.linux-bionic-arm64.runtime.native.system.io.ports/10.0.15/runtime.linux-bionic-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-4358cf74c138ad40.nuspec",
+    "originalPackagePath": "runtime.linux-arm64.runtime.native.system.io.ports/10.0.0/runtime.linux-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-d402b12144f2f9e9.nuspec",
+    "originalPackagePath": "runtime.linux-arm64.runtime.native.system.io.ports/10.0.15/runtime.linux-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-149d2c1e6c8adfa5.nuspec",
+    "originalPackagePath": "runtime.linux-arm.runtime.native.system.io.ports/10.0.0/runtime.linux-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-e9da09293fc96fd2.nuspec",
+    "originalPackagePath": "runtime.linux-arm.runtime.native.system.io.ports/10.0.15/runtime.linux-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-5f23dd1a8cb48da6.nuspec",
+    "originalPackagePath": "runtime.android-x86.runtime.native.system.io.ports/10.0.0/runtime.android-x86.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-55a4ec825490d81d.nuspec",
+    "originalPackagePath": "runtime.android-x86.runtime.native.system.io.ports/10.0.15/runtime.android-x86.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-9b09695c6385ae13.nuspec",
+    "originalPackagePath": "runtime.android-x64.runtime.native.system.io.ports/10.0.0/runtime.android-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-2b756f020b6171d5.nuspec",
+    "originalPackagePath": "runtime.android-x64.runtime.native.system.io.ports/10.0.15/runtime.android-x64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-20582a9dc9d09983.nuspec",
+    "originalPackagePath": "runtime.android-arm64.runtime.native.system.io.ports/10.0.0/runtime.android-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-1b229969bc822401.nuspec",
+    "originalPackagePath": "runtime.android-arm64.runtime.native.system.io.ports/10.0.15/runtime.android-arm64.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-e28569590e5332eb.nuspec",
+    "originalPackagePath": "runtime.android-arm.runtime.native.system.io.ports/10.0.0/runtime.android-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-4c23f2b12b9e0b0b.nuspec",
+    "originalPackagePath": "runtime.android-arm.runtime.native.system.io.ports/10.0.15/runtime.android-arm.runtime.native.system.io.ports.nuspec"
+  },
+  {
+    "file": "NuGet-4c715e67ffea0770.nuspec",
+    "originalPackagePath": "npgsql.entityframeworkcore.postgresql/10.0.0/npgsql.entityframeworkcore.postgresql.nuspec"
+  },
+  {
+    "file": "NuGet-c8610162c999caac.nuspec",
+    "originalPackagePath": "npgsql.entityframeworkcore.postgresql/10.0.3/npgsql.entityframeworkcore.postgresql.nuspec"
+  },
+  {
+    "file": "NuGet-29f7e993d9c2650a.nuspec",
+    "originalPackagePath": "npgsql/10.0.0/npgsql.nuspec"
+  },
+  {
+    "file": "NuGet-f0cb54963f482f77.nuspec",
+    "originalPackagePath": "npgsql/10.0.3/npgsql.nuspec"
+  },
+  {
+    "file": "NuGet-19c5de6259257e9f.md",
+    "originalPackagePath": "newtonsoft.json/13.0.3/LICENSE.md"
+  },
+  {
+    "file": "NuGet-c97c0624f7708da1.nuspec",
+    "originalPackagePath": "newtonsoft.json/13.0.3/newtonsoft.json.nuspec"
+  },
+  {
+    "file": "NuGet-c9ded3b6b8b4c72f.md",
+    "originalPackagePath": "newtonsoft.json/13.0.4/LICENSE.md"
+  },
+  {
+    "file": "NuGet-6469b2f5aa16e997.nuspec",
+    "originalPackagePath": "newtonsoft.json/13.0.4/newtonsoft.json.nuspec"
+  },
+  {
+    "file": "NuGet-639599b89b2bbfbc.nuspec",
+    "originalPackagePath": "mono.texttemplating/3.0.0/mono.texttemplating.nuspec"
+  },
+  {
+    "file": "NuGet-a76d688745dab67c",
+    "originalPackagePath": "microsoft.windowsdesktop.app.runtime.win-x64/10.0.15/LICENSE"
+  },
+  {
+    "file": "NuGet-b30f30c182ab8d0b.nuspec",
+    "originalPackagePath": "microsoft.windowsdesktop.app.runtime.win-x64/10.0.15/microsoft.windowsdesktop.app.runtime.win-x64.nuspec"
+  },
+  {
+    "file": "NuGet-d7d5c8a36f52b8f7.nuspec",
+    "originalPackagePath": "microsoft.visualstudio.solutionpersistence/1.0.52/microsoft.visualstudio.solutionpersistence.nuspec"
+  },
+  {
+    "file": "NuGet-08ba00da7ee4308c",
+    "originalPackagePath": "microsoft.visualstudio.solutionpersistence/1.0.52/NOTICE"
+  },
+  {
+    "file": "NuGet-643f41f986d65fa6.nuspec",
+    "originalPackagePath": "microsoft.testplatform.testhost/17.14.1/microsoft.testplatform.testhost.nuspec"
+  },
+  {
+    "file": "NuGet-dfc92b28cc146ab5.nuspec",
+    "originalPackagePath": "microsoft.testplatform.objectmodel/17.14.1/microsoft.testplatform.objectmodel.nuspec"
+  },
+  {
+    "file": "NuGet-a6785e8e93c87b65.nuspec",
+    "originalPackagePath": "microsoft.openapi/2.0.0/microsoft.openapi.nuspec"
+  },
+  {
+    "file": "NuGet-d383a915d10164c0.nuspec",
+    "originalPackagePath": "microsoft.openapi/2.13.0/microsoft.openapi.nuspec"
+  },
+  {
+    "file": "NuGet-4ff7dd338e47ffc5.TXT",
+    "originalPackagePath": "microsoft.netcore.app.runtime.win-x64/10.0.15/LICENSE.TXT"
+  },
+  {
+    "file": "NuGet-a538b20f8516ad90.nuspec",
+    "originalPackagePath": "microsoft.netcore.app.runtime.win-x64/10.0.15/microsoft.netcore.app.runtime.win-x64.nuspec"
+  },
+  {
+    "file": "NuGet-c61f489f88dfb9b4.nuspec",
+    "originalPackagePath": "microsoft.net.test.sdk/17.14.1/microsoft.net.test.sdk.nuspec"
+  },
+  {
+    "file": "NuGet-c5a8f9e663eec089.nuspec",
+    "originalPackagePath": "microsoft.net.illink.tasks/10.0.15/microsoft.net.illink.tasks.nuspec"
+  },
+  {
+    "file": "NuGet-0276b4483520ce73.nuspec",
+    "originalPackagePath": "microsoft.extensions.primitives/10.0.0/microsoft.extensions.primitives.nuspec"
+  },
+  {
+    "file": "NuGet-773633566e29ba5d.nuspec",
+    "originalPackagePath": "microsoft.extensions.primitives/10.0.15/microsoft.extensions.primitives.nuspec"
+  },
+  {
+    "file": "NuGet-d837bffd4609f93a.nuspec",
+    "originalPackagePath": "microsoft.extensions.primitives/10.0.4/microsoft.extensions.primitives.nuspec"
+  },
+  {
+    "file": "NuGet-8294e9d724ff0de5.nuspec",
+    "originalPackagePath": "microsoft.extensions.options.configurationextensions/10.0.15/microsoft.extensions.options.configurationextensions.nuspec"
+  },
+  {
+    "file": "NuGet-44e5247fca1b1f5b.nuspec",
+    "originalPackagePath": "microsoft.extensions.options/10.0.0/microsoft.extensions.options.nuspec"
+  },
+  {
+    "file": "NuGet-70f9a201d025e480.nuspec",
+    "originalPackagePath": "microsoft.extensions.options/10.0.15/microsoft.extensions.options.nuspec"
+  },
+  {
+    "file": "NuGet-1cde2b4655499871.nuspec",
+    "originalPackagePath": "microsoft.extensions.options/10.0.4/microsoft.extensions.options.nuspec"
+  },
+  {
+    "file": "NuGet-f2bd504291fd3741.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.eventsource/10.0.15/microsoft.extensions.logging.eventsource.nuspec"
+  },
+  {
+    "file": "NuGet-619a6fc18b3e8707.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.eventlog/10.0.0/microsoft.extensions.logging.eventlog.nuspec"
+  },
+  {
+    "file": "NuGet-2b7843ca56f63c4f.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.eventlog/10.0.15/microsoft.extensions.logging.eventlog.nuspec"
+  },
+  {
+    "file": "NuGet-f5072eb6df6a72cf.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.debug/10.0.15/microsoft.extensions.logging.debug.nuspec"
+  },
+  {
+    "file": "NuGet-d82a270172ed7b38.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.console/10.0.15/microsoft.extensions.logging.console.nuspec"
+  },
+  {
+    "file": "NuGet-40f1acc440cd5796.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.configuration/10.0.15/microsoft.extensions.logging.configuration.nuspec"
+  },
+  {
+    "file": "NuGet-7182d337bce13bb7.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.abstractions/10.0.0/microsoft.extensions.logging.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-327735f0eedb8232.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.abstractions/10.0.15/microsoft.extensions.logging.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-6564448c182ac300.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging.abstractions/10.0.4/microsoft.extensions.logging.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-8f4347b373dbcc76.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging/10.0.0/microsoft.extensions.logging.nuspec"
+  },
+  {
+    "file": "NuGet-2409e8783606bb2a.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging/10.0.15/microsoft.extensions.logging.nuspec"
+  },
+  {
+    "file": "NuGet-9d1f8cf288dfc453.nuspec",
+    "originalPackagePath": "microsoft.extensions.logging/10.0.4/microsoft.extensions.logging.nuspec"
+  },
+  {
+    "file": "NuGet-492c6d42ad28d2f3.nuspec",
+    "originalPackagePath": "microsoft.extensions.identity.stores/10.0.0/microsoft.extensions.identity.stores.nuspec"
+  },
+  {
+    "file": "NuGet-96098013d20ff6fd.nuspec",
+    "originalPackagePath": "microsoft.extensions.identity.stores/10.0.15/microsoft.extensions.identity.stores.nuspec"
+  },
+  {
+    "file": "NuGet-81092ba170ce7e15.nuspec",
+    "originalPackagePath": "microsoft.extensions.identity.core/10.0.0/microsoft.extensions.identity.core.nuspec"
+  },
+  {
+    "file": "NuGet-656ad7b466da38d3.nuspec",
+    "originalPackagePath": "microsoft.extensions.identity.core/10.0.15/microsoft.extensions.identity.core.nuspec"
+  },
+  {
+    "file": "NuGet-c1a2968c1d4d6b05.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting.windowsservices/10.0.0/microsoft.extensions.hosting.windowsservices.nuspec"
+  },
+  {
+    "file": "NuGet-cfec18e44e89f686.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting.windowsservices/10.0.15/microsoft.extensions.hosting.windowsservices.nuspec"
+  },
+  {
+    "file": "NuGet-e45ab7a5d40fbf36.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting.abstractions/10.0.0/microsoft.extensions.hosting.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-29c3d20800882028.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting.abstractions/10.0.15/microsoft.extensions.hosting.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-a40fa2d6894cffd3.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting/10.0.0/microsoft.extensions.hosting.nuspec"
+  },
+  {
+    "file": "NuGet-dd278a77f1ca056e.nuspec",
+    "originalPackagePath": "microsoft.extensions.hosting/10.0.15/microsoft.extensions.hosting.nuspec"
+  },
+  {
+    "file": "NuGet-ebefbf357229a176.nuspec",
+    "originalPackagePath": "microsoft.extensions.filesystemglobbing/10.0.15/microsoft.extensions.filesystemglobbing.nuspec"
+  },
+  {
+    "file": "NuGet-984e1ff1e845ce0e.nuspec",
+    "originalPackagePath": "microsoft.extensions.fileproviders.physical/10.0.15/microsoft.extensions.fileproviders.physical.nuspec"
+  },
+  {
+    "file": "NuGet-86c44065e4cb07d0.nuspec",
+    "originalPackagePath": "microsoft.extensions.fileproviders.abstractions/10.0.15/microsoft.extensions.fileproviders.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-4bd5e7e09d40a60e.nuspec",
+    "originalPackagePath": "microsoft.extensions.diagnostics.abstractions/10.0.15/microsoft.extensions.diagnostics.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-93e4ed3f3aca8428.nuspec",
+    "originalPackagePath": "microsoft.extensions.diagnostics/10.0.15/microsoft.extensions.diagnostics.nuspec"
+  },
+  {
+    "file": "NuGet-9277642f634d780d.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencymodel/10.0.0/microsoft.extensions.dependencymodel.nuspec"
+  },
+  {
+    "file": "NuGet-70eb4220233fa0fe.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencymodel/10.0.15/microsoft.extensions.dependencymodel.nuspec"
+  },
+  {
+    "file": "NuGet-5dff6983f185454c.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection.abstractions/10.0.0/microsoft.extensions.dependencyinjection.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-4e426ea49e05d301.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection.abstractions/10.0.15/microsoft.extensions.dependencyinjection.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-cc6b8ca2ef336557.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection.abstractions/10.0.4/microsoft.extensions.dependencyinjection.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-68993e7fc4be7c01.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection/10.0.0/microsoft.extensions.dependencyinjection.nuspec"
+  },
+  {
+    "file": "NuGet-44bafb4726af194f.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection/10.0.15/microsoft.extensions.dependencyinjection.nuspec"
+  },
+  {
+    "file": "NuGet-0b18c9976d7036bd.nuspec",
+    "originalPackagePath": "microsoft.extensions.dependencyinjection/10.0.4/microsoft.extensions.dependencyinjection.nuspec"
+  },
+  {
+    "file": "NuGet-995713f7b3eebccb.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.usersecrets/10.0.15/microsoft.extensions.configuration.usersecrets.nuspec"
+  },
+  {
+    "file": "NuGet-4fbc051d3e92d94b.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.json/10.0.15/microsoft.extensions.configuration.json.nuspec"
+  },
+  {
+    "file": "NuGet-cf1e7240900e29aa.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.fileextensions/10.0.15/microsoft.extensions.configuration.fileextensions.nuspec"
+  },
+  {
+    "file": "NuGet-ef73f6b7abf6f479.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.environmentvariables/10.0.15/microsoft.extensions.configuration.environmentvariables.nuspec"
+  },
+  {
+    "file": "NuGet-7b0c502b7f26c2c8.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.commandline/10.0.15/microsoft.extensions.configuration.commandline.nuspec"
+  },
+  {
+    "file": "NuGet-ef2b6284f58d631b.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.binder/10.0.0/microsoft.extensions.configuration.binder.nuspec"
+  },
+  {
+    "file": "NuGet-1261d2a7b0f9aff8.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.binder/10.0.15/microsoft.extensions.configuration.binder.nuspec"
+  },
+  {
+    "file": "NuGet-53b33620c1ba323f.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.abstractions/10.0.0/microsoft.extensions.configuration.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-aad6b0766732da69.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.abstractions/10.0.15/microsoft.extensions.configuration.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-de7c40a821b0c697.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration.abstractions/10.0.4/microsoft.extensions.configuration.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-43acd8cfda38c4c6.nuspec",
+    "originalPackagePath": "microsoft.extensions.configuration/10.0.15/microsoft.extensions.configuration.nuspec"
+  },
+  {
+    "file": "NuGet-ca1d31661fddda67.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.memory/10.0.0/microsoft.extensions.caching.memory.nuspec"
+  },
+  {
+    "file": "NuGet-b4ef4c0299f264be.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.memory/10.0.15/microsoft.extensions.caching.memory.nuspec"
+  },
+  {
+    "file": "NuGet-45895db36130a51f.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.memory/10.0.4/microsoft.extensions.caching.memory.nuspec"
+  },
+  {
+    "file": "NuGet-3ee43eeb89c2dec7.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.abstractions/10.0.0/microsoft.extensions.caching.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-689947cf05aac746.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.abstractions/10.0.15/microsoft.extensions.caching.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-a2e3749c95b95553.nuspec",
+    "originalPackagePath": "microsoft.extensions.caching.abstractions/10.0.4/microsoft.extensions.caching.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-1bbc9290e8037951.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.relational/10.0.0/microsoft.entityframeworkcore.relational.nuspec"
+  },
+  {
+    "file": "NuGet-b91a5462d0b05a35.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.relational/10.0.15/microsoft.entityframeworkcore.relational.nuspec"
+  },
+  {
+    "file": "NuGet-ecec17b63b31e1b6.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.relational/10.0.4/microsoft.entityframeworkcore.relational.nuspec"
+  },
+  {
+    "file": "NuGet-a147df0c0eaf2f50.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.design/10.0.15/microsoft.entityframeworkcore.design.nuspec"
+  },
+  {
+    "file": "NuGet-0949b34166a426c8.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.analyzers/10.0.0/microsoft.entityframeworkcore.analyzers.nuspec"
+  },
+  {
+    "file": "NuGet-d4c6b8a446132fb4.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.analyzers/10.0.15/microsoft.entityframeworkcore.analyzers.nuspec"
+  },
+  {
+    "file": "NuGet-e2ad7db957fe2255.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.analyzers/10.0.4/microsoft.entityframeworkcore.analyzers.nuspec"
+  },
+  {
+    "file": "NuGet-4d126129d31af683.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.abstractions/10.0.0/microsoft.entityframeworkcore.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-0ccb4d97ff796992.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.abstractions/10.0.15/microsoft.entityframeworkcore.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-b81e5689d34a23de.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore.abstractions/10.0.4/microsoft.entityframeworkcore.abstractions.nuspec"
+  },
+  {
+    "file": "NuGet-01b1a21b9e5fa88f.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore/10.0.0/microsoft.entityframeworkcore.nuspec"
+  },
+  {
+    "file": "NuGet-d4d8cee56c62c4a9.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore/10.0.15/microsoft.entityframeworkcore.nuspec"
+  },
+  {
+    "file": "NuGet-f2be781a9bd4915b.nuspec",
+    "originalPackagePath": "microsoft.entityframeworkcore/10.0.4/microsoft.entityframeworkcore.nuspec"
+  },
+  {
+    "file": "NuGet-262f0734b48ce6e6.nuspec",
+    "originalPackagePath": "microsoft.codecoverage/17.14.1/microsoft.codecoverage.nuspec"
+  },
+  {
+    "file": "NuGet-ee62bc90edc701c3.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.workspaces.msbuild/5.0.0/microsoft.codeanalysis.workspaces.msbuild.nuspec"
+  },
+  {
+    "file": "NuGet-7b64a2fdc91c21da.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.workspaces.common/5.0.0/microsoft.codeanalysis.workspaces.common.nuspec"
+  },
+  {
+    "file": "NuGet-7f86a9ad214821be.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.csharp.workspaces/5.0.0/microsoft.codeanalysis.csharp.workspaces.nuspec"
+  },
+  {
+    "file": "NuGet-95dde3074c2ab61e.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.csharp/5.0.0/microsoft.codeanalysis.csharp.nuspec"
+  },
+  {
+    "file": "NuGet-ac170b0422b3b8c3.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.common/5.0.0/microsoft.codeanalysis.common.nuspec"
+  },
+  {
+    "file": "NuGet-0a3aae8f6f3235bb.nuspec",
+    "originalPackagePath": "microsoft.codeanalysis.analyzers/3.11.0/microsoft.codeanalysis.analyzers.nuspec"
+  },
+  {
+    "file": "NuGet-ea4a094a1aa6d4d6.nuspec",
+    "originalPackagePath": "microsoft.build.framework/17.11.31/microsoft.build.framework.nuspec"
+  },
+  {
+    "file": "NuGet-6df0ad97482129d0.nuspec",
+    "originalPackagePath": "microsoft.build.framework/18.0.2/microsoft.build.framework.nuspec"
+  },
+  {
+    "file": "NuGet-09f91a49bf8e77a0.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.testhost/10.0.15/microsoft.aspnetcore.testhost.nuspec"
+  },
+  {
+    "file": "NuGet-f207837ba32a446d.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.openapi/10.0.0/microsoft.aspnetcore.openapi.nuspec"
+  },
+  {
+    "file": "NuGet-69c1c7bc06711b00.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.openapi/10.0.15/microsoft.aspnetcore.openapi.nuspec"
+  },
+  {
+    "file": "NuGet-5ec719c04d5a6975.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.mvc.testing/10.0.15/microsoft.aspnetcore.mvc.testing.nuspec"
+  },
+  {
+    "file": "NuGet-e1f9f3e7fa739304.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.nuspec"
+  },
+  {
+    "file": "NuGet-998b2589b4ada2c4.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.15/microsoft.aspnetcore.identity.entityframeworkcore.nuspec"
+  },
+  {
+    "file": "NuGet-872b4a1c78b5f692.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.cryptography.keyderivation/10.0.0/microsoft.aspnetcore.cryptography.keyderivation.nuspec"
+  },
+  {
+    "file": "NuGet-7f848a5ef38e8f3c.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.cryptography.keyderivation/10.0.15/microsoft.aspnetcore.cryptography.keyderivation.nuspec"
+  },
+  {
+    "file": "NuGet-81f6ca86ec2c0f2d.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.cryptography.internal/10.0.0/microsoft.aspnetcore.cryptography.internal.nuspec"
+  },
+  {
+    "file": "NuGet-b47c52502befdc04.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.cryptography.internal/10.0.15/microsoft.aspnetcore.cryptography.internal.nuspec"
+  },
+  {
+    "file": "NuGet-7cd0c1e862130590.txt",
+    "originalPackagePath": "microsoft.aspnetcore.app.runtime.win-x64/10.0.15/LICENSE.txt"
+  },
+  {
+    "file": "NuGet-631c9b019322f0d4.nuspec",
+    "originalPackagePath": "microsoft.aspnetcore.app.runtime.win-x64/10.0.15/microsoft.aspnetcore.app.runtime.win-x64.nuspec"
+  },
+  {
+    "file": "NuGet-451bf6ff32a79c65.nuspec",
+    "originalPackagePath": "humanizer.core/2.14.1/humanizer.core.nuspec"
+  }
+]

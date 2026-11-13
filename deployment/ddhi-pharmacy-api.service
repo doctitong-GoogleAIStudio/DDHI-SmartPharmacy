@@ -1,0 +1,18 @@
+[Unit]
+Description=DDHI Pharmacy API
+After=network-online.target postgresql.service
+[Service]
+User=ddhi-pharmacy
+Group=ddhi-pharmacy
+WorkingDirectory=/opt/ddhi-pharmacy/Api
+ExecStart=/opt/ddhi-pharmacy/Api/DDHI.Pharmacy.Api
+Environment=DDHI_CONFIG_FILE=/etc/ddhi-pharmacy/server.json
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ddhi-pharmacy /var/log/ddhi-pharmacy
+UMask=0077
+[Install]
+WantedBy=multi-user.target

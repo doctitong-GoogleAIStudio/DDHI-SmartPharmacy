@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "ddhi.pharmacy.barcode": {
+        "type": "Project"
+      },
+      "ddhi.pharmacy.contracts": {
+        "type": "Project"
+      },
+      "ddhi.pharmacy.domain": {
+        "type": "Project"
+      },
+      "ddhi.pharmacy.integration": {
+        "type": "Project",
+        "dependencies": {
+          "DDHI.Pharmacy.Contracts": "[0.1.0, )"
+        }
+      }
+    },
+    "net10.0/win-x64": {}
+  }
+}

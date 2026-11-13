@@ -1,0 +1,1 @@
+Automated software coverage is in ../UnitTests and ../IntegrationTests. Packaging extraction smoke tests are recorded in release/Tests. Clean-machine installation, upgrade, uninstall and Windows Server service lifecycle acceptance are pending.

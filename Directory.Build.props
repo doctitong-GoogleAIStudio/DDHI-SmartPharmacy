@@ -1,0 +1,1 @@
+<Project><PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><Version>0.1.0</Version><Authors>Vicente C. Cavalida Jr. MD</Authors><Company>Digos Doctors Hospital, Inc.</Company><Copyright>Copyright © 2026 Digos Doctors Hospital, Inc.</Copyright><Deterministic>true</Deterministic></PropertyGroup></Project>
