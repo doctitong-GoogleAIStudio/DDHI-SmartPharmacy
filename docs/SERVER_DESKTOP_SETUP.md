@@ -13,6 +13,14 @@ Use the dedicated destination Windows Server with Desktop Experience. MSI is pre
 
 For multiple workstations hospital IT must approve the DNS hostname and provide a matching PFX trusted on the server and workstations. Select Hospital LAN during initial setup and enter the approval reference, PFX path and password locally. The application cannot invent IT approval or issue a hospital CA identity. IT must configure DNS, firewall scope and certificate trust. Live Cerebro stays disabled.
 
+## Upgrade an existing localhost instance to Server Control 0.3.0
+
+Back up the database and protected recovery material, record the original data location, arrange downtime, stop the old server and close its manager. Install version 0.3.0 over the same installation path using the same Windows setup account; do not uninstall or delete data. The installer validates ownership and waits for owned services to stop. Open the prepared instance; use Open existing server profile for an original custom data folder if needed.
+
+In LAN connection enter the approved full DNS hostname (no scheme/port), matching trusted PFX, its password locally and the IT approval reference. Click Apply LAN connection and start server. DNS must resolve only to this server's LAN interfaces. The manager preserves the database, users and credential store, backs up connection settings, validates the certificate, changes the HTTPS listener and verifies startup. Failed activation attempts automatic rollback; Restore previous connection provides persisted recovery for an interrupted change. The configuration snapshots are not database backups. No DNS, firewall or trust-store changes are made automatically. Test the copied base endpoint and /health from every workstation. See SERVER_CLIENT_CONNECTION_GUIDE.md for the complete procedure.
+
+The Connection guide tab gives separate server/client instructions inside Server Control. Open complete connection guide (PDF) opens the bundled nine-page manual. The same PDF is available in the installed Documentation folder and release Documentation folder.
+
 ## Storage and recovery
 
 Keep live data outside installation binaries and source/release archives. Choose an IT-approved persistent volume. Credentials are bound to Windows protection scopes; do not deploy by copying runtime directories between machines. Use approved encrypted PostgreSQL backups and a tested recovery procedure.

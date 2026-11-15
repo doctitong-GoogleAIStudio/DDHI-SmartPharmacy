@@ -38,7 +38,8 @@ public sealed partial class ServerController(ServerProfile profile,Action<string
    if(Directory.Exists(PgData)&&Directory.EnumerateFileSystemEntries(PgData).Any())throw new InvalidOperationException("Nonempty database directory detected; initialization refused.");
    log("Initializing an independent PostgreSQL cluster with SCRAM authentication and data checksums…");
    var passwordFile=Path.Combine(profile.DataRoot,"init-password.tmp");await File.WriteAllTextAsync(passwordFile,secrets.OwnerPassword,new UTF8Encoding(false));
-   try{await Run(Path.Combine(profile.PostgresBin,"initdb.exe"),["-D",PgData,"-U","ddhi_owner","--pwfile",passwordFile,"--auth-local=scram-sha-256","--auth-host=scram-sha-256","--encoding=UTF8","--locale=C","--data-checksums"]);}finally{if(File.Exists(passwordFile))File.Delete(passwordFile);}
+   var initArguments=new List<string>{"-D",PgData,"-U","ddhi_owner","--pwfile",passwordFile,"--auth-local=scram-sha-256","--auth-host=scram-sha-256","--encoding=UTF8","--locale=C","--data-checksums"};if(TestSkipDatabaseSync)initArguments.AddRange(["--no-sync","-c","max_connections=20","-c","shared_buffers=16MB"]);
+   try{await Run(Path.Combine(profile.PostgresBin,"initdb.exe"),initArguments);}finally{if(File.Exists(passwordFile))File.Delete(passwordFile);}
   }
   await StartPostgres();
   await using(var owner=new NpgsqlConnection(Connection("ddhi_owner",secrets.OwnerPassword,"postgres"))){
@@ -57,7 +58,7 @@ public sealed partial class ServerController(ServerProfile profile,Action<string
    }
    log("Created an encrypted localhost PFX. No Windows trust-store changes were made.");
   } else {
-   if(!File.Exists(profile.CertificatePath))throw new FileNotFoundException("Select the hospital-issued PFX.");using var source=X509CertificateLoader.LoadPkcs12FromFile(profile.CertificatePath,suppliedPfxPassword,X509KeyStorageFlags.EphemeralKeySet);
+   if(!File.Exists(profile.CertificatePath))throw new FileNotFoundException("Select the hospital-issued PFX.");using var source=X509CertificateLoader.LoadPkcs12FromFile(profile.CertificatePath,suppliedPfxPassword,X509KeyStorageFlags.EphemeralKeySet|X509KeyStorageFlags.Exportable);
    if(!source.HasPrivateKey||!source.MatchesHostname(profile.Hostname)||source.NotAfter.ToUniversalTime()<=DateTime.UtcNow)throw new InvalidOperationException("PFX must contain a private key, be valid, and match the approved hostname.");using var chain=new X509Chain();if(!chain.Build(source))throw new InvalidOperationException("The hospital certificate chain is not trusted on this computer. Hospital IT must establish trust before LAN configuration.");
    var destination=Path.Combine(profile.DataRoot,"hospital-server.pfx");await File.WriteAllBytesAsync(destination,source.Export(X509ContentType.Pfx,secrets.CertificatePassword));profile.CertificatePath=destination;
   }
@@ -79,7 +80,16 @@ public sealed partial class ServerController(ServerProfile profile,Action<string
   info.RedirectStandardOutput=false;info.RedirectStandardError=false;var process=Process.Start(info)??throw new InvalidOperationException("Could not start server component.");File.WriteAllText(ProcessFile(name),JsonSerializer.Serialize(new ProcessRecord(process.Id,process.StartTime.ToUniversalTime().Ticks,exe)));log(name+" started.");
  }
  public async Task Start(){if(profile.ServicesConfigured){await StartWindowsServices();return;}if(!profile.Prepared)throw new InvalidOperationException("Complete initial setup first.");await StartPostgres();var secrets=ServerSecrets.Load(profile.DataRoot);var env=EnvironmentFor(Connection("ddhi_runtime",secrets.RuntimePassword),secrets);Launch("api",ApiExe,env);Launch("worker",Path.Combine(profile.ServerRoot,"Worker","DDHI.Pharmacy.Worker.exe"),env);}
- public async Task<string> Health(){if(!profile.Prepared)return "Not configured";using var handler=new HttpClientHandler();if(profile.Mode=="Local evaluation")handler.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>request.RequestUri?.IsLoopback==true&&certificate!=null&&certificate.Thumbprint==profile.CertificateThumbprint;using var client=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(5)};var response=await client.GetAsync(profile.Endpoint+"/health");response.EnsureSuccessStatusCode();var json=JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());return json.GetProperty("status").GetString()=="ready"?"Running • database ready":"Database unavailable";}
+ public async Task<string> Health(){
+  if(!profile.Prepared)return "Not configured";
+  HttpMessageHandler handler;
+  if(TestHealthHandlerFactory!=null)handler=TestHealthHandlerFactory();
+  else {var standard=new HttpClientHandler();if(profile.Mode=="Local evaluation")standard.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>request.RequestUri?.IsLoopback==true&&certificate!=null&&certificate.Thumbprint==profile.CertificateThumbprint;else standard.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>errors==SslPolicyErrors.None&&certificate!=null&&certificate.Thumbprint==profile.CertificateThumbprint;handler=standard;}
+  using var client=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(5)};
+  using var response=await client.GetAsync(profile.Endpoint+"/health");response.EnsureSuccessStatusCode();
+  var json=JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
+  return json.GetProperty("status").GetString()=="ready"?"Running • database ready":"Database unavailable";
+ }
  public async Task Bootstrap(string email,string password){if(!profile.Prepared)throw new InvalidOperationException("Set up the database first.");var secrets=ServerSecrets.Load(profile.DataRoot);var env=EnvironmentFor(Connection("ddhi_runtime",secrets.RuntimePassword),secrets);env["DDHI_BOOTSTRAP_EMAIL"]=email;env["DDHI_BOOTSTRAP_PASSWORD"]=password;await Run(ApiExe,["--bootstrap"],env);log("First application administrator created. No password was written to the configuration.");}
  public async Task Stop(){if(profile.ServicesConfigured){await StopWindowsServices();return;}foreach(var name in new[]{"worker","api"}){if(!IsRunning(name))continue;var record=JsonSerializer.Deserialize<ProcessRecord>(File.ReadAllText(ProcessFile(name)))!;using var p=Process.GetProcessById(record.Id);p.Kill(true);await p.WaitForExitAsync();log(name+" stopped.");}if(File.Exists(Path.Combine(PgData,"PG_VERSION")))await Run(Path.Combine(profile.PostgresBin,"pg_ctl.exe"),["-D",PgData,"-m","fast","-w","-t","60","stop"],allowFailure:true);}
  public async Task<string> VerifyDatabase(){var secrets=ServerSecrets.Load(profile.DataRoot);await using var con=new NpgsqlConnection(Connection("ddhi_runtime",secrets.RuntimePassword));await con.OpenAsync();var count=Convert.ToInt32(await new NpgsqlCommand("SELECT count(*) FROM \"Medicines\"",con).ExecuteScalarAsync());return $"Connected to ddhi_pharmacy as ddhi_runtime • {count} medicines";}

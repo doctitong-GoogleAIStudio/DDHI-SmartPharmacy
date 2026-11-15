@@ -1,7 +1,7 @@
 [Setup]
 AppId={{C477C2FA-2E3B-4310-A7D2-5B6C4020F286}
 AppName=DDHI Smart Pharmacy Server
-AppVersion=0.2.0
+AppVersion=0.3.0
 AppPublisher=Digos Doctors Hospital, Inc.
 DefaultDirName={autopf}\DDHI-SmartPharmacy-Server
 PrivilegesRequired=admin
@@ -18,7 +18,10 @@ WizardSmallImageFile=..\assets\branding\installer-small.bmp
 LicenseFile=..\LICENSE.txt
 Compression=lzma2/fast
 SolidCompression=yes
+CloseApplications=yes
+RestartApplications=no
 [Files]
+Source: "..\deployment\Stop-ServerForMaintenance.ps1"; Flags: dontcopy
 Source: "..\release\Server\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\release\Database\*"; DestDir: "{app}\Database"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\release\Documentation\*"; DestDir: "{app}\Documentation"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -35,41 +38,34 @@ begin
  Result := ExpandConstant('{param:EXTRACTONLY|0}') = '1';
 end;
 
-function OwnPostgreSQLService: Boolean;
-var ImagePath: String;
+function RunMaintenance(ScriptPath: String; RemoveServices: Boolean): Boolean;
+var Code: Integer; Arguments: String;
 begin
-  Result := False;
-  if RegQueryStringValue(HKLM, 'SYSTEM\CurrentControlSet\Services\DDHIPostgreSQL', 'ImagePath', ImagePath) then
-    Result := Pos(Lowercase(ExpandConstant('{app}\PostgreSQL\bin\pg_ctl.exe')), Lowercase(ImagePath)) > 0;
+  Arguments := '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + ScriptPath + '" -InstallRoot "' + ExpandConstant('{app}') + '"';
+  if RemoveServices then Arguments := Arguments + ' -RemoveServices';
+  Result := Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), Arguments, '', SW_HIDE, ewWaitUntilTerminated, Code);
+  if Result then Result := Code = 0;
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var Code: Integer;
 begin
   if ExtractOnlyCheck then begin Result := ''; exit; end;
   if not FileExists(ExpandConstant('{sys}\vcruntime140.dll')) then begin
     Result := 'Install the Microsoft Visual C++ x64 runtime on this destination server first. Official download: https://aka.ms/vs/17/release/vc_redist.x64.exe';
     exit;
   end;
-  // Stop application services before their privately bundled PostgreSQL instance.
-  Exec(ExpandConstant('{sys}\sc.exe'), 'stop DDHIPharmacyApi', '', SW_HIDE, ewWaitUntilTerminated, Code);
-  Exec(ExpandConstant('{sys}\sc.exe'), 'stop DDHIPharmacyWorker', '', SW_HIDE, ewWaitUntilTerminated, Code);
-  if OwnPostgreSQLService then
-    Exec(ExpandConstant('{sys}\net.exe'), 'stop DDHIPostgreSQL', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  ExtractTemporaryFile('Stop-ServerForMaintenance.ps1');
+  if not RunMaintenance(ExpandConstant('{tmp}\Stop-ServerForMaintenance.ps1'), False) then begin
+    Result := 'Could not safely stop the existing DDHI services, or service ownership belongs to a different installation. Stop the owned server during approved downtime and review service permissions before retrying. Database/configuration files were not replaced.';
+    exit;
+  end;
   Result := '';
 end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-var Code: Integer;
 begin
   if CurUninstallStep = usUninstall then begin
-    Exec(ExpandConstant('{sys}\sc.exe'), 'stop DDHIPharmacyApi', '', SW_HIDE, ewWaitUntilTerminated, Code);
-    Exec(ExpandConstant('{sys}\sc.exe'), 'stop DDHIPharmacyWorker', '', SW_HIDE, ewWaitUntilTerminated, Code);
-    Exec(ExpandConstant('{sys}\sc.exe'), 'delete DDHIPharmacyApi', '', SW_HIDE, ewWaitUntilTerminated, Code);
-    Exec(ExpandConstant('{sys}\sc.exe'), 'delete DDHIPharmacyWorker', '', SW_HIDE, ewWaitUntilTerminated, Code);
-    if OwnPostgreSQLService then begin
-      Exec(ExpandConstant('{sys}\net.exe'), 'stop DDHIPostgreSQL', '', SW_HIDE, ewWaitUntilTerminated, Code);
-      Exec(ExpandConstant('{sys}\sc.exe'), 'delete DDHIPostgreSQL', '', SW_HIDE, ewWaitUntilTerminated, Code);
-    end;
+    if not RunMaintenance(ExpandConstant('{app}\deployment\Stop-ServerForMaintenance.ps1'), True) then
+      RaiseException('Could not safely stop/remove the owned server services. Uninstall was interrupted; review service ownership and permissions.');
   end;
 end;
 

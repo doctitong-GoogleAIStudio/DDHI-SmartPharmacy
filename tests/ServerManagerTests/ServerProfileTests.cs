@@ -18,7 +18,7 @@ public class ServerProfileTests {
   var p=Valid();p.DataRoot=Path.Combine(Root,"runtime","manager-qa-"+Guid.NewGuid().ToString("N"));
   int FreePort(){var listener=new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback,0);listener.Start();var port=((System.Net.IPEndPoint)listener.LocalEndpoint).Port;listener.Stop();return port;}
   p.PostgresPort=FreePort();do{p.ApiPort=FreePort();}while(p.ApiPort==p.PostgresPort);
-  var controller=new ServerController(p,_=>{});
+  var controller=new ServerController(p,_=>{}){TestSkipDatabaseSync=true};
   async Task Ready(){Exception? error=null;for(int i=0;i<40;i++){try{if((await controller.Health()).Contains("ready"))return;}catch(Exception ex){error=ex;}await Task.Delay(500);}throw new InvalidOperationException("Test server did not become ready.",error);}
   try{
    await controller.Prepare();await controller.Start();await Ready();Assert.Contains("ddhi_runtime",await controller.VerifyDatabase());
@@ -26,6 +26,7 @@ public class ServerProfileTests {
    await using(var con=new Npgsql.NpgsqlConnection(controller.Connection("ddhi_runtime",secrets.RuntimePassword))){await con.OpenAsync();Assert.Equal("ddhi_runtime",await new Npgsql.NpgsqlCommand("SELECT current_user",con).ExecuteScalarAsync());Assert.False((bool)(await new Npgsql.NpgsqlCommand("SELECT rolsuper FROM pg_roles WHERE rolname=current_user",con).ExecuteScalarAsync())!);Assert.False((bool)(await new Npgsql.NpgsqlCommand("SELECT has_table_privilege(current_user,'\"AuditEvents\"','UPDATE')",con).ExecuteScalarAsync())!);}
    await controller.Bootstrap("manager-test@example.invalid","Test-only!Password123");await controller.Stop();await controller.Start();await Ready();
    await using(var con=new Npgsql.NpgsqlConnection(controller.Connection("ddhi_runtime",secrets.RuntimePassword))){await con.OpenAsync();Assert.Equal(1L,await new Npgsql.NpgsqlCommand("SELECT count(*) FROM \"AspNetUsers\"",con).ExecuteScalarAsync());}
+   await LanConversionAssertions.Exercise(controller,p,Root);
    using var cert=System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(p.CertificatePath,secrets.CertificatePassword);Assert.True(cert.HasPrivateKey);Assert.True(cert.MatchesHostname("localhost"));
   }finally{await controller.Stop();}
  }

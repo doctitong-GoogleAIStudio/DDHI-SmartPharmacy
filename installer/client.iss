@@ -2,7 +2,7 @@
 [Setup]
 AppId={{4CC80B9D-79E7-43F6-998B-953D197F12AD}
 AppName={#MyAppName}
-AppVersion=0.1.0
+AppVersion=0.1.1
 AppPublisher=Digos Doctors Hospital, Inc.
 DefaultDirName={localappdata}\Programs\DDHI-SmartPharmacy
 DefaultGroupName=DDHI Smart Pharmacy
@@ -27,6 +27,7 @@ Name: desktopicon; Description: "Create a desktop shortcut"; Flags: unchecked
 Source: "..\release\Client\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 [Icons]
 Name: "{group}\DDHI Smart Pharmacy"; Filename: "{app}\DDHI-SmartPharmacy.exe"; Check: not ExtractOnlyCheck
+Name: "{group}\Connection guide"; Filename: "{app}\Documentation\DDHI-Server-and-Client-Connection-Guide.pdf"; Check: not ExtractOnlyCheck
 Name: "{autodesktop}\DDHI Smart Pharmacy"; Filename: "{app}\DDHI-SmartPharmacy.exe"; Tasks: desktopicon; Check: not ExtractOnlyCheck
 [Run]
 Filename: "{app}\DDHI-SmartPharmacy.exe"; Description: "Configure server and sign in"; Flags: nowait postinstall skipifsilent; Check: not ExtractOnlyCheck

@@ -1,6 +1,6 @@
-# Release status - Server Control 0.2.0 / client and API 0.1.0
+# Release status - Server Control 0.3.0 / client and API 0.1.0
 
-Build date: 13 November 2026 (Asia/Manila).
+Build date: 15 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
 Developer: Vicente C. Cavalida Jr. MD.
 Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
@@ -55,3 +55,7 @@ Checksums/ReleaseVerification.json records final artifacts and test results. Che
 ## Desktop server update
 
 Server Control shows the six requested steps: install, PostgreSQL/accounts, certificate/services, administrator, start/check, and client connection. MSI is preparation/preview only; installation is for a different server. Localhost-only evaluation is selected for now. Service secrets are machine-protected with restricted ACLs. Local certificate trust requires an explicit operator action. Hospital LAN identity requires IT approval. See SERVER_DESKTOP_SETUP.md.
+
+## Existing-instance LAN conversion in 0.3.0
+
+The LAN connection page converts an existing prepared localhost/LAN instance using a valid trusted matching PFX and approved hostname. It verifies local DNS mappings, preserves users, stock and database credentials, saves protected connection snapshots, starts the new endpoint with the selected certificate, and attempts rollback on failed health checks. Manual restoration handles persisted interrupted changes. A custom-profile picker opens existing data without initialization. Existing application users disable first-administrator creation. The installer now validates service ownership and waits for stop completion during maintenance. Automated evidence is recorded in ServerManagerTests.trx and LanUpgradeSmoke.json; elevated service lifecycle and physical hospital-client acceptance remain pending. Tests use an isolated CA and socket route without altering Windows trust or hospital DNS; QA-only initdb skips durability syncing, which is not a production setting.

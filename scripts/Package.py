@@ -48,7 +48,7 @@ def main():
             raise RuntimeError(f'Unexpected executable size: {path}')
     for name in ('Installation Guide', 'Administrator Guide', 'Pharmacy User Manual',
                  'Barcode Scanner Setup', 'Cerebro Integration Guide',
-                 'Workstation Deployment Guide', 'Backup Recovery Guide'):
+                 'Workstation Deployment Guide', 'Backup Recovery Guide', 'DDHI-Server-and-Client-Connection-Guide'):
         with (RELEASE / 'Documentation' / (name + '.pdf')).open('rb') as stream:
             if stream.read(5) != b'%PDF-':
                 raise RuntimeError(f'Invalid PDF: {name}')
@@ -66,8 +66,13 @@ def main():
         'PublishedServerSmoke.json': ['httpsHealth', 'testCertificatePinned', 'anonymousDenied',
                                      'bootstrapSucceeded', 'staffAuthentication',
                                      'catalogAndReceiving', 'auditChainValid', 'workerStarted'],
-        'InstallerPayloadSmoke.json': ['clientPayloadVerified', 'serverPayloadVerified'],
+        'InstallerPayloadSmoke.json': ['clientPayloadVerified', 'serverPayloadVerified', 'serverSupplementalPayloadVerified'],
         'DesktopLaunch.json': ['launched', 'logoVisible', 'loginLayoutReviewed'],
+        'ServerDesktopPreview.json': ['DesktopWindowLoaded', 'PreparationOnly', 'LocalInitializationDisabled', 'LanConnectionControlsLoaded', 'ConnectionGuideLoaded'],
+        'LanUpgradeSmoke.json': ['managedProcessConversion', 'tlsHostnameVerified', 'existingAdministratorLogin',
+                                 'medicineAndUsersPreserved', 'stockAndLotsPreserved', 'credentialsUnchanged',
+                                 'dnsFailureRejectedBeforeChange', 'wrongPfxPasswordRejected', 'concurrentChangeRejected',
+                                 'corruptBackupRejected', 'manualRestore', 'failedActivationRolledBack', 'interruptedChangeRecovery'],
     }.items():
         data = json.loads((RELEASE / 'Tests' / filename).read_text(encoding='utf-8-sig'))
         if any(data.get(key) is not True for key in required):
@@ -76,6 +81,9 @@ def main():
     desktop = evidence['DesktopLaunch.json']
     if desktop.get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Desktop launch evidence does not match the packaged EXE.')
+    server_preview = evidence['ServerDesktopPreview.json']
+    if server_preview.get('Version') != '0.3.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
+        raise RuntimeError('Server desktop launch evidence does not match version 0.3.0 and the current EXE.')
     installers = evidence['InstallerPayloadSmoke.json']
     for key, name in [('clientInstallerSha256', executables[1]), ('serverInstallerSha256', executables[2])]:
         if installers.get(key, '').lower() != sha(RELEASE / name):
@@ -91,7 +99,7 @@ def main():
 
     for name in ('INITIAL_AUDIT.md', 'ARCHITECTURE.md', 'IMPLEMENTATION_PLAN.md',
                  'DATA_OWNERSHIP.md', 'CEREBRO_INTEGRATION_ASSUMPTIONS.md',
-                 'RISK_REGISTER.md', 'RELEASE_STATUS.md', 'SERVER_DESKTOP_SETUP.md'):
+                 'RISK_REGISTER.md', 'RELEASE_STATUS.md', 'SERVER_DESKTOP_SETUP.md', 'SERVER_CLIENT_CONNECTION_GUIDE.md'):
         shutil.copy2(ROOT / 'docs' / name, RELEASE / 'Documentation' / name)
     shutil.copy2(ROOT / 'README.md', RELEASE / 'README.md')
     shutil.copy2(ROOT / 'LICENSE.txt', RELEASE / 'LICENSE.txt')
@@ -104,7 +112,7 @@ def main():
         for path in (ROOT / directory).rglob('*'):
             if path.is_file() and not any(p in ('bin', 'obj', '__pycache__') for p in path.relative_to(ROOT).parts):
                 source_files.append(path)
-    for name in ('AGENTS.md', '.gitignore', 'README.md', 'LICENSE.txt', 'THIRD_PARTY_NOTICES.md',
+    for name in ('AGENTS.md', '.gitignore', '.gitattributes', 'README.md', 'LICENSE.txt', 'THIRD_PARTY_NOTICES.md',
                  'DDHI.SmartPharmacy.sln', 'Directory.Build.props', 'global.json', 'NuGet.Config'):
         source_files.append(ROOT / name)
     with zipfile.ZipFile(source_archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
@@ -114,7 +122,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.2.0-server', 'components': {'client': '0.1.0', 'api': '0.1.0', 'serverControl': '0.2.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.3.0-server', 'components': {'client': '0.1.0', 'clientInstaller': '0.1.1', 'api': '0.1.0', 'serverControl': '0.3.0', 'serverInstaller': '0.3.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,
