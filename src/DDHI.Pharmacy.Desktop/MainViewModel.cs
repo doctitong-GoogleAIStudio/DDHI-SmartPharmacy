@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.IO;
+using DDHI.Pharmacy.Contracts;
 namespace DDHI.Pharmacy.Desktop;
 public sealed class MainViewModel:INotifyPropertyChanged {
  public event PropertyChangedEventHandler? PropertyChanged;
@@ -20,7 +21,9 @@ public sealed class MainViewModel:INotifyPropertyChanged {
  public string Endpoint {get;private set;}="";
  public async Task Login(string address,string email,string password){
   var uri=new Uri(address.TrimEnd('/')+"/");if(uri.Scheme!="https"&&!(uri.Scheme=="http"&&uri.IsLoopback))throw new InvalidOperationException("Use a trusted HTTPS hospital server address.");
-  Client.Dispose();Client=new HttpClient{BaseAddress=uri,Timeout=TimeSpan.FromSeconds(25)};Client.DefaultRequestHeaders.Add("X-Workstation",Environment.MachineName);
+  var paired=ConnectionSettingsStore.Default.Load();
+  if(paired!=null&&!paired.MatchesAddress(address))throw new InvalidOperationException("This address differs from your saved server. Use Find server or open its connection file before signing in.");
+  Client.Dispose();Client=new HttpClient(paired?.CreateHandler()??new HttpClientHandler{AllowAutoRedirect=false}){BaseAddress=uri,Timeout=TimeSpan.FromSeconds(25)};Client.DefaultRequestHeaders.Add("X-Workstation",Environment.MachineName);
   using var response=await Client.PostAsJsonAsync("auth/login",new{email,password});await Ensure(response);using var token=JsonDocument.Parse(await response.Content.ReadAsStringAsync());Client.DefaultRequestHeaders.Authorization=new AuthenticationHeaderValue("Bearer",token.RootElement.GetProperty("accessToken").GetString());
   var workstation=await Post("workstations",new{name=Environment.MachineName});WorkstationId=workstation.GetProperty("Id").GetString()!;Client.DefaultRequestHeaders.Remove("X-Workstation");Client.DefaultRequestHeaders.Add("X-Workstation",WorkstationId);
   var me=await Get("me");Roles=me.GetProperty("roles").EnumerateArray().Select(x=>x.GetString()!).ToArray();Footer=$"{email}  ·  {string.Join(", ",Roles)}  ·  {Environment.MachineName}  ·  Asia/Manila";Status="Connected. All transactions require explicit confirmation.";

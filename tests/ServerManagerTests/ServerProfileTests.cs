@@ -27,7 +27,8 @@ public class ServerProfileTests {
    await controller.Bootstrap("manager-test@example.invalid","Test-only!Password123");await controller.Stop();await controller.Start();await Ready();
    await using(var con=new Npgsql.NpgsqlConnection(controller.Connection("ddhi_runtime",secrets.RuntimePassword))){await con.OpenAsync();Assert.Equal(1L,await new Npgsql.NpgsqlCommand("SELECT count(*) FROM \"AspNetUsers\"",con).ExecuteScalarAsync());}
    await LanConversionAssertions.Exercise(controller,p,Root);
-   using var cert=System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(p.CertificatePath,secrets.CertificatePassword);Assert.True(cert.HasPrivateKey);Assert.True(cert.MatchesHostname("localhost"));
+   using(var cert=System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(p.CertificatePath,secrets.CertificatePassword)){Assert.True(cert.HasPrivateKey);Assert.True(cert.MatchesHostname("localhost"));}
+   await SimpleLanAssertions.Exercise(controller,p,Root);
   }finally{await controller.Stop();}
  }
 }

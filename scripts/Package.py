@@ -68,7 +68,9 @@ def main():
                                      'catalogAndReceiving', 'auditChainValid', 'workerStarted'],
         'InstallerPayloadSmoke.json': ['clientPayloadVerified', 'serverPayloadVerified', 'serverSupplementalPayloadVerified'],
         'DesktopLaunch.json': ['launched', 'logoVisible', 'loginLayoutReviewed'],
-        'ServerDesktopPreview.json': ['DesktopWindowLoaded', 'PreparationOnly', 'LocalInitializationDisabled', 'LanConnectionControlsLoaded', 'ConnectionGuideLoaded'],
+        'ServerDesktopPreview.json': ['DesktopWindowLoaded', 'PreparationOnly', 'LocalInitializationDisabled', 'LanConnectionControlsLoaded', 'ConnectionGuideLoaded', 'SimpleLanControlsLoaded'],
+        'SimpleConnectionSmoke.json': ['automaticDiscovery', 'pinnedHttps', 'wrongKeyRejected', 'existingAdministratorLogin',
+                                       'databaseAndStockPreserved', 'credentialsUnchanged', 'publicConnectionFile', 'identitySurvivesReenable', 'restoreAndRestart'],
         'LanUpgradeSmoke.json': ['managedProcessConversion', 'tlsHostnameVerified', 'existingAdministratorLogin',
                                  'medicineAndUsersPreserved', 'stockAndLotsPreserved', 'credentialsUnchanged',
                                  'dnsFailureRejectedBeforeChange', 'wrongPfxPasswordRejected', 'concurrentChangeRejected',
@@ -82,8 +84,8 @@ def main():
     if desktop.get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Desktop launch evidence does not match the packaged EXE.')
     server_preview = evidence['ServerDesktopPreview.json']
-    if server_preview.get('Version') != '0.3.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
-        raise RuntimeError('Server desktop launch evidence does not match version 0.3.0 and the current EXE.')
+    if server_preview.get('Version') != '0.4.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
+        raise RuntimeError('Server desktop launch evidence does not match version 0.4.0 and the current EXE.')
     installers = evidence['InstallerPayloadSmoke.json']
     for key, name in [('clientInstallerSha256', executables[1]), ('serverInstallerSha256', executables[2])]:
         if installers.get(key, '').lower() != sha(RELEASE / name):
@@ -122,7 +124,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.3.0-server', 'components': {'client': '0.1.0', 'clientInstaller': '0.1.1', 'api': '0.1.0', 'serverControl': '0.3.0', 'serverInstaller': '0.3.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.4.0-simple-connection', 'components': {'client': '0.2.0', 'clientInstaller': '0.2.0', 'api': '0.1.0', 'worker': '0.2.0', 'serverControl': '0.4.0', 'serverInstaller': '0.4.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,

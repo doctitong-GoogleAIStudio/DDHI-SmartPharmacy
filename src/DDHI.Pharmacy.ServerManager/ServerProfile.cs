@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
+using DDHI.Pharmacy.Contracts;
 namespace DDHI.Pharmacy.ServerManager;
 public sealed class ServerProfile {
  public string DataRoot {get;set;}="";public string ServerRoot {get;set;}="";public string PostgresBin {get;set;}="";
@@ -11,8 +12,9 @@ public sealed class ServerProfile {
  public string Hostname {get;set;}="localhost";public string Mode {get;set;}="Local evaluation";
  public string CertificatePath {get;set;}="";public string CertificateThumbprint {get;set;}="";public string ApprovalReference {get;set;}="";
  public bool Prepared {get;set;} public bool ServicesConfigured {get;set;}
+ public string PairingPublicKeySha256 {get;set;}=""; public string SimpleLanInterface {get;set;}=""; public int DiscoveryPort {get;set;}=8444;
  public string ProfilePath=>Path.Combine(DataRoot,"profile.json");
- public string Endpoint=>$"https://{Hostname}:{ApiPort}";
+ public string Endpoint=>$"https://{(Mode=="Simple LAN"?LanAddresses.CurrentAddress(Hostname,SimpleLanInterface):Hostname)}:{ApiPort}";
  public static ServerProfile Defaults(){
   var dir=new DirectoryInfo(AppContext.BaseDirectory);var server=dir.Parent?.FullName??dir.FullName;var project=dir;
   while(project!=null&&!File.Exists(Path.Combine(project.FullName,"AGENTS.md")))project=project.Parent;
@@ -29,7 +31,8 @@ public sealed class ServerProfile {
   if(parent!=null){var projectRelative=Path.GetRelativePath(parent.FullName,DataRoot);if(!projectRelative.StartsWith("..")&&!projectRelative.StartsWith("runtime"+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Development server data must be inside the project runtime folder, which is excluded from source/release archives.");}
   if(PostgresPort is <1024 or >65535||ApiPort is <1024 or >65535||PostgresPort==ApiPort)throw new InvalidOperationException("Choose distinct unprivileged TCP ports between 1024 and 65535.");
   if(Mode=="Local evaluation"&&Hostname!="localhost")throw new InvalidOperationException("Local evaluation must use localhost and loopback bindings.");
-  if(Mode!="Local evaluation"&&(string.IsNullOrWhiteSpace(ApprovalReference)||Uri.CheckHostName(Hostname)!=UriHostNameType.Dns||Hostname.Equals("localhost",StringComparison.OrdinalIgnoreCase)))throw new InvalidOperationException("Hospital mode needs an IT-approved DNS hostname and approval reference.");
+  if(Mode=="Simple LAN"){if(!System.Net.IPAddress.TryParse(Hostname,out var ip)||ip.AddressFamily!=System.Net.Sockets.AddressFamily.InterNetwork||PairingPublicKeySha256.Length!=64)throw new InvalidOperationException("The simple LAN identity is incomplete. Enable LAN again.");}
+  else if(Mode!="Local evaluation"&&(string.IsNullOrWhiteSpace(ApprovalReference)||Uri.CheckHostName(Hostname)!=UriHostNameType.Dns||Hostname.Equals("localhost",StringComparison.OrdinalIgnoreCase)))throw new InvalidOperationException("Hospital mode needs an IT-approved DNS hostname and approval reference.");
   foreach(var exe in new[]{Path.Combine(PostgresBin,"initdb.exe"),Path.Combine(PostgresBin,"pg_ctl.exe"),Path.Combine(ServerRoot,"Api","DDHI.Pharmacy.Api.exe"),Path.Combine(ServerRoot,"Worker","DDHI.Pharmacy.Worker.exe")})if(!File.Exists(exe))throw new FileNotFoundException("Required server component is missing.",exe);
  }
 }

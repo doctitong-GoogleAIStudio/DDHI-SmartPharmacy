@@ -1,4 +1,4 @@
-# Release status - Server Control 0.3.0 / client and API 0.1.0
+# Release status - Server Control 0.4.0 / client 0.2.0 / API 0.1.0
 
 Build date: 15 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
@@ -38,7 +38,7 @@ Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
 - Four actual hospital workstations, real scanner devices, thermal printers, service recovery, clean Windows Server installation, upgrade/uninstall and off-server disaster-recovery drills require on-site acceptance. Automated concurrent HTTP tests are not physical multi-workstation tests.
 - Live Cerebro REST/read-only contracts, credentials, vendor authorization and ownership/reconciliation agreements have not been provided. Those adapters intentionally fail closed. No Cerebro production database or billing record was accessed or modified.
 - No hardware-attested physical-scan verification or vendor SDK adapter is supplied. HID/manual/image/serial test input cannot bypass the approved manual verification policy.
-- Hospital TLS certificates, internal DNS/firewall rules, PostgreSQL installation, least-privilege production accounts, off-server secret storage and backup scheduling must be provisioned by hospital IT. The installer now includes PostgreSQL 17.12 and desktop Server Control. Its confirmed wizard creates the database and separate protected credentials on the destination server. It does not install an operating system, approve DNS or silently establish certificate trust.
+- Hospital network approval, off-server secret storage and backup scheduling remain IT responsibilities. The installer includes PostgreSQL 17.12 and desktop Server Control; the confirmed wizard creates the database, separate protected credentials and services on the destination server. Simple LAN creates its own encrypted server identity and scoped firewall rules, with explicit first-time client code confirmation. Hospital DNS and a trusted PFX are needed only for optional Advanced TLS. Actual elevated rule/service behavior still requires destination-server acceptance.
 - Code signing certificate was not provided; executables and installers are unsigned.
 - Month-only GS1 expiry is rejected pending an approved pharmacy policy. Advanced repackaging/shelf-label layouts and full purchase-order fulfillment need approved hospital specifications; current stock labels preserve source balance/lot traceability.
 - Inventory costing uses the batch unit cost captured at initial receiving; cost revaluation and differing purchase-cost policy are not implemented. Financial acceptance must review valuation before relying on accounting reports.
@@ -54,8 +54,15 @@ Checksums/ReleaseVerification.json records final artifacts and test results. Che
 
 ## Desktop server update
 
-Server Control shows the six requested steps: install, PostgreSQL/accounts, certificate/services, administrator, start/check, and client connection. MSI is preparation/preview only; installation is for a different server. Localhost-only evaluation is selected for now. Service secrets are machine-protected with restricted ACLs. Local certificate trust requires an explicit operator action. Hospital LAN identity requires IT approval. See SERVER_DESKTOP_SETUP.md.
+Server Control opens as a desktop window on the dedicated server. Initial setup defaults to Windows services and automatic LAN setup. For an existing prepared instance, use Connect computers > Enable LAN. MSI is preparation/preview only; installation is for a different server. Service secrets are machine-protected with restricted ACLs. The updated client confirms the server's public-key identity once without changing Windows certificate trust. See SERVER_DESKTOP_SETUP.md.
 
 ## Existing-instance LAN conversion in 0.3.0
 
 The LAN connection page converts an existing prepared localhost/LAN instance using a valid trusted matching PFX and approved hostname. It verifies local DNS mappings, preserves users, stock and database credentials, saves protected connection snapshots, starts the new endpoint with the selected certificate, and attempts rollback on failed health checks. Manual restoration handles persisted interrupted changes. A custom-profile picker opens existing data without initialization. Existing application users disable first-administrator creation. The installer now validates service ownership and waits for stop completion during maintenance. Automated evidence is recorded in ServerManagerTests.trx and LanUpgradeSmoke.json; elevated service lifecycle and physical hospital-client acceptance remain pending. Tests use an isolated CA and socket route without altering Windows trust or hospital DNS; QA-only initdb skips durability syncing, which is not a production setting.
+
+
+## Simple automatic connection in 0.4.0
+
+The new default workflow is Enable LAN on the server, then automatic discovery and one-time code confirmation on each updated client. A public .ddhiconnect file is the fallback. Server/client HTTPS is authenticated by the paired public key rather than requiring a hospital CA in simple mode. Keys are generated/protected on the server; client trust metadata is DPAPI-protected per Windows user. DNS, manual PFX import and an approval-reference field are not required for this mode. Discovery never sends staff credentials or silently establishes a new trust identity. Existing accounts and inventory are retained, and repeated enablement retains the server key. A different key and invalid certificate dates are rejected. The worker serves local-subnet UDP discovery metadata only. Default ports are TCP 8443 and UDP 8444; owned firewall rules are scoped to the selected adapter, local subnet and API/worker programs. Advanced TLS remains optional.
+
+All 37 Server Manager tests passed. SimpleConnectionSmoke.json and ServerManagerTests.trx record isolated discovery, pinned HTTPS, key rejection, login, data/credential preservation and restart checks. Windows trust stores are not changed. Actual elevated firewall/service/reboot behavior and physical workstation connectivity still need destination-server acceptance; automated loopback tests do not prove those. Live Cerebro remains disabled.

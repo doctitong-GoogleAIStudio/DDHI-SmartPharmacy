@@ -84,6 +84,7 @@ public sealed partial class ServerController(ServerProfile profile,Action<string
   if(!profile.Prepared)return "Not configured";
   HttpMessageHandler handler;
   if(TestHealthHandlerFactory!=null)handler=TestHealthHandlerFactory();
+  else if(profile.Mode=="Simple LAN")handler=ClientConnection().CreateHandler();
   else {var standard=new HttpClientHandler();if(profile.Mode=="Local evaluation")standard.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>request.RequestUri?.IsLoopback==true&&certificate!=null&&certificate.Thumbprint==profile.CertificateThumbprint;else standard.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>errors==SslPolicyErrors.None&&certificate!=null&&certificate.Thumbprint==profile.CertificateThumbprint;handler=standard;}
   using var client=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(5)};
   using var response=await client.GetAsync(profile.Endpoint+"/health");response.EnsureSuccessStatusCode();

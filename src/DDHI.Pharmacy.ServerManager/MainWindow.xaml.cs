@@ -60,16 +60,17 @@ public partial class MainWindow : Window
     }
     void Fill()
     {
+        FillSimpleLan();
         DataRootInput.Text = profile.DataRoot; PgBinInput.Text = profile.PostgresBin;
         PgPortInput.Text = profile.PostgresPort.ToString(); ApiPortInput.Text = profile.ApiPort.ToString();
         HostnameInput.Text = profile.Hostname; PfxInput.Text = profile.CertificatePath;
-        ApprovalInput.Text = profile.ApprovalReference; ModeInput.SelectedIndex = profile.Mode == "Local evaluation" ? 0 : 1;
+        ApprovalInput.Text = profile.ApprovalReference; ModeInput.SelectedIndex = profile.Mode == "Hospital LAN" ? 1 : 0;
         EndpointDisplay.Text = profile.Endpoint; DataDisplay.Text = profile.DataRoot;
         CertificatePathDisplay.Text = profile.CertificatePath; ThumbprintDisplay.Text = profile.CertificateThumbprint;
-        CertificateNote.Text = profile.Mode == "Local evaluation"
-            ? "Local evaluation: this same computer only. Use LAN connection to preserve this instance while enabling separate clients."
+        CertificateNote.Text = profile.Mode == "Simple LAN" ? "LAN enabled. Clients find this server automatically and confirm the code once." : profile.Mode == "Local evaluation"
+            ? "This connection is local-only. Open Connect computers and click Enable LAN for separate clients."
             : "Hospital LAN: use Copy client address on each workstation. IT must establish client trust and scoped firewall access.";
-        TlsStatus.Text = profile.Prepared ? (profile.Mode == "Local evaluation" ? "Local PFX" : "Hospital PFX supplied") : "Not configured";
+        TlsStatus.Text = profile.Prepared ? (profile.Mode == "Simple LAN" ? "App-managed HTTPS" : profile.Mode == "Local evaluation" ? "Local PFX" : "Hospital PFX supplied") : "Not configured";
         PrepareButton.IsEnabled = !profile.Prepared && !busy && !PreviewOnly;
         StartButton.IsEnabled = StopButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly;
         LanApplyButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly && controller.ConnectionChangeState is not ("Applying" or "RecoveryRequired");
@@ -117,8 +118,8 @@ public partial class MainWindow : Window
     {
         if (PreviewOnly)
         {
-            MainTabs.SelectedItem = ConnectionGuideTab;
-            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.3.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true }));
+            MainTabs.SelectedItem = SimpleLanTab;
+            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.4.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true }));
             return;
         }
         if (profile.Prepared) await Guard(RefreshStatus);
@@ -128,7 +129,7 @@ public partial class MainWindow : Window
         try { ReadInputs(); } catch (Exception ex) { Log(ex.Message); return; }
         if (MessageBox.Show(this, "Create this independent server instance with the displayed paths and ports? For an existing server, use Open existing server profile and LAN connection instead.", "Confirm new setup", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return;
         var password = PfxPassword.Password; PfxPassword.Clear();
-        await Guard(async () => { await controller.Prepare(password); RememberInstance(); if (UseWindowsServices.IsChecked == true) await controller.InstallWindowsServices(); await RefreshStatus(); Log("Database and certificate are ready. Create the first administrator once, then click Start server."); });
+        await Guard(async () => { await controller.Prepare(password); RememberInstance(); if (UseWindowsServices.IsChecked == true) await controller.InstallWindowsServices(); if(AutoLanAfterSetup.IsChecked==true && profile.Mode=="Local evaluation" && NetworkAddress.SelectedItem is DDHI.Pharmacy.Contracts.LanAddress address)await controller.EnableSimpleLan(address); await RefreshStatus(); Log("Database and certificate are ready. Create the first administrator once, then click Start server."); });
     }
     async void ApplyLanConnection(object sender, RoutedEventArgs e)
     {

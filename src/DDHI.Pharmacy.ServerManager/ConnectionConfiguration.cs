@@ -106,6 +106,7 @@ public sealed partial class ServerController
     {
         if (!profile.Prepared) throw new InvalidOperationException("Open the existing prepared server instance first.");
         profile.Validate();
+        if (!TestSkipFirewall && File.Exists(FirewallMarker)) RequireAdministrator();
         if (profile.ServicesConfigured)
         {
             RequireAdministrator();
@@ -218,6 +219,7 @@ public sealed partial class ServerController
         await AtomicWrite(profile.ProfilePath, oldProfile);
         ApplyConnectionProfile(restored);
         GrantConnectionServiceAccess();
+        await SynchronizeSimpleFirewall();
     }
 
     void ApplyConnectionProfile(ServerProfile values)
@@ -227,6 +229,9 @@ public sealed partial class ServerController
         profile.CertificatePath = values.CertificatePath;
         profile.CertificateThumbprint = values.CertificateThumbprint;
         profile.ApprovalReference = values.ApprovalReference;
+        profile.PairingPublicKeySha256 = values.PairingPublicKeySha256;
+        profile.SimpleLanInterface = values.SimpleLanInterface;
+        profile.DiscoveryPort = values.DiscoveryPort;
     }
 
     void GrantConnectionServiceAccess()
@@ -265,6 +270,7 @@ public sealed partial class ServerController
             var ddhi = config["DDHI"] as JsonObject ?? new JsonObject();
             if (ddhi.Parent == null) config["DDHI"] = ddhi;
             ddhi["CertificatePath"] = destination;
+            ddhi.Remove("PairingConnection"); ddhi.Remove("DiscoveryPort");
             var kestrel = config["Kestrel"]?.AsObject() ?? throw new InvalidDataException("The HTTPS configuration is missing.");
             var https = kestrel["Endpoints"]?["Https"]?.AsObject() ?? throw new InvalidDataException("The HTTPS endpoint is missing.");
             https["Url"] = $"https://0.0.0.0:{profile.ApiPort}";
@@ -275,10 +281,12 @@ public sealed partial class ServerController
             profile.CertificatePath = destination;
             profile.CertificateThumbprint = certificate.Thumbprint;
             profile.ApprovalReference = options.ApprovalReference.Trim();
+            profile.PairingPublicKeySha256 = ""; profile.SimpleLanInterface = "";
             await AtomicWrite(profile.ProfilePath, JsonSerializer.SerializeToUtf8Bytes(profile, new JsonSerializerOptions { WriteIndented = true }));
             GrantConnectionServiceAccess();
             await Start();
             await WaitForHealthyConnection();
+            await SynchronizeSimpleFirewall();
             await WriteJournal(directory, "Applied");
             log($"LAN connection is ready: {profile.Endpoint}. Existing database, users and protected credentials were retained. Connection backup: {directory}");
         }
