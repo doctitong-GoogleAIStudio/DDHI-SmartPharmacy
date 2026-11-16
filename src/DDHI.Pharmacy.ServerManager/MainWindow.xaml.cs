@@ -57,10 +57,12 @@ public partial class MainWindow : Window
         Fill();
         timer.Tick += async (_, _) => { if (!busy && profile.Prepared) await Guard(RefreshStatus); };
         timer.Start();
+        Closed += (_, _) => { timer.Stop(); recordSession?.Dispose(); };
     }
     void Fill()
     {
         FillSimpleLan();
+        FillDatabaseAccess();
         DataRootInput.Text = profile.DataRoot; PgBinInput.Text = profile.PostgresBin;
         PgPortInput.Text = profile.PostgresPort.ToString(); ApiPortInput.Text = profile.ApiPort.ToString();
         HostnameInput.Text = profile.Hostname; PfxInput.Text = profile.CertificatePath;
@@ -118,8 +120,8 @@ public partial class MainWindow : Window
     {
         if (PreviewOnly)
         {
-            MainTabs.SelectedItem = SimpleLanTab;
-            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.4.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true }));
+            MainTabs.SelectedItem = DatabaseAccessTab;
+            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.5.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true, DatabaseAccessControlsLoaded = true }));
             return;
         }
         if (profile.Prepared) await Guard(RefreshStatus);

@@ -28,3 +28,9 @@ For a fresh source checkout, run scripts/Bootstrap-Tools.ps1. Stage-PostgreSQL.p
 ## Simple automatic connection update
 
 Server Control 0.4.0 and client 0.2.0 add local-network discovery and one-time code-confirmed pairing. On the server click Enable LAN; clients find it automatically, confirm the matching code once and then sign in. Future launches remember the public key and can rediscover the same identity at a new IP. A small connection file is the fallback. HTTPS remains encrypted; no staff password, database password or private key is shared in that file. Simple mode needs no DNS name, manual PFX import or approval-ticket field. Existing accounts, stock and database credentials are retained. Install the new client on every workstation. See the four-page Connection guide. Same-network connectivity and first-time identity confirmation are still required; physical firewall/service/reboot and hospital acceptance remain pending.
+
+Client 0.2.1 fixes sidebar readability. Normal menu labels use light text; hovered, selected and keyboard-focused items use dark text on pale green. Close the client and install the updated client installer on each workstation. The existing server 0.4.0 and paired connection remain compatible.
+
+## Server Control 0.5.0 and client 0.3.0
+
+Database Access follows Activity in Server Control: connection/health details, role-authorized read-only record viewing and CSV/JSON snapshot export, plus optional IT SQL Shell/pgAdmin launch with a separate database login. Client 0.3.0 shows the signed-in role and email below the hospital name and filters both navigation modules and action buttons using the existing API role policies. Sign-out/account changes clear role menus and record caches. See docs/DATABASE_ACCESS.md and docs/CLIENT_ROLE_NAVIGATION.md. Existing pairing and database records are retained; API/worker versions are unchanged.

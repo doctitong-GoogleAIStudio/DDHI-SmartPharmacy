@@ -47,6 +47,22 @@ internal static class SimpleLanAssertions
         await database.CloseAsync();await controller.Stop();await controller.Start();
         for(var i=0;i<30;i++){try{if((await controller.Health()).Contains("ready"))break;}catch{}await Task.Delay(300);}
         await database.OpenAsync();Assert.Contains("ready",await controller.Health());Assert.Equal(snapshot,await Snapshot());
+        using(var records=controller.OpenRecordSession()) {
+            await records.SignIn("manager-test@example.invalid","Test-only!Password123");
+            Assert.True(records.IsAuthenticated);
+            var medicines=await records.Read(DatabaseDataset.All.Single(d=>d.Endpoint=="medicines"));
+            Assert.Equal(System.Text.Json.JsonValueKind.Array,medicines.ValueKind);
+            Assert.Equal(medicines.GetArrayLength(),DatabaseRecordExport.ToView(medicines).Count);
+            var users=await records.Read(DatabaseDataset.All.Single(d=>d.Endpoint=="users"));
+            Assert.DoesNotContain("PasswordHash",users.GetRawText());
+            await Assert.ThrowsAsync<InvalidOperationException>(()=>records.Read(DatabaseDataset.All.Single(d=>d.Endpoint=="receiving")));
+            Assert.DoesNotContain(secret.RuntimePassword,controller.DatabaseConnectionDetails);
+            records.SignOut(); await Assert.ThrowsAsync<InvalidOperationException>(()=>records.Read(DatabaseDataset.All[0]));
+        }
+        await File.WriteAllTextAsync(Path.Combine(root,"release","Tests","DatabaseAccessSmoke.json"),JsonSerializer.Serialize(new {
+            version="0.5.0",pinnedHttps=true,staffAuthentication=true,roleDenied=true,readOnlyRecords=true,
+            viewConversion=true,credentialsHidden=true,signOutClearsAccess=true,externalToolsLaunched=false
+        },new JsonSerializerOptions{WriteIndented=true}));
         await File.WriteAllTextAsync(Path.Combine(root,"release","Tests","SimpleConnectionSmoke.json"),JsonSerializer.Serialize(new{
             version="0.4.0",automaticDiscovery=true,pinnedHttps=true,wrongKeyRejected=true,existingAdministratorLogin=true,
             databaseAndStockPreserved=true,credentialsUnchanged=true,publicConnectionFile=true,identitySurvivesReenable=true,

@@ -97,8 +97,28 @@
 
 </StackPanel></ScrollViewer></TabItem><TabItem Header="Activity"><TextBox x:Name="Activity" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/></TabItem>
 
+<TabItem x:Name="DatabaseAccessTab" Header="Database Access"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
+<TextBlock Text="Database Access" FontSize="25" FontWeight="SemiBold"/>
+<TextBlock Text="Connection status and details" FontSize="18" FontWeight="SemiBold" Margin="0,14,0,6"/>
+<TextBox x:Name="DbConnectionDetails" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"/>
+<WrapPanel><Button x:Name="DbCheckButton" Content="Check database and API" Click="CheckDatabaseAccess"/><Button Content="Copy connection details" Click="CopyDatabaseDetails"/></WrapPanel>
+<Separator Margin="0,14"/>
+<TextBlock Text="View and export records" FontSize="20" FontWeight="SemiBold"/>
+<TextBlock Text="Sign in with your pharmacy application account. Existing roles control access. This viewer is read-only. Exports contain the loaded snapshot, subject to API result limits; they are not complete database backups." TextWrapping="Wrap" Margin="0,8,0,12"/>
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,12,0"><TextBlock Text="Staff email"/><TextBox x:Name="DbStaffEmail"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="Staff password"/><PasswordBox x:Name="DbStaffPassword" Padding="10" Margin="0,4,0,14"/></StackPanel></Grid>
+<WrapPanel><Button x:Name="DbSignInButton" Content="Sign in to records" Click="SignInDatabaseAccess"/><Button x:Name="DbSignOutButton" Content="Sign out of records" Click="SignOutDatabaseAccess"/></WrapPanel>
+<TextBlock x:Name="DbSessionStatus" Text="Not signed in. Record access uses your application role." TextWrapping="Wrap" Margin="0,8"/>
+<ComboBox x:Name="DbDataset" DisplayMemberPath="Name" Padding="8" Margin="0,4,0,8"/>
+<WrapPanel><Button x:Name="DbLoadButton" Content="View records" Click="LoadDatabaseRecords"/><Button x:Name="DbExportButton" Content="Export loaded records (CSV / JSON)" Click="ExportDatabaseRecords"/></WrapPanel>
+<DataGrid x:Name="DbRecords" Height="260" Margin="0,10" AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column"/>
+<TextBlock x:Name="DbAccessMessage" Text="Choose Check database and API, or sign in to view records." TextWrapping="Wrap" Background="#FFF2D1" Padding="12" Margin="0,8,0,14"/>
+<Separator Margin="0,10"/><TextBlock Text="IT database administration tools" FontSize="20" FontWeight="SemiBold"/>
+<TextBlock Text="SQL Shell is included. Select an existing pgAdmin4.exe to open optional pgAdmin. These tools require an IT-provisioned PostgreSQL account/password, separate from your pharmacy staff login. App-managed passwords are never shown or filled in. PostgreSQL stays local to the server." TextWrapping="Wrap" Margin="0,8,0,12"/>
+<TextBlock Text="PostgreSQL account for SQL Shell"/><TextBox x:Name="DbToolUser" Text="ddhi_runtime"/>
+<WrapPanel><Button x:Name="DbPsqlButton" Content="Open SQL Shell" Click="OpenDatabaseShell"/><Button x:Name="DbAdminButton" Content="Open installed pgAdmin" Click="OpenDatabaseAdmin"/></WrapPanel>
+</StackPanel></ScrollViewer></TabItem>
 </TabControl>
 
-<TextBlock Grid.Row="3" Text="Server Control 0.4.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
+<TextBlock Grid.Row="3" Text="Server Control 0.5.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
 
 </Grid></Window>

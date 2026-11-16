@@ -1,4 +1,4 @@
-# Release status - Server Control 0.4.0 / client 0.2.0 / API 0.1.0
+# Release status - Server Control 0.5.0 / client 0.3.0 / API 0.1.0
 
 Build date: 15 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
@@ -66,3 +66,7 @@ The LAN connection page converts an existing prepared localhost/LAN instance usi
 The new default workflow is Enable LAN on the server, then automatic discovery and one-time code confirmation on each updated client. A public .ddhiconnect file is the fallback. Server/client HTTPS is authenticated by the paired public key rather than requiring a hospital CA in simple mode. Keys are generated/protected on the server; client trust metadata is DPAPI-protected per Windows user. DNS, manual PFX import and an approval-reference field are not required for this mode. Discovery never sends staff credentials or silently establishes a new trust identity. Existing accounts and inventory are retained, and repeated enablement retains the server key. A different key and invalid certificate dates are rejected. The worker serves local-subnet UDP discovery metadata only. Default ports are TCP 8443 and UDP 8444; owned firewall rules are scoped to the selected adapter, local subnet and API/worker programs. Advanced TLS remains optional.
 
 All 37 Server Manager tests passed. SimpleConnectionSmoke.json and ServerManagerTests.trx record isolated discovery, pinned HTTPS, key rejection, login, data/credential preservation and restart checks. Windows trust stores are not changed. Actual elevated firewall/service/reboot behavior and physical workstation connectivity still need destination-server acceptance; automated loopback tests do not prove those. Live Cerebro remains disabled.
+
+## Database Access and client role navigation — 16 November 2026
+
+Server Control 0.5.0 adds Database Access after Activity, with redacted connection details, health checks, application-authenticated read-only records, CSV/JSON snapshots and explicit IT tool launch. Client 0.3.0 displays the signed-in email/role and filters modules/actions using existing API permissions. A 59-test Server Manager suite passed, including new session, role-menu/action, export, real HTTPS login and permission-denial checks. Role sidebars were rendered using actual client XAML and policy data; no real staff authentication was automated. External SQL Shell/pgAdmin operation, destination-server maintenance and physical client acceptance remain pending. API/worker/database schema are unchanged.
