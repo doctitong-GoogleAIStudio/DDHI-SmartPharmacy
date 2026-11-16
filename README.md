@@ -34,3 +34,7 @@ Client 0.2.1 fixes sidebar readability. Normal menu labels use light text; hover
 ## Server Control 0.5.0 and client 0.3.0
 
 Database Access follows Activity in Server Control: connection/health details, role-authorized read-only record viewing and CSV/JSON snapshot export, plus optional IT SQL Shell/pgAdmin launch with a separate database login. Client 0.3.0 shows the signed-in role and email below the hospital name and filters both navigation modules and action buttons using the existing API role policies. Sign-out/account changes clear role menus and record caches. See docs/DATABASE_ACCESS.md and docs/CLIENT_ROLE_NAVIGATION.md. Existing pairing and database records are retained; API/worker versions are unchanged.
+
+## Server Control 0.6.0: separate IT database login
+
+Database Access now lets the original Windows setup administrator create a separate ddhi_it_ PostgreSQL login with an operator-chosen password. Read-only inventory views are the default; explicit database maintenance access is optional. Existing application credentials and database networking are retained. Passwords are converted to salted SCRAM verifiers before SQL execution and are not retained by Server Control. See docs/IT_DATABASE_LOGIN.md. Client 0.3.0 is unchanged.

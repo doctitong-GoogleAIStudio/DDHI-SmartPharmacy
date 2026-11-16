@@ -23,6 +23,9 @@ public partial class MainWindow
         DbLoadButton.IsEnabled = enabled && recordSession?.IsAuthenticated == true;
         DbSignOutButton.IsEnabled = !busy && recordSession != null;
         DbExportButton.IsEnabled = enabled && recordSession?.IsAuthenticated == true && displayedRecords != null;
+        DbItCreateButton.IsEnabled = enabled && ServerController.IsAdministrator;
+        DbItMaintenanceAck.IsEnabled = !busy && DbItPermission.SelectedIndex == 1;
+        DbItAdminNote.Text = ServerController.IsAdministrator ? "Create a separate IT login below; the application service accounts are retained." : "To create an IT login, reopen Server Control as Administrator using the original Windows setup account.";
     }
     void ClearDatabaseSession()
     {
@@ -108,5 +111,33 @@ public partial class MainWindow
             Process.Start(new ProcessStartInfo(dialog.FileName) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(dialog.FileName) });
             DbAccessMessage.Text = "pgAdmin opened. Use the displayed loopback host, port and database with an IT-provisioned PostgreSQL login. Saved passwords were not shared.";
         } catch (Exception ex) { DbAccessMessage.Text = ex.Message; }
+    }
+    void ItPermissionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (DbItMaintenanceAck == null) return;
+        DbItMaintenanceAck.IsChecked = false;
+        DbItMaintenanceAck.IsEnabled = !busy && DbItPermission.SelectedIndex == 1;
+    }
+    async void CreateItLogin(object sender, RoutedEventArgs e)
+    {
+        if (busy || PreviewOnly) return;
+        var username=DbItUsername.Text.Trim(); var password=DbItPassword.Password; var confirmation=DbItPasswordConfirm.Password;
+        DbItPassword.Clear(); DbItPasswordConfirm.Clear();
+        var permission=DbItPermission.SelectedIndex==1 ? ItDatabasePermission.DatabaseMaintenance : ItDatabasePermission.ReadOnlyInventory;
+        var acknowledged=DbItMaintenanceAck.IsChecked==true;
+        try {
+            if (password!=confirmation) throw new InvalidOperationException("The two passwords do not match. Enter them again.");
+            ItDatabaseLoginRules.Validate(username,password,permission,acknowledged);
+        } catch(Exception ex) { DbItResult.Text=ex.Message; return; }
+        var access=permission==ItDatabasePermission.ReadOnlyInventory ? "Read-only inventory views" : "Database maintenance with explicit schema-owner access";
+        if(MessageBox.Show(this,$"Create PostgreSQL login {username}?\n\nAccess: {access}\n\nUse the password you entered in SQL Shell or pgAdmin. Server Control will not retain it. Existing application account passwords are not changed.","Create separate IT database login",MessageBoxButton.OKCancel,MessageBoxImage.Question)!=MessageBoxResult.OK)return;
+        await DatabaseAction(async()=>{
+            DbItResult.Text="Creating the separate IT login...";
+            try {
+                var created=await controller.CreateItDatabaseLogin(username,password,permission,acknowledged);
+                DbToolUser.Text=created.Username; DbItResult.Text=created.Instructions;
+                MessageBox.Show(this,$"Created {created.Username}\nAccess: {created.Access}\nDatabase: ddhi_pharmacy\nHost: 127.0.0.1\nPort: {created.Port}\n\nUse the password you entered. Keep it in your approved password manager; Server Control has not saved it.","IT database login created",MessageBoxButton.OK,MessageBoxImage.Information);
+            } catch(Exception ex) { DbItResult.Text="Login creation failed: "+ex.Message; throw; }
+        });
     }
 }

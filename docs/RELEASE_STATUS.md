@@ -1,4 +1,4 @@
-# Release status - Server Control 0.5.0 / client 0.3.0 / API 0.1.0
+# Release status - Server Control 0.6.0 / client 0.3.0 / API 0.1.0
 
 Build date: 15 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
@@ -70,3 +70,7 @@ All 37 Server Manager tests passed. SimpleConnectionSmoke.json and ServerManager
 ## Database Access and client role navigation — 16 November 2026
 
 Server Control 0.5.0 adds Database Access after Activity, with redacted connection details, health checks, application-authenticated read-only records, CSV/JSON snapshots and explicit IT tool launch. Client 0.3.0 displays the signed-in email/role and filters modules/actions using existing API permissions. A 59-test Server Manager suite passed, including new session, role-menu/action, export, real HTTPS login and permission-denial checks. Role sidebars were rendered using actual client XAML and policy data; no real staff authentication was automated. External SQL Shell/pgAdmin operation, destination-server maintenance and physical client acceptance remain pending. API/worker/database schema are unchanged.
+
+## Separate IT PostgreSQL login — Server Control 0.6.0
+
+Database Access includes an elevated, original-setup-account wizard for a new ddhi_it_ login with an operator-chosen password and explicit access level. Read-only inventory views are default; pharmacy schema-owner maintenance requires acknowledgement and explicit role selection in SQL. No superuser is granted. Existing users are refused rather than reset. Provisioning is transactional, validates managed namespaces and effective PUBLIC permissions, uses a salted SCRAM verifier instead of cleartext password SQL, and preserves application credentials, stock and ledger data. All 76 Server Manager tests passed, including real PostgreSQL authentication, wrong-password denial, view access, forbidden writes/credential reads, maintenance scoping, duplicate protection, rollback, namespace collision and unsafe PUBLIC-grant rejection. No actual hospital-server IT login was provisioned by these tests. Client 0.3.0 is unchanged; destination-server installation/tool acceptance remains pending. See IT_DATABASE_LOGIN.md.

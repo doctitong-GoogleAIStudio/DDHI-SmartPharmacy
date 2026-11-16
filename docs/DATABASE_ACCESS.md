@@ -1,4 +1,4 @@
-# Database Access — Server Control 0.5.0
+# Database Access — Server Control 0.6.0
 
 Install the updated server installer over the same installation using the original Windows setup account. Preserve the original data folder and take an encrypted backup before the upgrade. Open Server Control as Administrator. The new Database Access tab is immediately after Activity. Existing client 0.2.1 remains compatible.
 
@@ -16,7 +16,7 @@ The grid is read-only. There is no SQL editor and no record creation/update/dele
 
 Open SQL Shell launches the bundled psql on 127.0.0.1 using the displayed PostgreSQL port and database. Enter an IT-provisioned PostgreSQL username. The shell prompts for that database account's password; your pharmacy staff password is not a PostgreSQL login. No saved application/database passwords are displayed or passed. SQL Shell starts with transactions read-only and a 30-second statement timeout; PostgreSQL account permissions remain authoritative. It is an IT tool, separate from the role-controlled application viewer.
 
-Open installed pgAdmin lets IT select an existing pgAdmin4.exe. pgAdmin is optional and is not bundled/downloaded automatically. Configure it with the displayed host/port/database and a separately provisioned database login. This feature does not reset credentials, grant roles, open PostgreSQL to client computers, or alter database networking. Client PCs continue to connect only to the central HTTPS API.
+Open installed pgAdmin lets IT select an existing pgAdmin4.exe. pgAdmin is optional and is not bundled/downloaded automatically. Configure it with the displayed host/port/database and a separately provisioned database login. Opening a tool does not share saved passwords or alter PostgreSQL networking. Server Control 0.6.0 adds a separate IT-login creation form in this tab; see IT_DATABASE_LOGIN.md. It creates a new account with the explicitly selected access level and does not reset existing accounts. Client PCs continue to connect only to the central HTTPS API.
 
 ## Validation limits
 

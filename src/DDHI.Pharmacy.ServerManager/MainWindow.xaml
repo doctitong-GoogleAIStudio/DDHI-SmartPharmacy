@@ -113,12 +113,22 @@
 <DataGrid x:Name="DbRecords" Height="260" Margin="0,10" AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column"/>
 <TextBlock x:Name="DbAccessMessage" Text="Choose Check database and API, or sign in to view records." TextWrapping="Wrap" Background="#FFF2D1" Padding="12" Margin="0,8,0,14"/>
 <Separator Margin="0,10"/><TextBlock Text="IT database administration tools" FontSize="20" FontWeight="SemiBold"/>
+<TextBlock Text="Create a separate IT PostgreSQL login" FontSize="18" FontWeight="SemiBold" Margin="0,14,0,6"/>
+<TextBlock x:Name="DbItAdminNote" TextWrapping="Wrap" Margin="0,4,0,10"/>
+<TextBlock Text="New username (ddhi_it_ followed by your name; lowercase letters, numbers and underscores)"/><TextBox x:Name="DbItUsername" Text="ddhi_it_support" MaxLength="63"/>
+<TextBlock Text="Choose a password: 16–128 printable ASCII characters, uppercase/lowercase/number/symbol, no spaces" TextWrapping="Wrap"/>
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,12,0"><TextBlock Text="New PostgreSQL password"/><PasswordBox x:Name="DbItPassword" Padding="10" Margin="0,4,0,14" MaxLength="128"/></StackPanel><StackPanel Grid.Column="1"><TextBlock Text="Confirm password"/><PasswordBox x:Name="DbItPasswordConfirm" Padding="10" Margin="0,4,0,14" MaxLength="128"/></StackPanel></Grid>
+<TextBlock Text="Access level"/><ComboBox x:Name="DbItPermission" SelectedIndex="0" SelectionChanged="ItPermissionChanged" Padding="8" Margin="0,4,0,10"><ComboBoxItem Content="Read-only inventory views (recommended)"/><ComboBoxItem Content="Database maintenance (pharmacy database owner access)"/></ComboBox>
+<CheckBox x:Name="DbItMaintenanceAck" Content="I acknowledge that maintenance access can alter/delete pharmacy data and inspect protected tables." Margin="0,6,0,10"/>
+<TextBlock Text="Read-only access covers ddhi_it.medicines, inventory, suppliers and locations. It excludes underlying application tables, staff credentials and patient/order data. Maintenance is a separate privileged choice. Neither option creates a PostgreSQL superuser or changes application account passwords." TextWrapping="Wrap" Margin="0,4,0,10"/>
+<Button x:Name="DbItCreateButton" Content="Create IT database login" Click="CreateItLogin" HorizontalAlignment="Left"/>
+<TextBox x:Name="DbItResult" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Text="Your new login details will appear here. Choose and retain your own password; it is not displayed or saved." Margin="0,10,0,16"/>
 <TextBlock Text="SQL Shell is included. Select an existing pgAdmin4.exe to open optional pgAdmin. These tools require an IT-provisioned PostgreSQL account/password, separate from your pharmacy staff login. App-managed passwords are never shown or filled in. PostgreSQL stays local to the server." TextWrapping="Wrap" Margin="0,8,0,12"/>
 <TextBlock Text="PostgreSQL account for SQL Shell"/><TextBox x:Name="DbToolUser" Text="ddhi_runtime"/>
 <WrapPanel><Button x:Name="DbPsqlButton" Content="Open SQL Shell" Click="OpenDatabaseShell"/><Button x:Name="DbAdminButton" Content="Open installed pgAdmin" Click="OpenDatabaseAdmin"/></WrapPanel>
 </StackPanel></ScrollViewer></TabItem>
 </TabControl>
 
-<TextBlock Grid.Row="3" Text="Server Control 0.5.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
+<TextBlock Grid.Row="3" Text="Server Control 0.6.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
 
 </Grid></Window>
