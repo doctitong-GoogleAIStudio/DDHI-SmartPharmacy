@@ -12,3 +12,11 @@ REVOKE UPDATE, DELETE, TRUNCATE ON "StockMovements", "AuditEvents", "OperationKe
 -- Account management removes account-private identity records only; clinical history remains protected.
 GRANT DELETE ON "AspNetUsers", "AspNetUserClaims", "AspNetUserRoles", "AspNetUserLogins", "AspNetUserTokens" TO ddhi_runtime;
 -- Do not grant DELETE/TRUNCATE or schema ownership to the runtime account.
+
+-- Outside/uncertain patient intake is append-only and never a stock credit.
+DO $$ BEGIN
+ IF to_regclass('public."ExternalReturnIntakes"') IS NOT NULL THEN
+  GRANT SELECT, INSERT ON "ExternalReturnIntakes" TO ddhi_runtime;
+  REVOKE UPDATE, DELETE, TRUNCATE ON "ExternalReturnIntakes" FROM ddhi_runtime;
+ END IF;
+END $$;

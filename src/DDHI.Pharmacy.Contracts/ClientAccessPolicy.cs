@@ -30,7 +30,8 @@ public static class ClientAccessPolicy
     {
         if (!CanView(page,roles)) return false;
         return page switch {
-            "Medicine Master" or "Barcode Registration" => Has(roles,"Catalog"),
+            "Medicine Master" => action is "Browse generics" or "View brands" or "All brand products" or "Export CSV / Excel" or "Print / PDF" ? Has(roles,"SignedIn") : Has(roles,"Catalog"),
+            "Barcode Registration" => Has(roles,"Catalog"),
             "Inventory Management" => action switch {
                 "Quarantine / release stock" or "Record disposition" or "Add location" => Has(roles,"Catalog"),
                 "Reconcile ledger" => Has(roles,"Report"),
@@ -38,7 +39,7 @@ public static class ClientAccessPolicy
                 "FEFO by medicine" or "Export CSV / Excel" or "Print / PDF" => Has(roles,"SignedIn"),
                 _ => false
             },
-            "Returns and Adjustments" => action == "Return to quarantine" ? Has(roles,"Clinical") : Has(roles,"Catalog"),
+            "Returns and Adjustments" => action is "Export CSV / Excel" or "Print / PDF" ? Has(roles,"Clinical")||Has(roles,"Catalog") : action is "Return to quarantine" or "Find discharge medicines" or "Hospital discharge return" or "Patient return history" or "Outside / uncertain intake" or "Outside intake history" ? Has(roles,"Clinical") : Has(roles,"Catalog"),
             "Medicine Recalls" => Has(roles,"Catalog"),
             "Cerebro Synchronization" => action == "Manual acknowledgment" ? Has(roles,"Catalog") : Has(roles,"Report"),
             "System Settings" => Has(roles,"Chief"),

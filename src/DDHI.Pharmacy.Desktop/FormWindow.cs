@@ -12,9 +12,9 @@ public sealed class FormWindow:Window {
   var confirm=new Button{Content="Review and confirm",Padding=new Thickness(14,9,14,9)};buttons.Children.Add(confirm);confirm.Click+=(s,e)=>Submit();var cancel=new Button{Content="Cancel",Padding=new Thickness(14,9,14,9)};buttons.Children.Add(cancel);cancel.Click+=(s,e)=>{DialogResult=false;};
   var stack=new StackPanel();outer.Children.Add(new ScrollViewer{Content=stack,VerticalScrollBarVisibility=ScrollBarVisibility.Auto});
   stack.Children.Add(new TextBlock{Text=title,FontSize=23,Margin=new Thickness(0,0,0,16),TextWrapping=TextWrapping.Wrap});
-  foreach(var field in fields){stack.Children.Add(new TextBlock{Text=field.Label,TextWrapping=TextWrapping.Wrap});FrameworkElement element;
+  foreach(var field in fields){if(field.Kind!="bool")stack.Children.Add(new TextBlock{Text=field.Label,TextWrapping=TextWrapping.Wrap});FrameworkElement element;
    if(field.Lookup!=null){var combo=new ComboBox{DisplayMemberPath="Value",SelectedValuePath="Key",ItemsSource=lookups.GetValueOrDefault(field.Lookup,[])};element=combo;}
-   else if(field.Kind=="bool")element=new CheckBox{Content=field.Label,IsChecked=field.Default=="true",Margin=new Thickness(0,8,0,14)};
+   else if(field.Kind=="bool")element=new CheckBox{Content=new TextBlock{Text=field.Label,TextWrapping=TextWrapping.Wrap},IsChecked=field.Default=="true",Margin=new Thickness(0,8,0,14)};
    else if(field.Kind=="date")element=new DatePicker{Margin=new Thickness(0,5,0,14)};
    else if(field.Kind=="choice")element=new ComboBox{ItemsSource=field.Default.Split('|'),SelectedIndex=0};
    else if(field.Kind=="password")element=new PasswordBox{Padding=new Thickness(8),Margin=new Thickness(0,5,0,14)};

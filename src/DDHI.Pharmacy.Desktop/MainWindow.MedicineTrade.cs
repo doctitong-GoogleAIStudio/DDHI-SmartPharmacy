@@ -5,8 +5,7 @@ public partial class MainWindow
 {
     async Task EditMedicineTrade()
     {
-        var id=SelectedId();var rows=await vm.Get("medicines");
-        var medicine=rows.EnumerateArray().Single(x=>x.GetProperty("id").GetString()==id);
+        var id=SelectedId();var medicine=await vm.Get("medicines/"+id);
         string Value(string key)=>medicine.TryGetProperty(key,out var value)?value.GetString()??"":"";
         var dialog=new FormWindow("Edit importer / distributor — "+Value("genericName"),[
             new("importedBy","Imported by (optional; clear to remove)","text",Value("importedBy")),

@@ -3,10 +3,10 @@ public record MedicineInput(string GenericName,string BrandName,string Strength,
 public record BarcodeInput(Guid MedicineId,string Barcode,string Packaging,decimal ConversionFactor,bool Confirmed,string Format="Auto");
 public record ReceiveInput(Guid MedicineId,Guid LocationId,Guid SupplierId,string Reference,string Lot,DateOnly Expiration,decimal Quantity,decimal ConversionFactor,decimal UnitCost,bool Confirmed,Guid? PurchaseOrderId=null);
 public record OrderInput(string Reference,string EncounterReference,Guid MedicineId,decimal Quantity,bool Confirmed);
-public record DispenseInput(Guid OrderId,Guid BalanceId,decimal Quantity,string Barcode,string VerificationMode,bool PatientVerified,bool Confirmed,string OverrideReason);
+public record DispenseInput(Guid OrderId,Guid BalanceId,decimal Quantity,string Barcode,string VerificationMode,bool PatientVerified,bool Confirmed,string OverrideReason,bool ApproveBrandSubstitution=false,string SubstitutionApprovalReference="",string SubstitutionReason="");
 public record MoveInput(Guid BalanceId,Guid DestinationId,decimal Quantity,string Reference,string Reason,bool Confirmed);
 public record CountInput(Guid BalanceId,decimal CountedQuantity,string Reference,string Reason,bool Confirmed);
-public record ReturnInput(Guid DispenseLineId,decimal Quantity,string Reference,string Reason,bool Confirmed);
+public record ReturnInput(Guid DispenseLineId,decimal Quantity,string Reference,string Reason,bool Confirmed,bool DischargeReturn=false,string DischargeReference="",string PackageCondition="",bool UnusedVerified=false,bool HospitalSourceVerified=false,string HospitalEvidenceReference="");
 public record RecallInput(Guid BatchId,string Reference,string Reason,bool Confirmed);
 public record NamedInput(string Name);
 public record WorkstationInput(string Name);

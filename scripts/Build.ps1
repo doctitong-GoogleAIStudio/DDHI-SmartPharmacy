@@ -15,9 +15,13 @@ dotnet publish src\DDHI.Pharmacy.ServerManager -c Release -r win-x64 --self-cont
 dotnet test tests\ServerManagerTests -c Release --logger "trx;LogFileName=ServerManagerTests.trx" --results-directory release\Tests -m:1 --disable-build-servers; Check
 python scripts\Manuals.py; Check
 python scripts\Make-LanConnectionGuide.py; Check
+python scripts\Make-CompleteManual.py; Check
 New-Item -ItemType Directory -Path release\Client\Documentation -Force | Out-Null
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Client\Documentation -Force
 Copy-Item docs\MEDICINE_IMPORTER_DISTRIBUTOR.md release\Client\Documentation -Force
+Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf release\Client\Documentation -Force
+Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf release\Documentation -Force
+Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf "release\Documentation\Pharmacy User Manual.pdf" -Force
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Documentation -Force
 Copy-Item docs\*.md release\Documentation -Force
 Copy-Item docs\ThirdParty release\Documentation -Recurse -Force

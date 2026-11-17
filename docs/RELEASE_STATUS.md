@@ -1,4 +1,4 @@
-# Release status - Server Control 0.7.1 / client 0.4.1 / API 0.2.1
+# Release status - Server Control 0.8.0 / client 0.5.0 / API 0.3.0
 
 Build date: 17 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
@@ -82,3 +82,7 @@ Scan results display named catalog, package and stock fields with explicit missi
 ## Medicine importer and distributor — 0.7.1
 
 Optional medicine-level company fields persist in PostgreSQL, appear in the client catalog/export/scan results, and can be added or corrected through catalog-authorized forms. Legacy ten-column and extended twelve-column approved CSV imports are supported. The migration adds empty-default columns while preserving existing catalog and stock. Server status now offers Apply database updates for the selected prepared instance, with a backup/maintenance confirmation and controlled restart. See MEDICINE_IMPORTER_DISTRIBUTOR.md; separate-server service upgrade and physical scanner acceptance remain pending.
+
+## Generic brands, authorized substitution, mixed-source returns and complete manual - 0.8.0
+
+Generic browsing groups existing product definitions without merging IDs/stock. Catalog staff can add a brand under a selected definition. Brand names now appear in inventory/order selectors and stock reports. Explicit pharmacist substitution requires matching recorded generic/strength/form/route/base unit, verification, approval reference and reason; it retains original and actual product/brand identities and existing stock safeguards. Hospital patient returns require source evidence and an original dispensing line, enforce cumulative limits and quarantine the actual dispensed brand. Outside/uncertain items have append-only custody intake with no inventory/outbox credit. Migrations add recording fields/table with defaults for older rows; older returns are not retrospectively asserted as source-verified. Health reports pending schema updates. The complete bookmarked PDF covers all 19 sidebars, server operation, mixed-source examples and 102 glossary terms. Hospital clinical/physical handling, billing, destination-service lifecycle and clean-machine acceptance remain pending; live Cerebro remains disabled.

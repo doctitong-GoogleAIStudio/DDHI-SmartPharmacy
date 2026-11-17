@@ -6,6 +6,8 @@ $testRoot=Join-Path $PWD ('work\isetup-'+[Guid]::NewGuid().ToString('N').Substri
 New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
 $verified=@{Client=$false;Server=$false;ServerSupplemental=$false}
 $evidencePath=Join-Path $PWD 'release\Tests\InstallerPayloadSmoke.json'
+$initialClientInstallerHash=(Get-FileHash release\Installers\DDHI-SmartPharmacy-Setup-x64.exe -Algorithm SHA256).Hash
+$initialServerInstallerHash=(Get-FileHash release\Installers\DDHI-SmartPharmacy-Server-Setup-x64.exe -Algorithm SHA256).Hash
 if (Test-Path -LiteralPath $evidencePath) {
  $previous=Get-Content -LiteralPath $evidencePath -Raw | ConvertFrom-Json
  $verified.Client=$previous.clientPayloadVerified -and $previous.clientInstallerSha256 -eq (Get-FileHash release\Installers\DDHI-SmartPharmacy-Setup-x64.exe -Algorithm SHA256).Hash
@@ -41,6 +43,7 @@ foreach ($kind in $targets) {
   $verified.ServerSupplemental=$true
  }
 }
+if ($initialClientInstallerHash -ne (Get-FileHash release\Installers\DDHI-SmartPharmacy-Setup-x64.exe -Algorithm SHA256).Hash -or $initialServerInstallerHash -ne (Get-FileHash release\Installers\DDHI-SmartPharmacy-Server-Setup-x64.exe -Algorithm SHA256).Hash) {throw 'An installer changed during payload verification. Re-run verification after packaging has finished.'}
 if (-not $verified.Client -or -not $verified.Server) {throw 'Both current installer payloads must be verified; run with -Target All.'}
 if (-not $verified.ServerSupplemental) {throw 'The server database scripts and documentation must also be verified; run with -Target Server or All.'}
 @{clientPayloadVerified=$verified.Client;serverPayloadVerified=$verified.Server;serverSupplementalPayloadVerified=$verified.ServerSupplemental;clientInstallerSha256=(Get-FileHash release\Installers\DDHI-SmartPharmacy-Setup-x64.exe -Algorithm SHA256).Hash;serverInstallerSha256=(Get-FileHash release\Installers\DDHI-SmartPharmacy-Server-Setup-x64.exe -Algorithm SHA256).Hash;mode='Extraction-only smoke test; no shortcuts, registry registration or service changes';cleanMachineInstall=$false;upgradeUninstallAccepted=$false;testDirectory=$testRoot} | ConvertTo-Json | Set-Content release\Tests\InstallerPayloadSmoke.json

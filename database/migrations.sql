@@ -1086,3 +1086,169 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "DischargeReference" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "DischargeReturn" boolean NOT NULL DEFAULT FALSE;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "MovementId" uuid;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "PackageCondition" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "Reference" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "Returns" ADD "UnusedVerified" boolean NOT NULL DEFAULT FALSE;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "BrandSubstituted" boolean NOT NULL DEFAULT FALSE;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "DispensedBrandName" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "DispensedMedicineId" uuid;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "RequestedBrandName" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "RequestedMedicineId" uuid;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "SubstitutionApprovalReference" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    ALTER TABLE "DispenseTransactions" ADD "SubstitutionReason" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    CREATE UNIQUE INDEX "IX_Returns_Reference" ON "Returns" ("Reference") WHERE "Reference" <> '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117112941_BrandSubstitutionAndDischargeReturns') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261117112941_BrandSubstitutionAndDischargeReturns', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117113616_MixedSourceReturnIntake') THEN
+    ALTER TABLE "Returns" ADD "HospitalEvidenceReference" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117113616_MixedSourceReturnIntake') THEN
+    ALTER TABLE "Returns" ADD "HospitalSourceVerified" boolean NOT NULL DEFAULT FALSE;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117113616_MixedSourceReturnIntake') THEN
+    CREATE TABLE "ExternalReturnIntakes" (
+        "Id" uuid NOT NULL,
+        "Reference" character varying(2000) NOT NULL,
+        "EncounterReference" character varying(2000) NOT NULL,
+        "Source" character varying(2000) NOT NULL,
+        "ItemDescription" character varying(2000) NOT NULL,
+        "Quantity" numeric(20,4) NOT NULL,
+        "Unit" character varying(2000) NOT NULL,
+        "PackageCondition" character varying(2000) NOT NULL,
+        "Lot" character varying(2000) NOT NULL,
+        "Expiration" date,
+        "Barcode" character varying(2000) NOT NULL,
+        "ReceiptReference" character varying(2000) NOT NULL,
+        "CustodyDisposition" character varying(2000) NOT NULL,
+        "Notes" character varying(2000) NOT NULL,
+        "RecordedBy" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ExternalReturnIntakes" PRIMARY KEY ("Id")
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117113616_MixedSourceReturnIntake') THEN
+    CREATE UNIQUE INDEX "IX_ExternalReturnIntakes_Reference" ON "ExternalReturnIntakes" ("Reference");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117113616_MixedSourceReturnIntake') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261117113616_MixedSourceReturnIntake', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+

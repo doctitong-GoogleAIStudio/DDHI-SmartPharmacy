@@ -48,7 +48,7 @@ def main():
             raise RuntimeError(f'Unexpected executable size: {path}')
     for name in ('Installation Guide', 'Administrator Guide', 'Pharmacy User Manual',
                  'Barcode Scanner Setup', 'Cerebro Integration Guide',
-                 'Workstation Deployment Guide', 'Backup Recovery Guide', 'DDHI-Server-and-Client-Connection-Guide'):
+                 'Workstation Deployment Guide', 'Backup Recovery Guide', 'DDHI-Server-and-Client-Connection-Guide', 'DDHI-SmartPharmacy-Complete-User-Manual'):
         with (RELEASE / 'Documentation' / (name + '.pdf')).open('rb') as stream:
             if stream.read(5) != b'%PDF-':
                 raise RuntimeError(f'Invalid PDF: {name}')
@@ -62,6 +62,9 @@ def main():
     }
     evidence = {}
     for filename, required in {
+        'GenericReturnSmoke.json': ['genericMultiBrands', 'approvedSubstitution', 'hospitalReturnLinkedToActualBrand', 'externalNoStockOrBillingCredit', 'runtimeIntakeAppendOnly'],
+        'CompleteManualReview.json': ['allSidebarSections', 'glossaryPresent', 'allPagesRendered', 'layoutReviewed'],
+        'GenericReturnPresentation.json': ['genericBrowseReviewed', 'addBrandReviewed', 'substitutionFieldsReviewed', 'hospitalReturnReviewed', 'externalIntakeReviewed'],
         'MedicineTradeSmoke.json': ['catalogPersisted', 'scanFields', 'schemaUpdatePreservedRecords', 'runtimeRole'],
         'MedicineSchemaUpgrade.json': ['countsPreserved', 'legacyFieldsPreserved', 'isolatedDatabase'],
         'MedicineTradePresentation.json': ['addFieldsReviewed', 'editFieldsReviewed', 'scanFieldsReviewed'],
@@ -90,6 +93,10 @@ def main():
             raise RuntimeError(f'Incomplete release evidence: {filename}')
         evidence[filename] = data
     desktop = evidence['DesktopLaunch.json']
+    if evidence['CompleteManualReview.json'].get('pdfSha256', '').lower() != sha(RELEASE / 'Documentation/DDHI-SmartPharmacy-Complete-User-Manual.pdf'):
+        raise RuntimeError('Manual review evidence does not match the packaged PDF.')
+    if evidence['GenericReturnPresentation.json'].get('clientSha256', '').lower() != sha(RELEASE / executables[0]):
+        raise RuntimeError('Generic/return presentation evidence does not match the packaged client.')
     if evidence['MedicineTradePresentation.json'].get('clientSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Importer/distributor presentation evidence does not match the packaged client.')
     if evidence['NavigationContrast.json'].get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
@@ -99,8 +106,8 @@ def main():
     if desktop.get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Desktop launch evidence does not match the packaged EXE.')
     server_preview = evidence['ServerDesktopPreview.json']
-    if server_preview.get('Version') != '0.7.1' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
-        raise RuntimeError('Server desktop launch evidence does not match version 0.7.1 and the current EXE.')
+    if server_preview.get('Version') != '0.8.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
+        raise RuntimeError('Server desktop launch evidence does not match version 0.8.0 and the current EXE.')
     installers = evidence['InstallerPayloadSmoke.json']
     for key, name in [('clientInstallerSha256', executables[1]), ('serverInstallerSha256', executables[2])]:
         if installers.get(key, '').lower() != sha(RELEASE / name):
@@ -139,7 +146,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.7.1-medicine-trade', 'components': {'client': '0.4.1', 'clientInstaller': '0.4.1', 'api': '0.2.1', 'worker': '0.3.1', 'serverControl': '0.7.1', 'serverInstaller': '0.7.1', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.8.0-generic-brands-manual', 'components': {'client': '0.5.0', 'clientInstaller': '0.5.0', 'api': '0.3.0', 'worker': '0.4.0', 'serverControl': '0.8.0', 'serverInstaller': '0.8.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,

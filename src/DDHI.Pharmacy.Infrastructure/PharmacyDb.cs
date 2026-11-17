@@ -19,6 +19,7 @@ public sealed class PharmacyDb(DbContextOptions<PharmacyDb> options) : IdentityD
  public DbSet<DispenseOrder> DispenseOrders => Set<DispenseOrder>();
  public DbSet<DispenseTransaction> DispenseTransactions => Set<DispenseTransaction>();
  public DbSet<DispenseTransactionLine> DispenseTransactionLines => Set<DispenseTransactionLine>();
+ public DbSet<ExternalReturnIntake> ExternalReturnIntakes => Set<ExternalReturnIntake>();
  public DbSet<Return> Returns => Set<Return>();
  public DbSet<StockAdjustment> StockAdjustments => Set<StockAdjustment>();
  public DbSet<RecallNotice> RecallNotices => Set<RecallNotice>();
@@ -75,6 +76,8 @@ public sealed class PharmacyDb(DbContextOptions<PharmacyDb> options) : IdentityD
   b.Entity<IntegrationAcknowledgment>().HasIndex(x=>x.OutboxId).IsUnique();
   b.Entity<CerebroMedicineMapping>().HasIndex(x=>x.ExternalId).IsUnique();
   b.Entity<CerebroOrderMapping>().HasIndex(x=>x.ExternalId).IsUnique();
+  b.Entity<ExternalReturnIntake>().HasIndex(x=>x.Reference).IsUnique();
+  b.Entity<Return>().HasIndex(x=>x.Reference).IsUnique().HasFilter("\"Reference\" <> ''");
   b.Entity<Workstation>().HasIndex(x=>x.Name).IsUnique();
   b.Entity<SystemSetting>().HasIndex(x=>x.Name).IsUnique();
   b.Entity<OperationKey>().HasIndex(x=>x.Key).IsUnique();
