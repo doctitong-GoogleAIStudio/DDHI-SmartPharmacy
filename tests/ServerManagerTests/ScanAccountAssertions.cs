@@ -30,6 +30,21 @@ internal static class ScanAccountAssertions
         var secret=ServerSecrets.Load(profile.DataRoot);await using var db=new NpgsqlConnection(controller.Connection("ddhi_runtime",secret.RuntimePassword));await db.OpenAsync();
         foreach(var table in new[]{"AspNetUsers","AspNetUserClaims","AspNetUserRoles","AspNetUserLogins","AspNetUserTokens"})Assert.True((bool)(await new NpgsqlCommand($"SELECT has_table_privilege(current_user,'\"{table}\"','DELETE')",db).ExecuteScalarAsync())!);
         foreach(var table in new[]{"AuditEvents","InventoryBalances"})Assert.False((bool)(await new NpgsqlCommand($"SELECT has_table_privilege(current_user,'\"{table}\"','DELETE')",db).ExecuteScalarAsync())!);
+        var chiefEmail="catalog-qa-"+Guid.NewGuid().ToString("N")+"@example.invalid";
+        await Post("/api/users",new{email=chiefEmail,password="Synthetic-only!Password123",role="Chief Pharmacist"});
+        var chiefToken=await Post("/auth/login",new{email=chiefEmail,password="Synthetic-only!Password123"});
+        client.DefaultRequestHeaders.Authorization=new("Bearer",chiefToken.GetProperty("accessToken").GetString());
+        var medicine=await Post("/api/medicines",new{genericName="QA trade medicine",brandName="",strength="5 mg",dosageForm="Tablet",route="Oral",manufacturer="QA maker",category="QA",baseUnit="tablet",reorderLevel=0,importedBy="QA importer",distributedBy="QA distributor"});
+        await Post("/api/barcodes",new{medicineId=medicine.GetProperty("Id").GetGuid(),barcode="18904083844874",packaging="box",conversionFactor=10,confirmed=true});
+        var tradeScan=await Post("/api/scan",new{barcode="18904083844874"});
+        Assert.Equal("QA importer",tradeScan.GetProperty("result").GetProperty("Medicine").GetProperty("ImportedBy").GetString());
+        Assert.Equal("QA distributor",tradeScan.GetProperty("result").GetProperty("Medicine").GetProperty("DistributedBy").GetString());
+        const string countSql="SELECT (SELECT COUNT(*) FROM \"Medicines\")::text||'|'||(SELECT COUNT(*) FROM \"AspNetUsers\")::text||'|'||(SELECT COUNT(*) FROM \"StockMovements\")::text";
+        var before=await new NpgsqlCommand(countSql,db).ExecuteScalarAsync();await db.CloseAsync();
+        await controller.ApplyDatabaseUpdates();
+        for(var attempt=0;attempt<40;attempt++){try{if((await controller.Health()).Contains("ready"))break;}catch{}await Task.Delay(500);}
+        Assert.Contains("ready",await controller.Health());await db.OpenAsync();Assert.Equal(before,await new NpgsqlCommand(countSql,db).ExecuteScalarAsync());
+        await File.WriteAllTextAsync(Path.Combine(root,"release","Tests","MedicineTradeSmoke.json"),JsonSerializer.Serialize(new{catalogPersisted=true,scanFields=true,schemaUpdatePreservedRecords=true,runtimeRole=true,physicalWorkstationsTested=false}));
         await File.WriteAllTextAsync(Path.Combine(root,"release","Tests","ScanAccountSmoke.json"),JsonSerializer.Serialize(new{publishedRuntimeRole=true,profileEdit=true,roleReplacement=true,accountDeletion=true,clinicalDeleteDenied=true,structuredScan=true,physicalScannerAcceptance=false}));
     }
 }

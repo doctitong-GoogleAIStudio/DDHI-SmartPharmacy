@@ -1,4 +1,4 @@
-# Release status - Server Control 0.7.0 / client 0.4.0 / API 0.2.0
+# Release status - Server Control 0.7.1 / client 0.4.1 / API 0.2.1
 
 Build date: 17 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
@@ -78,3 +78,7 @@ Database Access includes an elevated, original-setup-account wizard for a new dd
 ## Readable scans and staff editing — 0.7.0
 
 Scan results display named catalog, package and stock fields with explicit missing encoded data. Exact approved mappings, equivalent zero-padded GTIN aliases, distinct packaging indicators and ambiguous mapping denial share one resolver with dispensing. Image decoding preserves GS1 symbology metadata. User Administration supports editable email/name/phone/multiple roles, clearing optional information, and confirmed account deletion with history retained. Live security-stamp validation revokes changed accounts; stale writes, self-role changes and loss of the last active administrator are rejected. Startup applies DELETE only to five Identity account tables, never stock/audit tables. See SCAN_AND_ACCOUNT_GUIDE.md. Isolated tests and synthetic WPF previews are release evidence; physical scanner/workstation and destination-server upgrade acceptance remain pending.
+
+## Medicine importer and distributor — 0.7.1
+
+Optional medicine-level company fields persist in PostgreSQL, appear in the client catalog/export/scan results, and can be added or corrected through catalog-authorized forms. Legacy ten-column and extended twelve-column approved CSV imports are supported. The migration adds empty-default columns while preserving existing catalog and stock. Server status now offers Apply database updates for the selected prepared instance, with a backup/maintenance confirmation and controlled restart. See MEDICINE_IMPORTER_DISTRIBUTOR.md; separate-server service upgrade and physical scanner acceptance remain pending.

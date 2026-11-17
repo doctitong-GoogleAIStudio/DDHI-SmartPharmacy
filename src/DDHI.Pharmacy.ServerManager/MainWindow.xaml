@@ -16,7 +16,7 @@
 
 <TextBlock Text="Server endpoint" FontWeight="Bold"/><TextBox x:Name="EndpointDisplay" IsReadOnly="True"/><TextBlock Text="Data location" FontWeight="Bold"/><TextBox x:Name="DataDisplay" IsReadOnly="True"/>
 
-<WrapPanel><Button x:Name="StartButton" Content="Start server" Click="StartServer"/><Button x:Name="StopButton" Content="Stop server" Click="StopServer"/><Button Content="Check health" Click="CheckHealth"/><Button Content="Open logs folder" Click="OpenLogs"/><Button Content="Open existing server profile" Click="OpenExistingProfile"/><Button Content="Copy client address" Click="CopyClientAddress"/></WrapPanel>
+<WrapPanel><Button x:Name="StartButton" Content="Start server" Click="StartServer"/><Button x:Name="UpdateDatabaseButton" Content="Apply database updates" Click="UpdateDatabase"/><Button x:Name="StopButton" Content="Stop server" Click="StopServer"/><Button Content="Check health" Click="CheckHealth"/><Button Content="Open logs folder" Click="OpenLogs"/><Button Content="Open existing server profile" Click="OpenExistingProfile"/><Button Content="Copy client address" Click="CopyClientAddress"/></WrapPanel>
 
 <TextBlock x:Name="CertificateNote" TextWrapping="Wrap" Margin="0,16,0,12"/>
 
@@ -129,6 +129,6 @@
 </StackPanel></ScrollViewer></TabItem>
 </TabControl>
 
-<TextBlock Grid.Row="3" Text="Server Control 0.7.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
+<TextBlock Grid.Row="3" Text="Server Control 0.7.1 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
 
 </Grid></Window>

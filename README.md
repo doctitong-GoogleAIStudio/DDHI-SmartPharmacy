@@ -2,7 +2,7 @@
 
 Digos Doctors Hospital, Inc. | Developer: Vicente C. Cavalida Jr. MD
 
-Server Control 0.7.0, client 0.4.0, worker 0.3.0 and API 0.2.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
+Server Control 0.7.1, client 0.4.1, worker 0.3.1 and API 0.2.1 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
 
 ## Build
 
@@ -42,3 +42,5 @@ Database Access now lets the original Windows setup administrator create a separ
 ## Readable scans and account editing
 
 See [Scan and Account Guide](docs/SCAN_AND_ACCOUNT_GUIDE.md) for named scan results, catalog/package matching and System Administrator profile/role editing and deletion. Update both the server and client; start through the updated Server Control to apply the account-management permissions.
+
+Medicine Master includes optional Imported by / Distributed by fields, an editor for existing medicines, scan display and extended CSV import. Back up and use Server status > Apply database updates after installing the server update. See docs/MEDICINE_IMPORTER_DISTRIBUTOR.md.

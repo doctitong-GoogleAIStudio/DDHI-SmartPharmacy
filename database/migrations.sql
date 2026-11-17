@@ -1061,3 +1061,28 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117110136_MedicineTradeParties') THEN
+    ALTER TABLE "Medicines" ADD "DistributedBy" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117110136_MedicineTradeParties') THEN
+    ALTER TABLE "Medicines" ADD "ImportedBy" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261117110136_MedicineTradeParties') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261117110136_MedicineTradeParties', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+

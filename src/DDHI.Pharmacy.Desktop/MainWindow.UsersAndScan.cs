@@ -6,6 +6,7 @@ public partial class MainWindow
 {
     void UserColumns(object? sender,System.Windows.Controls.DataGridAutoGeneratingColumnEventArgs e)
     {
+        if(current=="Medicine Master"){e.Column.Header=e.PropertyName.ToLowerInvariant() switch{"importedby"=>"Imported by","distributedby"=>"Distributed by",_=>e.Column.Header};return;}
         if(current!="User Administration")return;
         if(e.PropertyName.Equals("id",StringComparison.OrdinalIgnoreCase)||e.PropertyName.Equals("version",StringComparison.OrdinalIgnoreCase)){e.Cancel=true;return;}
         e.Column.Header=e.PropertyName.ToLowerInvariant() switch{"fullname"=>"Full name","email"=>"Staff email","phonenumber"=>"Phone","roles"=>"Assigned roles","lockoutend"=>"Locked until",_=>e.PropertyName};

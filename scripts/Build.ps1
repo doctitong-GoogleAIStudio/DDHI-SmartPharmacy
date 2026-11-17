@@ -17,6 +17,7 @@ python scripts\Manuals.py; Check
 python scripts\Make-LanConnectionGuide.py; Check
 New-Item -ItemType Directory -Path release\Client\Documentation -Force | Out-Null
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Client\Documentation -Force
+Copy-Item docs\MEDICINE_IMPORTER_DISTRIBUTOR.md release\Client\Documentation -Force
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Documentation -Force
 Copy-Item docs\*.md release\Documentation -Force
 Copy-Item docs\ThirdParty release\Documentation -Recurse -Force

@@ -10,6 +10,17 @@ if ($pgStart.ExitCode -ne 0) { throw 'Isolated database failed to start.' }
 try {
 $env:PGHOST='127.0.0.1';$env:PGPORT='55432';$env:PGUSER='ddhi_test';$env:PGDATABASE='ddhi_test_workflows';$env:PGPASSWORD=Get-Content work\pg-password.txt -Raw
 $env:DDHI_TEST_CONNECTION='Host=127.0.0.1;Port=55432;Database=ddhi_test_workflows;Username=ddhi_test;Password='+$env:PGPASSWORD
+$beforeUpgrade= & '.\.tools\postgres\pgsql\bin\psql.exe' -At -f tests\IntegrationTests\upgrade-fingerprint.sql
+if($LASTEXITCODE -ne 0){throw 'Cannot read pre-upgrade QA fingerprint.'}
+$env:ConnectionStrings__Pharmacy=$env:DDHI_TEST_CONNECTION
+try {
+ dotnet src\DDHI.Pharmacy.Api\bin\Release\net10.0\DDHI.Pharmacy.Api.dll --migrate *> logs\schema-upgrade-test.log
+ if($LASTEXITCODE -ne 0){throw 'QA schema upgrade failed.'}
+} finally {Remove-Item Env:\ConnectionStrings__Pharmacy -ErrorAction SilentlyContinue}
+$afterUpgrade= & '.\.tools\postgres\pgsql\bin\psql.exe' -At -f tests\IntegrationTests\upgrade-fingerprint.sql
+if($LASTEXITCODE -ne 0 -or ($beforeUpgrade -join '|') -ne ($afterUpgrade -join '|')){throw 'Schema upgrade changed existing catalog, account or stock data.'}
+@{countsPreserved=$true;legacyFieldsPreserved=$true;isolatedDatabase=$true;fingerprint=$afterUpgrade}|ConvertTo-Json|Set-Content release\Tests\MedicineSchemaUpgrade.json
+
 dotnet test tests\UnitTests -c Release --no-build --logger 'trx;LogFileName=UnitTestsFinal.trx' --results-directory release\Tests *> logs\unit-final.log
 if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }
 dotnet test tests\IntegrationTests -c Release --no-build --logger 'trx;LogFileName=IntegrationTestsFinal.trx' --results-directory release\Tests *> logs\integration-final.log

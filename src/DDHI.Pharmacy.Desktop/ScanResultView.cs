@@ -58,7 +58,7 @@ public sealed class ScanResultView : UserControl
         Add(barcode,"Serial number",value.Serial??"Not encoded");fields.Children.Add(barcode);
         if(value.Medicine is { } med){
             fields.Children.Add(new TextBlock{Text=med.GenericName,FontSize=26,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,12,0,8)});
-            var grid=new UniformGrid{Columns=3};Add(grid,"Brand",Blank(med.BrandName));Add(grid,"Strength",med.Strength);Add(grid,"Dosage form",med.DosageForm);Add(grid,"Route",Blank(med.Route));Add(grid,"Manufacturer",Blank(med.Manufacturer));Add(grid,"Catalog status",med.Active?"Active":"Inactive");
+            var grid=new UniformGrid{Columns=3};Add(grid,"Brand",Blank(med.BrandName));Add(grid,"Strength",med.Strength);Add(grid,"Dosage form",med.DosageForm);Add(grid,"Route",Blank(med.Route));Add(grid,"Manufacturer",Blank(med.Manufacturer));Add(grid,"Imported by",Blank(med.ImportedBy));Add(grid,"Distributed by",Blank(med.DistributedBy));Add(grid,"Catalog status",med.Active?"Active":"Inactive");
             if(value.Package is { } pack)Add(grid,"Registered package",$"{pack.Packaging} = {pack.BaseUnitsPerPackage:0.####} {pack.BaseUnit}");fields.Children.Add(grid);
         }
         warning.Text=string.Join("\n",value.Warnings);

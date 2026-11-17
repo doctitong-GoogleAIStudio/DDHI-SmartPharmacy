@@ -45,7 +45,7 @@ public sealed class BarcodeLookup(PharmacyDb db)
         if(stock.Any(x=>x.Expired))warnings.Add("Recorded expired stock is present; it is not eligible for dispensing.");
         if(stock.Any(x=>x.Recalled))warnings.Add("Recorded recalled stock is present; it is not eligible for dispensing.");
         var package=mapping==null?new ScanPackageInfo("Internal stock balance",1,medicine.BaseUnit):new ScanPackageInfo(mapping.Packaging,mapping.ConversionFactor,medicine.BaseUnit);
-        var info=new ScanMedicineInfo(medicine.Id,medicine.GenericName,medicine.BrandName,medicine.Strength,medicine.DosageForm,medicine.Route,medicine.Manufacturer,medicine.BaseUnit,medicine.ActiveStatus);
+        var info=new ScanMedicineInfo(medicine.Id,medicine.GenericName,medicine.BrandName,medicine.Strength,medicine.DosageForm,medicine.Route,medicine.Manufacturer,medicine.BaseUnit,medicine.ActiveStatus,medicine.ImportedBy,medicine.DistributedBy);
         return new(data,medicine,mapping,internalStock,new("Matched","Registered medicine/package found. Confirm the physical label; scanning does not receive or dispense stock.",data.Raw,data.Symbology,data.Gtin,data.Lot,data.Expiration,data.Serial,info,package,stock,warnings));
     }
 }

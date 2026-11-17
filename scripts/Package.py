@@ -62,6 +62,9 @@ def main():
     }
     evidence = {}
     for filename, required in {
+        'MedicineTradeSmoke.json': ['catalogPersisted', 'scanFields', 'schemaUpdatePreservedRecords', 'runtimeRole'],
+        'MedicineSchemaUpgrade.json': ['countsPreserved', 'legacyFieldsPreserved', 'isolatedDatabase'],
+        'MedicineTradePresentation.json': ['addFieldsReviewed', 'editFieldsReviewed', 'scanFieldsReviewed'],
         'ScanAccountSmoke.json': ['publishedRuntimeRole', 'profileEdit', 'roleReplacement', 'accountDeletion', 'clinicalDeleteDenied', 'structuredScan'],
         'ScanAccountPresentation.json': ['scanLayoutReviewed', 'accountEditorReviewed', 'noRawJson'],
         'BackupRestore.json': ['backupAuthenticated', 'restoreSucceeded', 'countsMatch'],
@@ -87,6 +90,8 @@ def main():
             raise RuntimeError(f'Incomplete release evidence: {filename}')
         evidence[filename] = data
     desktop = evidence['DesktopLaunch.json']
+    if evidence['MedicineTradePresentation.json'].get('clientSha256', '').lower() != sha(RELEASE / executables[0]):
+        raise RuntimeError('Importer/distributor presentation evidence does not match the packaged client.')
     if evidence['NavigationContrast.json'].get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Navigation contrast evidence does not match the packaged client.')
     if evidence['ClientRoleNavigation.json'].get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
@@ -94,8 +99,8 @@ def main():
     if desktop.get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Desktop launch evidence does not match the packaged EXE.')
     server_preview = evidence['ServerDesktopPreview.json']
-    if server_preview.get('Version') != '0.7.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
-        raise RuntimeError('Server desktop launch evidence does not match version 0.7.0 and the current EXE.')
+    if server_preview.get('Version') != '0.7.1' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
+        raise RuntimeError('Server desktop launch evidence does not match version 0.7.1 and the current EXE.')
     installers = evidence['InstallerPayloadSmoke.json']
     for key, name in [('clientInstallerSha256', executables[1]), ('serverInstallerSha256', executables[2])]:
         if installers.get(key, '').lower() != sha(RELEASE / name):
@@ -134,7 +139,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.7.0-scans-and-accounts', 'components': {'client': '0.4.0', 'clientInstaller': '0.4.0', 'api': '0.2.0', 'worker': '0.3.0', 'serverControl': '0.7.0', 'serverInstaller': '0.7.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.7.1-medicine-trade', 'components': {'client': '0.4.1', 'clientInstaller': '0.4.1', 'api': '0.2.1', 'worker': '0.3.1', 'serverControl': '0.7.1', 'serverInstaller': '0.7.1', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,

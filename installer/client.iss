@@ -2,7 +2,7 @@
 [Setup]
 AppId={{4CC80B9D-79E7-43F6-998B-953D197F12AD}
 AppName={#MyAppName}
-AppVersion=0.4.0
+AppVersion=0.4.1
 AppPublisher=Digos Doctors Hospital, Inc.
 DefaultDirName={localappdata}\Programs\DDHI-SmartPharmacy
 DefaultGroupName=DDHI Smart Pharmacy

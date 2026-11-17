@@ -65,7 +65,7 @@ app.UseRateLimiter();app.UseAuthentication();
 // Opaque Identity bearer tickets must also refer to an existing, enabled account with unchanged roles.
 app.Use(async(ctx,next)=>{if(ctx.User.Identity?.IsAuthenticated==true){var manager=ctx.RequestServices.GetRequiredService<UserManager<PharmacyUser>>();var u=await manager.GetUserAsync(ctx.User);if(u==null||await manager.IsLockedOutAsync(u)){ctx.Response.StatusCode=401;return;}var signIn=ctx.RequestServices.GetRequiredService<SignInManager<PharmacyUser>>();if(!await signIn.ValidateSecurityStampAsync(u,ctx.User.FindFirstValue(signIn.Options.ClaimsIdentity.SecurityStampClaimType))){ctx.Response.StatusCode=401;return;}var current=await manager.GetRolesAsync(u);if(!current.Order().SequenceEqual(ctx.User.FindAll(ClaimTypes.Role).Select(c=>c.Value).Order())){ctx.Response.StatusCode=401;return;}}await next();});
 app.UseAuthorization();
-app.MapGet("/health",async(PharmacyDb db)=>Results.Json(new{status=await db.Database.CanConnectAsync()?"ready":"database unavailable",version="0.2.0",liveCerebro=false}));
+app.MapGet("/health",async(PharmacyDb db)=>Results.Json(new{status=await db.Database.CanConnectAsync()?"ready":"database unavailable",version="0.2.1",liveCerebro=false}));
 app.MapPost("/auth/login",async(LoginInput r,UserManager<PharmacyUser> users,SignInManager<PharmacyUser> signIn,HttpContext ctx,InventoryService service)=>{
  var user=await users.FindByEmailAsync(r.Email);if(user==null)return Results.Unauthorized();
  var check=await signIn.CheckPasswordSignInAsync(user,r.Password,true);if(!check.Succeeded)return Results.Unauthorized();
@@ -79,10 +79,12 @@ api.MapGet("/openapi",()=>Results.Redirect("/openapi/v1.json")).RequireAuthoriza
 if(app.Environment.IsDevelopment())app.MapOpenApi().RequireAuthorization("Admin");
 static Actor ActorOf(HttpContext c)=>new(c.User.FindFirstValue(ClaimTypes.NameIdentifier)??"",ActorRoles.ForOperation(c.User.FindAll(ClaimTypes.Role).Select(x=>x.Value),c.Request.Path.ToString()),c.Request.Headers["X-Workstation"].ToString());
 static async Task<IResult> Mutate<T>(T r,HttpContext c,InventoryService service,Func<Actor,Task<object>> action){var actor=ActorOf(c);var result=await service.Execute(c.Request.Headers["Idempotency-Key"].ToString(),actor,new MutationEnvelope<T>(c.Request.Path.ToString(),r),()=>action(actor));return Results.Content(result,"application/json");}
+static string MedicineTradeText(string? value){var text=value?.Trim()??"";Safety.Require(text.Length<=2000&&!text.Any(char.IsControl),"Importer/distributor must be at most 2000 characters without control characters.");return text;}
+api.MapPost("/medicines/{id:guid}/trade",async(Guid id,MedicineTradeInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(new{id,r},c,s,async a=>{Safety.Require(r.Confirmed&&!string.IsNullOrWhiteSpace(r.Reason)&&r.Reason.Length<=500,"Confirm the catalog change and provide a reason (up to 500 characters).");var medicine=await db.Medicines.SingleAsync(m=>m.Id==id);medicine.ImportedBy=MedicineTradeText(r.ImportedBy);medicine.DistributedBy=MedicineTradeText(r.DistributedBy);medicine.UpdatedAt=DateTime.UtcNow;return new{medicine.Id,medicine.ImportedBy,medicine.DistributedBy};})).RequireAuthorization("Catalog");
 api.MapGet("/medicines",async(PharmacyDb db)=>await db.Medicines.AsNoTracking().OrderBy(x=>x.GenericName).Take(10000).ToListAsync());
 api.MapPost("/medicines",async(MedicineInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(r,c,s,a=>{
  Safety.Require(!string.IsNullOrWhiteSpace(r.GenericName)&&!string.IsNullOrWhiteSpace(r.Strength)&&!string.IsNullOrWhiteSpace(r.DosageForm)&&!string.IsNullOrWhiteSpace(r.BaseUnit)&&r.ReorderLevel>=0,"Generic name, strength, form, base unit and nonnegative reorder level required.");
- var m=new Medicine{GenericName=r.GenericName,BrandName=r.BrandName,Strength=r.Strength,DosageForm=r.DosageForm,Route=r.Route,Manufacturer=r.Manufacturer,Category=r.Category,BaseUnit=r.BaseUnit,ReorderLevel=r.ReorderLevel};db.Medicines.Add(m);return Task.FromResult<object>(m);
+ var m=new Medicine{GenericName=r.GenericName,BrandName=r.BrandName,Strength=r.Strength,DosageForm=r.DosageForm,Route=r.Route,Manufacturer=r.Manufacturer,ImportedBy=MedicineTradeText(r.ImportedBy),DistributedBy=MedicineTradeText(r.DistributedBy),Category=r.Category,BaseUnit=r.BaseUnit,ReorderLevel=r.ReorderLevel};db.Medicines.Add(m);return Task.FromResult<object>(m);
 })).RequireAuthorization("Catalog");
 api.MapGet("/barcodes",async(PharmacyDb db)=>await db.MedicineBarcodes.AsNoTracking().ToListAsync());
 api.MapPost("/barcodes",async(BarcodeInput r,HttpContext c,InventoryService s)=>await Mutate(r,c,s,a=>s.RegisterBarcode(r,a))).RequireAuthorization("Catalog");
@@ -142,10 +144,11 @@ api.MapPost("/imports/medicines",async(CsvInput r,HttpContext c,InventoryService
  using var parser=new Microsoft.VisualBasic.FileIO.TextFieldParser(new StringReader(r.Csv));parser.SetDelimiters(",");parser.HasFieldsEnclosedInQuotes=true;
  var header=parser.ReadFields()??throw new InvalidOperationException("Empty CSV.");
  var expected=new[]{"CerebroMedicineId","GenericName","BrandName","Strength","DosageForm","Route","Manufacturer","Category","BaseUnit","ReorderLevel"};
- Safety.Require(header.SequenceEqual(expected),"CSV header must match samples/medicines.csv exactly.");
- var count=0;while(!parser.EndOfData){var row=parser.ReadFields()!;Safety.Require(row.Length==10&&row[0].Length>0&&row[1].Length>0&&row[3].Length>0&&row[4].Length>0&&row[8].Length>0,"Invalid catalog row.");
+ var extended=expected.Concat(new[]{"ImportedBy","DistributedBy"}).ToArray();
+ Safety.Require(header.SequenceEqual(expected)||header.SequenceEqual(extended),"CSV header must match samples/medicines.csv or samples/medicines-with-trade.csv exactly.");
+ var count=0;while(!parser.EndOfData){var row=parser.ReadFields()!;Safety.Require(row.Length==header.Length&&row[0].Length>0&&row[1].Length>0&&row[3].Length>0&&row[4].Length>0&&row[8].Length>0,"Invalid catalog row.");
  Safety.Require(decimal.TryParse(row[9],System.Globalization.NumberStyles.Number,System.Globalization.CultureInfo.InvariantCulture,out var level)&&level>=0,"Invalid reorder level.");
- var med=new Medicine{CerebroMedicineId=row[0],GenericName=row[1],BrandName=row[2],Strength=row[3],DosageForm=row[4],Route=row[5],Manufacturer=row[6],Category=row[7],BaseUnit=row[8],ReorderLevel=level};db.Medicines.Add(med);db.CerebroMedicineMappings.Add(new CerebroMedicineMapping{Medicine=med,ExternalId=row[0],Approved=true});count++;Safety.Require(count<=10000,"Maximum 10000 rows per import.");
+ var med=new Medicine{CerebroMedicineId=row[0],GenericName=row[1],BrandName=row[2],Strength=row[3],DosageForm=row[4],Route=row[5],Manufacturer=row[6],Category=row[7],BaseUnit=row[8],ReorderLevel=level,ImportedBy=header.Length==12?MedicineTradeText(row[10]):"",DistributedBy=header.Length==12?MedicineTradeText(row[11]):""};db.Medicines.Add(med);db.CerebroMedicineMappings.Add(new CerebroMedicineMapping{Medicine=med,ExternalId=row[0],Approved=true});count++;Safety.Require(count<=10000,"Maximum 10000 rows per import.");
  }return Task.FromResult<object>(new{imported=count,reference=r.ApprovalReference});
 })).RequireAuthorization("Catalog");
 api.MapPost("/imports/stock-snapshot",async(SnapshotInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(r,c,s,async a=>{

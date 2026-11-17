@@ -74,7 +74,7 @@ public partial class MainWindow : Window
             : "Hospital LAN: use Copy client address on each workstation. IT must establish client trust and scoped firewall access.";
         TlsStatus.Text = profile.Prepared ? (profile.Mode == "Simple LAN" ? "App-managed HTTPS" : profile.Mode == "Local evaluation" ? "Local PFX" : "Hospital PFX supplied") : "Not configured";
         PrepareButton.IsEnabled = !profile.Prepared && !busy && !PreviewOnly;
-        StartButton.IsEnabled = StopButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly;
+        UpdateDatabaseButton.IsEnabled = StartButton.IsEnabled = StopButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly;
         LanApplyButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly && controller.ConnectionChangeState is not ("Applying" or "RecoveryRequired");
         RestoreConnectionButton.IsEnabled = profile.Prepared && !busy && !PreviewOnly && controller.CanRestoreConnection;
         AdminCreateButton.IsEnabled = profile.Prepared && usersExist == false && !busy && !PreviewOnly;
@@ -121,7 +121,7 @@ public partial class MainWindow : Window
         if (PreviewOnly)
         {
             MainTabs.SelectedItem = DatabaseAccessTab;
-            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.7.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true, DatabaseAccessControlsLoaded = true, ItLoginControlsLoaded = true }));
+            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.7.1", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true, DatabaseAccessControlsLoaded = true, ItLoginControlsLoaded = true }));
             return;
         }
         if (profile.Prepared) await Guard(RefreshStatus);
@@ -165,6 +165,12 @@ public partial class MainWindow : Window
         if (PreviewOnly) return;
         if (MessageBox.Show(this, "Trust the displayed localhost certificate for this Windows account? Verify its fingerprint. This does not establish hospital LAN or workstation trust.", "Authorize local certificate trust", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
         try { controller.TrustLocalCertificateForCurrentUser(); TlsStatus.Text = "Trusted locally (this Windows account)"; } catch (Exception ex) { Log(ex.Message); }
+    }
+    async void UpdateDatabase(object sender, RoutedEventArgs e)
+    {
+        if(PreviewOnly)return;
+        if(MessageBox.Show(this,"Back up the database first and ask staff to sign out. Apply database updates to this existing instance? The server will stop briefly and restart after a successful update. Do not repeat Initial setup.","Update existing database",MessageBoxButton.OKCancel,MessageBoxImage.Warning)!=MessageBoxResult.OK)return;
+        await Guard(async()=>{await controller.ApplyDatabaseUpdates();await RefreshStatus();});
     }
     async void StartServer(object sender, RoutedEventArgs e) => await Guard(async () => { await controller.Start(); await RefreshStatus(); });
     async void StopServer(object sender, RoutedEventArgs e)

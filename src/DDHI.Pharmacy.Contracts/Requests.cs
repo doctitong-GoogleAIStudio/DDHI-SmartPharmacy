@@ -1,5 +1,5 @@
 namespace DDHI.Pharmacy.Contracts;
-public record MedicineInput(string GenericName,string BrandName,string Strength,string DosageForm,string Route,string Manufacturer,string Category,string BaseUnit,decimal ReorderLevel);
+public record MedicineInput(string GenericName,string BrandName,string Strength,string DosageForm,string Route,string Manufacturer,string Category,string BaseUnit,decimal ReorderLevel,string ImportedBy="",string DistributedBy="");
 public record BarcodeInput(Guid MedicineId,string Barcode,string Packaging,decimal ConversionFactor,bool Confirmed,string Format="Auto");
 public record ReceiveInput(Guid MedicineId,Guid LocationId,Guid SupplierId,string Reference,string Lot,DateOnly Expiration,decimal Quantity,decimal ConversionFactor,decimal UnitCost,bool Confirmed,Guid? PurchaseOrderId=null);
 public record OrderInput(string Reference,string EncounterReference,Guid MedicineId,decimal Quantity,bool Confirmed);
@@ -20,3 +20,5 @@ public record PurchaseInput(Guid SupplierId,string Reference,decimal OrderedQuan
 public record StockStateInput(Guid BalanceId,string TargetStatus,decimal Quantity,string Reference,string ApprovalReference,bool Confirmed);
 public record DisposeInput(Guid BalanceId,decimal Quantity,string Reference,string Reason,bool Confirmed);
 public record ReasonInput(string Reason,bool Confirmed);
+
+public record MedicineTradeInput(string ImportedBy,string DistributedBy,string Reason,bool Confirmed);

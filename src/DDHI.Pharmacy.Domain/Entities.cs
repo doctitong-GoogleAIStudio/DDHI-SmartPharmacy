@@ -6,7 +6,7 @@ public abstract class Entity { public Guid Id { get; set; } = Guid.NewGuid(); pu
 public class Medicine : Entity {
  public string? CerebroMedicineId {get;set;} public string GenericName {get;set;}=""; public string BrandName {get;set;}="";
  public string Strength {get;set;}=""; public string DosageForm {get;set;}=""; public string Route {get;set;}="";
- public string Manufacturer {get;set;}=""; public string Category {get;set;}=""; public string BaseUnit {get;set;}="unit";
+ public string Manufacturer {get;set;}=""; public string ImportedBy {get;set;}=""; public string DistributedBy {get;set;}=""; public string Category {get;set;}=""; public string BaseUnit {get;set;}="unit";
  public string PackagingUnit {get;set;}="unit"; public decimal ConversionFactor {get;set;}=1; public decimal ReorderLevel {get;set;}
  public bool ActiveStatus {get;set;}=true; public DateTime UpdatedAt {get;set;}=DateTime.UtcNow;
 }
