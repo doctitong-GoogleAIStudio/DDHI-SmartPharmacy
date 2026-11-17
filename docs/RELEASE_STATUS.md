@@ -1,6 +1,6 @@
-# Release status - Server Control 0.6.0 / client 0.3.0 / API 0.1.0
+# Release status - Server Control 0.7.0 / client 0.4.0 / API 0.2.0
 
-Build date: 15 November 2026 (Asia/Manila).
+Build date: 17 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
 Developer: Vicente C. Cavalida Jr. MD.
 Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
@@ -74,3 +74,7 @@ Server Control 0.5.0 adds Database Access after Activity, with redacted connecti
 ## Separate IT PostgreSQL login â€” Server Control 0.6.0
 
 Database Access includes an elevated, original-setup-account wizard for a new ddhi_it_ login with an operator-chosen password and explicit access level. Read-only inventory views are default; pharmacy schema-owner maintenance requires acknowledgement and explicit role selection in SQL. No superuser is granted. Existing users are refused rather than reset. Provisioning is transactional, validates managed namespaces and effective PUBLIC permissions, uses a salted SCRAM verifier instead of cleartext password SQL, and preserves application credentials, stock and ledger data. All 76 Server Manager tests passed, including real PostgreSQL authentication, wrong-password denial, view access, forbidden writes/credential reads, maintenance scoping, duplicate protection, rollback, namespace collision and unsafe PUBLIC-grant rejection. No actual hospital-server IT login was provisioned by these tests. Client 0.3.0 is unchanged; destination-server installation/tool acceptance remains pending. See IT_DATABASE_LOGIN.md.
+
+## Readable scans and staff editing — 0.7.0
+
+Scan results display named catalog, package and stock fields with explicit missing encoded data. Exact approved mappings, equivalent zero-padded GTIN aliases, distinct packaging indicators and ambiguous mapping denial share one resolver with dispensing. Image decoding preserves GS1 symbology metadata. User Administration supports editable email/name/phone/multiple roles, clearing optional information, and confirmed account deletion with history retained. Live security-stamp validation revokes changed accounts; stale writes, self-role changes and loss of the last active administrator are rejected. Startup applies DELETE only to five Identity account tables, never stock/audit tables. See SCAN_AND_ACCOUNT_GUIDE.md. Isolated tests and synthetic WPF previews are release evidence; physical scanner/workstation and destination-server upgrade acceptance remain pending.

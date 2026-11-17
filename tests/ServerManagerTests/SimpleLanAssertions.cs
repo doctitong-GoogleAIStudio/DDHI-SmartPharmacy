@@ -64,6 +64,7 @@ internal static class SimpleLanAssertions
             viewConversion=true,credentialsHidden=true,signOutClearsAccess=true,externalToolsLaunched=false
         },new JsonSerializerOptions{WriteIndented=true}));
         await ItDatabaseLoginAssertions.Exercise(controller,profile,root);
+        await ScanAccountAssertions.Exercise(controller,profile,root);
         await File.WriteAllTextAsync(Path.Combine(root,"release","Tests","SimpleConnectionSmoke.json"),JsonSerializer.Serialize(new{
             version="0.4.0",automaticDiscovery=true,pinnedHttps=true,wrongKeyRejected=true,existingAdministratorLogin=true,
             databaseAndStockPreserved=true,credentialsUnchanged=true,publicConnectionFile=true,identitySurvivesReenable=true,

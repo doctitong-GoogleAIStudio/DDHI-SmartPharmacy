@@ -2,7 +2,7 @@
 
 Digos Doctors Hospital, Inc. | Developer: Vicente C. Cavalida Jr. MD
 
-Server Control 0.4.0, client/worker 0.2.0 and API 0.1.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
+Server Control 0.7.0, client 0.4.0, worker 0.3.0 and API 0.2.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
 
 ## Build
 
@@ -38,3 +38,7 @@ Database Access follows Activity in Server Control: connection/health details, r
 ## Server Control 0.6.0: separate IT database login
 
 Database Access now lets the original Windows setup administrator create a separate ddhi_it_ PostgreSQL login with an operator-chosen password. Read-only inventory views are the default; explicit database maintenance access is optional. Existing application credentials and database networking are retained. Passwords are converted to salted SCRAM verifiers before SQL execution and are not retained by Server Control. See docs/IT_DATABASE_LOGIN.md. Client 0.3.0 is unchanged.
+
+## Readable scans and account editing
+
+See [Scan and Account Guide](docs/SCAN_AND_ACCOUNT_GUIDE.md) for named scan results, catalog/package matching and System Administrator profile/role editing and deletion. Update both the server and client; start through the updated Server Control to apply the account-management permissions.

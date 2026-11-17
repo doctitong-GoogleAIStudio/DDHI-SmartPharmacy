@@ -63,9 +63,9 @@ app.Use(async(ctx,next)=>{
 });
 app.UseRateLimiter();app.UseAuthentication();
 // Opaque Identity bearer tickets must also refer to an existing, enabled account with unchanged roles.
-app.Use(async(ctx,next)=>{if(ctx.User.Identity?.IsAuthenticated==true){var manager=ctx.RequestServices.GetRequiredService<UserManager<PharmacyUser>>();var u=await manager.GetUserAsync(ctx.User);if(u==null||await manager.IsLockedOutAsync(u)){ctx.Response.StatusCode=401;return;}var current=await manager.GetRolesAsync(u);if(!current.Order().SequenceEqual(ctx.User.FindAll(ClaimTypes.Role).Select(c=>c.Value).Order())){ctx.Response.StatusCode=401;return;}}await next();});
+app.Use(async(ctx,next)=>{if(ctx.User.Identity?.IsAuthenticated==true){var manager=ctx.RequestServices.GetRequiredService<UserManager<PharmacyUser>>();var u=await manager.GetUserAsync(ctx.User);if(u==null||await manager.IsLockedOutAsync(u)){ctx.Response.StatusCode=401;return;}var signIn=ctx.RequestServices.GetRequiredService<SignInManager<PharmacyUser>>();if(!await signIn.ValidateSecurityStampAsync(u,ctx.User.FindFirstValue(signIn.Options.ClaimsIdentity.SecurityStampClaimType))){ctx.Response.StatusCode=401;return;}var current=await manager.GetRolesAsync(u);if(!current.Order().SequenceEqual(ctx.User.FindAll(ClaimTypes.Role).Select(c=>c.Value).Order())){ctx.Response.StatusCode=401;return;}}await next();});
 app.UseAuthorization();
-app.MapGet("/health",async(PharmacyDb db)=>Results.Json(new{status=await db.Database.CanConnectAsync()?"ready":"database unavailable",version="0.1.0",liveCerebro=false}));
+app.MapGet("/health",async(PharmacyDb db)=>Results.Json(new{status=await db.Database.CanConnectAsync()?"ready":"database unavailable",version="0.2.0",liveCerebro=false}));
 app.MapPost("/auth/login",async(LoginInput r,UserManager<PharmacyUser> users,SignInManager<PharmacyUser> signIn,HttpContext ctx,InventoryService service)=>{
  var user=await users.FindByEmailAsync(r.Email);if(user==null)return Results.Unauthorized();
  var check=await signIn.CheckPasswordSignInAsync(user,r.Password,true);if(!check.Succeeded)return Results.Unauthorized();
@@ -74,10 +74,10 @@ app.MapPost("/auth/login",async(LoginInput r,UserManager<PharmacyUser> users,Sig
  await ctx.SignInAsync(IdentityConstants.BearerScheme,principal);return Results.Empty;
 }).RequireRateLimiting("login");
 var api=app.MapGroup("/api").RequireAuthorization();
-api.MapGet("/me",(HttpContext c)=>new{user=c.User.Identity?.Name,roles=c.User.FindAll(ClaimTypes.Role).Select(x=>x.Value)});
+api.MapGet("/me",(HttpContext c)=>new{id=c.User.FindFirstValue(ClaimTypes.NameIdentifier),user=c.User.Identity?.Name,roles=c.User.FindAll(ClaimTypes.Role).Select(x=>x.Value)});
 api.MapGet("/openapi",()=>Results.Redirect("/openapi/v1.json")).RequireAuthorization("Admin");
 if(app.Environment.IsDevelopment())app.MapOpenApi().RequireAuthorization("Admin");
-static Actor ActorOf(HttpContext c)=>new(c.User.FindFirstValue(ClaimTypes.NameIdentifier)??"",c.User.FindFirstValue(ClaimTypes.Role)??"",c.Request.Headers["X-Workstation"].ToString());
+static Actor ActorOf(HttpContext c)=>new(c.User.FindFirstValue(ClaimTypes.NameIdentifier)??"",ActorRoles.ForOperation(c.User.FindAll(ClaimTypes.Role).Select(x=>x.Value),c.Request.Path.ToString()),c.Request.Headers["X-Workstation"].ToString());
 static async Task<IResult> Mutate<T>(T r,HttpContext c,InventoryService service,Func<Actor,Task<object>> action){var actor=ActorOf(c);var result=await service.Execute(c.Request.Headers["Idempotency-Key"].ToString(),actor,new MutationEnvelope<T>(c.Request.Path.ToString(),r),()=>action(actor));return Results.Content(result,"application/json");}
 api.MapGet("/medicines",async(PharmacyDb db)=>await db.Medicines.AsNoTracking().OrderBy(x=>x.GenericName).Take(10000).ToListAsync());
 api.MapPost("/medicines",async(MedicineInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(r,c,s,a=>{
@@ -86,11 +86,11 @@ api.MapPost("/medicines",async(MedicineInput r,HttpContext c,InventoryService s,
 })).RequireAuthorization("Catalog");
 api.MapGet("/barcodes",async(PharmacyDb db)=>await db.MedicineBarcodes.AsNoTracking().ToListAsync());
 api.MapPost("/barcodes",async(BarcodeInput r,HttpContext c,InventoryService s)=>await Mutate(r,c,s,a=>s.RegisterBarcode(r,a))).RequireAuthorization("Catalog");
-api.MapPost("/scan",async(ScanInput r,HttpContext c,PharmacyDb db,InventoryService s)=>await Mutate(r,c,s,async a=>{
- var data=BarcodeParser.Parse(r.Barcode);Safety.Require(Guid.TryParse(a.Workstation,out var wid)&&await db.Workstations.AnyAsync(x=>x.Id==wid),"Register this workstation first.");
- db.ScannerEvents.Add(new ScannerEvent{WorkstationId=wid,Mode="ManualBarcode / HID unverified",Symbology=data.Symbology,Success=true});
- if(data.Raw.StartsWith("DDHI-STOCK-")&&Guid.TryParseExact(data.Raw[11..],"N",out var stockId)){var stock=await db.InventoryBalances.Include(x=>x.Batch).ThenInclude(x=>x.Medicine).SingleOrDefaultAsync(x=>x.Id==stockId);return (object)new{data,medicine=stock?.Batch.Medicine,stock=stock==null?null:new{stock.Id,stock.Batch.Lot,stock.Batch.Expiration,stock.Status,stock.Quantity},verification="Internal stock label input; unverified. No transaction committed."};}
- var match=await db.MedicineBarcodes.Include(x=>x.Medicine).SingleOrDefaultAsync(x=>x.Barcode==(data.Gtin??data.Raw));return (object)new{data,medicine=match?.Medicine,verification="Unverified input. Scan alone never commits dispensing."};
+api.MapPost("/scan",async(ScanInput r,HttpContext c,PharmacyDb db,InventoryService service)=>await Mutate(r,c,service,async actor=>{
+ Safety.Require(Guid.TryParse(actor.Workstation,out var wid)&&await db.Workstations.AnyAsync(x=>x.Id==wid),"Register this workstation first.");
+ var resolved=await new BarcodeLookup(db).Resolve(r.Barcode);
+ db.ScannerEvents.Add(new ScannerEvent{WorkstationId=wid,Mode="ManualBarcode / HID unverified",Symbology=resolved.Data.Symbology,Success=resolved.Result.Status=="Matched"});
+ return (object)new {data=resolved.Data,medicine=resolved.Medicine,stock=resolved.InternalStock==null?null:new{resolved.InternalStock.Id,resolved.InternalStock.Batch.Lot,resolved.InternalStock.Batch.Expiration,resolved.InternalStock.Status,resolved.InternalStock.Quantity},verification="Unverified input. Scan alone never commits dispensing.",result=resolved.Result};
 }));
 api.MapGet("/inventory",async(PharmacyDb db)=>await db.InventoryBalances.AsNoTracking().OrderBy(x=>x.Batch.Expiration).Select(x=>new{x.Id,x.BatchId,x.LocationId,x.Batch.MedicineId,Medicine=x.Batch.Medicine.GenericName,x.Batch.Medicine.Strength,x.Batch.Medicine.DosageForm,x.Batch.Lot,x.Batch.Expiration,Location=x.Location.Name,x.Status,x.Quantity,x.Batch.UnitCost,Value=x.Quantity*x.Batch.UnitCost,Recall=db.RecallAffectedBatchs.Any(r=>r.BatchId==x.BatchId),DaysToExpiry=x.Batch.Expiration.DayNumber-Safety.Today.DayNumber}).Take(20000).ToListAsync());
 api.MapGet("/fefo/{medicineId:guid}",async(Guid medicineId,PharmacyDb db)=>await db.InventoryBalances.Where(x=>x.Batch.MedicineId==medicineId&&x.Status==StockStatus.Available&&x.Quantity>0&&x.Batch.Expiration>=Safety.Today&&!db.RecallAffectedBatchs.Any(r=>r.BatchId==x.BatchId)).OrderBy(x=>x.Batch.Expiration).Select(x=>new{x.Id,x.BatchId,x.Batch.Lot,x.Batch.Expiration,x.Quantity,x.LocationId}).ToListAsync());
@@ -120,8 +120,8 @@ api.MapGet("/workstations",async(PharmacyDb db)=>await db.Workstations.AsNoTrack
 api.MapGet("/scanners",async(PharmacyDb db)=>await db.ScannerConfigurations.AsNoTracking().ToListAsync());
 api.MapPost("/scanners",async(ScannerInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(r,c,s,a=>{Safety.Require(r.Type is "HID" or "COM" or "Bluetooth HID" or "Vendor SDK","Unknown scanner type.");Safety.Require(!string.IsNullOrWhiteSpace(r.Name),"Name required.");Safety.Require(r.WorkstationId.ToString()==a.Workstation||Roles.Catalog.Contains(a.Role),"Configure only your workstation.");var scanner=new ScannerConfiguration{WorkstationId=r.WorkstationId,Name=r.Name,Enabled=r.Enabled,Type=r.Type,Port=r.Port,Suffix=r.Suffix};db.ScannerConfigurations.Add(scanner);return Task.FromResult<object>(scanner);}));
 api.MapGet("/dashboard",async(PharmacyDb db)=>new{medicines=await db.Medicines.CountAsync(),stockUnits=await db.InventoryBalances.SumAsync(x=>x.Quantity),nearExpiryBatches=await db.InventoryBatchs.CountAsync(x=>x.Expiration<=Safety.Today.AddDays(90)&&x.Expiration>=Safety.Today),expiredBatches=await db.InventoryBatchs.CountAsync(x=>x.Expiration<Safety.Today),openRecalls=await db.RecallNotices.CountAsync(x=>!x.Closed),workstations=await db.Workstations.CountAsync(),integration="Mock only • Live Cerebro disabled"});
-api.MapGet("/users",async(UserManager<PharmacyUser> users)=>{var rows=new List<object>();foreach(var u in await users.Users.ToListAsync())rows.Add(new{u.Id,u.Email,Roles=await users.GetRolesAsync(u),u.LockoutEnd});return rows;}).RequireAuthorization("Admin");
-api.MapPost("/users",async(UserInput r,HttpContext c,InventoryService s,UserManager<PharmacyUser> users)=>await Mutate(new{r.Email,r.Role},c,s,async a=>{Safety.Require(Roles.All.Contains(r.Role),"Unknown role.");var u=new PharmacyUser{Email=r.Email,UserName=r.Email,EmailConfirmed=true};var result=await users.CreateAsync(u,r.Password);Safety.Require(result.Succeeded,string.Join(";",result.Errors.Select(x=>x.Description)));await users.AddToRoleAsync(u,r.Role);return new{u.Id,u.Email,r.Role};})).RequireAuthorization("Admin");
+UserAdministration.Map(api);
+
 api.MapGet("/settings",async(PharmacyDb db)=>await db.SystemSettings.AsNoTracking().ToListAsync()).RequireAuthorization("Catalog");
 api.MapPost("/settings",async(SettingInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(r,c,s,async a=>{
  Safety.Require(a.Role==Roles.Chief,"Chief Pharmacist approval required.");Safety.Require(!string.IsNullOrWhiteSpace(r.ApprovalReference),"Written hospital approval reference required.");
@@ -160,7 +160,7 @@ api.MapPut("/scanners/{id:guid}",async(Guid id,ScannerInput r,HttpContext c,Inve
 }));
 
 api.MapPost("/medicines/{id:guid}/status",async(Guid id,MedicineStatusInput r,HttpContext c,InventoryService s,PharmacyDb db)=>await Mutate(new{id,r},c,s,async a=>{Safety.Require(r.Confirmed&&!string.IsNullOrWhiteSpace(r.Reason),"Confirmed authorized reason required.");var med=await db.Medicines.SingleAsync(x=>x.Id==id);med.ActiveStatus=r.ActiveStatus;med.UpdatedAt=DateTime.UtcNow;return new{med.Id,med.ActiveStatus};})).RequireAuthorization("Catalog");
-api.MapPost("/users/{id}/lock",async(string id,UserLockInput r,HttpContext c,InventoryService s,UserManager<PharmacyUser> users)=>await Mutate(new{id,r},c,s,async a=>{Safety.Require(r.Confirmed&&!string.IsNullOrWhiteSpace(r.Reason)&&id!=a.UserId,"Confirmed reason required; cannot lock your own account.");var user=await users.FindByIdAsync(id)??throw new InvalidOperationException("User not found.");await users.SetLockoutEnabledAsync(user,true);var result=await users.SetLockoutEndDateAsync(user,r.Locked?DateTimeOffset.UtcNow.AddYears(50):null);Safety.Require(result.Succeeded,"Account update failed.");return new{user.Id,r.Locked};})).RequireAuthorization("Admin");
+
 
 api.MapPost("/stock-status",async(StockStateInput r,HttpContext c,InventoryService s,LifecycleService lifecycle)=>await Mutate(r,c,s,a=>lifecycle.ChangeStatus(r,a))).RequireAuthorization("Catalog");
 api.MapPost("/disposals",async(DisposeInput r,HttpContext c,InventoryService s,LifecycleService lifecycle)=>await Mutate(r,c,s,a=>lifecycle.Dispose(r,a))).RequireAuthorization("Catalog");

@@ -79,7 +79,7 @@ public sealed partial class ServerController(ServerProfile profile,Action<string
   if(IsRunning(name))return;var info=new ProcessStartInfo(exe){UseShellExecute=false,CreateNoWindow=true,WorkingDirectory=Path.GetDirectoryName(exe)!,RedirectStandardOutput=true,RedirectStandardError=true};foreach(var kv in env)info.Environment[kv.Key]=kv.Value;
   info.RedirectStandardOutput=false;info.RedirectStandardError=false;var process=Process.Start(info)??throw new InvalidOperationException("Could not start server component.");File.WriteAllText(ProcessFile(name),JsonSerializer.Serialize(new ProcessRecord(process.Id,process.StartTime.ToUniversalTime().Ticks,exe)));log(name+" started.");
  }
- public async Task Start(){if(profile.ServicesConfigured){await StartWindowsServices();return;}if(!profile.Prepared)throw new InvalidOperationException("Complete initial setup first.");await StartPostgres();var secrets=ServerSecrets.Load(profile.DataRoot);var env=EnvironmentFor(Connection("ddhi_runtime",secrets.RuntimePassword),secrets);Launch("api",ApiExe,env);Launch("worker",Path.Combine(profile.ServerRoot,"Worker","DDHI.Pharmacy.Worker.exe"),env);}
+ public async Task Start(){if(profile.ServicesConfigured){await StartWindowsServices();return;}if(!profile.Prepared)throw new InvalidOperationException("Complete initial setup first.");await StartPostgres();await EnsureAccountManagementGrants();var secrets=ServerSecrets.Load(profile.DataRoot);var env=EnvironmentFor(Connection("ddhi_runtime",secrets.RuntimePassword),secrets);Launch("api",ApiExe,env);Launch("worker",Path.Combine(profile.ServerRoot,"Worker","DDHI.Pharmacy.Worker.exe"),env);}
  public async Task<string> Health(){
   if(!profile.Prepared)return "Not configured";
   HttpMessageHandler handler;

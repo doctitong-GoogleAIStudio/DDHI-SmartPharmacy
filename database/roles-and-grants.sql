@@ -9,4 +9,6 @@ GRANT USAGE ON SCHEMA public TO ddhi_runtime;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO ddhi_runtime;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ddhi_runtime;
 REVOKE UPDATE, DELETE, TRUNCATE ON "StockMovements", "AuditEvents", "OperationKeys" FROM ddhi_runtime;
+-- Account management removes account-private identity records only; clinical history remains protected.
+GRANT DELETE ON "AspNetUsers", "AspNetUserClaims", "AspNetUserRoles", "AspNetUserLogins", "AspNetUserTokens" TO ddhi_runtime;
 -- Do not grant DELETE/TRUNCATE or schema ownership to the runtime account.

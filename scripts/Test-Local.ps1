@@ -4,8 +4,9 @@ Set-Location (Split-Path -Parent $PSScriptRoot)
 $env:VSTEST_ARTIFACTS_DIRECTORY=Join-Path $PWD 'work\vstest'
 dotnet build tests\IntegrationTests -c Release --no-restore -m:1 --disable-build-servers *> logs\build-tests.log
 if ($LASTEXITCODE -ne 0) { Get-Content logs\build-tests.log -Tail 30; throw 'Test build failed.' }
-& '.\.tools\postgres\pgsql\bin\pg_ctl.exe' -D work\pgdata -l logs\postgres.log -o '-p 55432 -h 127.0.0.1 -c shared_buffers=32MB -c max_connections=40' -w start
-if ($LASTEXITCODE -ne 0) { throw 'Isolated database failed to start.' }
+$pgStart=Start-Process -FilePath "$PWD\.tools\postgres\pgsql\bin\pg_ctl.exe" -ArgumentList @('-D',('"'+"$PWD\work\pgdata"+'"'),'-l',('"'+"$PWD\logs\postgres.log"+'"'),'-o','"-p 55432 -h 127.0.0.1 -c shared_buffers=32MB -c max_connections=40"','-w','start') -WindowStyle Hidden -PassThru
+$pgStart.WaitForExit()
+if ($pgStart.ExitCode -ne 0) { throw 'Isolated database failed to start.' }
 try {
 $env:PGHOST='127.0.0.1';$env:PGPORT='55432';$env:PGUSER='ddhi_test';$env:PGDATABASE='ddhi_test_workflows';$env:PGPASSWORD=Get-Content work\pg-password.txt -Raw
 $env:DDHI_TEST_CONNECTION='Host=127.0.0.1;Port=55432;Database=ddhi_test_workflows;Username=ddhi_test;Password='+$env:PGPASSWORD

@@ -15,7 +15,7 @@ using Xunit;
 public class Factory:WebApplicationFactory<Program> {
  protected override void ConfigureWebHost(IWebHostBuilder b){b.UseEnvironment("Development");b.UseSetting("ConnectionStrings:Pharmacy",Environment.GetEnvironmentVariable("DDHI_TEST_CONNECTION")??throw new InvalidOperationException("DDHI_TEST_CONNECTION required; use isolated test database."));}
 }
-public class WorkflowTests: IAsyncLifetime {
+public partial class WorkflowTests: IAsyncLifetime {
  readonly Factory factory=new();HttpClient chief=null!,admin=null!,reader=null!;
  public async Task InitializeAsync(){
   using var scope=factory.Services.CreateScope();var db=scope.ServiceProvider.GetRequiredService<PharmacyDb>();Safety.Require((db.Database.GetDbConnection().Database.StartsWith("ddhi_test")||db.Database.GetDbConnection().Database.StartsWith("ddhi_restore_")),"Refuse non-test database.");await db.Database.MigrateAsync();

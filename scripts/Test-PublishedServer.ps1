@@ -22,8 +22,9 @@ public static class DdhiPinnedSmokeClient {
 }
 '@
 $apiProcess=$null;$workerProcess=$null;$client=$null
-& '.\.tools\postgres\pgsql\bin\pg_ctl.exe' -D work\pgdata -l logs\postgres.log -o '-p 55432 -h 127.0.0.1 -c shared_buffers=32MB -c max_connections=40' -w start
-if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL startup failed.' }
+$pgStart=Start-Process -FilePath "$PWD\.tools\postgres\pgsql\bin\pg_ctl.exe" -ArgumentList @('-D',('"'+"$PWD\work\pgdata"+'"'),'-l',('"'+"$PWD\logs\postgres.log"+'"'),'-o','"-p 55432 -h 127.0.0.1 -c shared_buffers=32MB -c max_connections=40"','-w','start') -WindowStyle Hidden -PassThru
+$pgStart.WaitForExit()
+if ($pgStart.ExitCode -ne 0) { throw 'Isolated database failed to start.' }
 try {
  $database='ddhi_test_published_'+[Guid]::NewGuid().ToString('N')
  $env:PGHOST='127.0.0.1';$env:PGPORT='55432';$env:PGUSER='ddhi_test';$env:PGPASSWORD=Get-Content work\pg-password.txt -Raw
