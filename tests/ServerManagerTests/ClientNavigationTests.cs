@@ -41,7 +41,7 @@ public class ClientNavigationTests
     {
         Assert.Contains("Inventory Receiving",ClientAccessPolicy.PagesFor([Roles.Clerk]));
         Assert.DoesNotContain("Medication Dispensing",ClientAccessPolicy.PagesFor([Roles.Clerk]));
-        Assert.Contains("Audit Logs",ClientAccessPolicy.PagesFor([Roles.Auditor]));
+        Assert.Contains("Audit Trail",ClientAccessPolicy.PagesFor([Roles.Auditor]));
         Assert.DoesNotContain("Inventory Receiving",ClientAccessPolicy.PagesFor([Roles.Auditor]));
         Assert.False(ClientAccessPolicy.CanAction("Cerebro Synchronization","Manual acknowledgment",[Roles.Auditor]));
     }

@@ -2,7 +2,7 @@
 
 Digos Doctors Hospital, Inc. | Developer: Vicente C. Cavalida Jr. MD
 
-Server Control 0.8.0, client 0.5.0, worker 0.4.0 and API 0.3.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
+Server Control 0.8.0, client 0.6.0, worker 0.4.0 and API 0.4.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
 
 ## Build
 
@@ -46,3 +46,6 @@ See [Scan and Account Guide](docs/SCAN_AND_ACCOUNT_GUIDE.md) for named scan resu
 Medicine Master includes optional Imported by / Distributed by fields, an editor for existing medicines, scan display and extended CSV import. Back up and use Server status > Apply database updates after installing the server update. See docs/MEDICINE_IMPORTER_DISTRIBUTOR.md.
 
 Generic groups now browse several separate brand products, with explicit documented pharmacist brand substitution. Patient discharge returns distinguish verified hospital issue (original line to quarantine) from outside/uncertain custody intake (no hospital stock or billing credit). Back up and apply server database updates before using matching clients. Read docs/COMPLETE_USER_MANUAL.md or the bookmarked complete PDF in client Documentation.
+
+
+Audit/timed-session update (19 November 2026): client 0.6.0 and API 0.4.0 add Audit Trail activities, staff/role/computer snapshots, date/time to seconds, safe before/after fields, app file events, timed sessions and daily observed totals in hours/minutes. Server Control remains 0.8.0. Back up the server, install this matching server package, use Server status > Apply database updates as Administrator with the original Windows setup account, then update clients. Existing audit hashes and clinical data are preserved. Session duration is observed connection time, not attendance or active work. Real hospital acceptance remains pending. See COMPLETE_USER_MANUAL.md chapter 21 and AUDIT_TRAIL.md.

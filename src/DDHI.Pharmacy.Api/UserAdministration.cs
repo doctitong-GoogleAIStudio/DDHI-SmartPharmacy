@@ -18,7 +18,7 @@ static class UserAdministration
     };
     static async Task<IResult> Change(HttpContext context,InventoryService service,object input,Func<Actor,Task<object>> action)
     {
-        var actor=new Actor(context.User.FindFirstValue(ClaimTypes.NameIdentifier)??"",ActorRoles.ForOperation(context.User.FindAll(ClaimTypes.Role).Select(c=>c.Value),context.Request.Path.ToString()),context.Request.Headers["X-Workstation"].ToString());
+        var actor=new Actor(context.User.FindFirstValue(ClaimTypes.NameIdentifier)??"",ActorRoles.ForOperation(context.User.FindAll(ClaimTypes.Role).Select(c=>c.Value),context.Request.Path.ToString()),context.Request.Headers["X-Workstation"].ToString(),context.Connection.RemoteIpAddress?.ToString()??"",AuditEndpoints.Session(context));
         var result=await service.Execute(context.Request.Headers["Idempotency-Key"].ToString(),actor,new{Path=context.Request.Path.ToString(),Input=input},async()=>{
             var manager=context.RequestServices.GetRequiredService<UserManager<PharmacyUser>>();
             var current=await manager.Users.AsNoTracking().SingleOrDefaultAsync(u=>u.Id==actor.UserId);
@@ -59,6 +59,7 @@ static class UserAdministration
             var roles=(input.Roles??[]).Distinct(StringComparer.Ordinal).Order().ToArray();
             Safety.Require(roles.Length>0&&roles.Length<=Roles.All.Length&&roles.All(Roles.All.Contains),"Select one or more supported roles.");
             var prior=(await users.GetRolesAsync(user)).Order().ToArray();
+            context.RequestServices.GetRequiredService<PharmacyDb>().AuditCapture?.Note("Staff account",id,"Assigned roles",string.Join(", ",prior),string.Join(", ",roles));
             Safety.Require(id!=actor.UserId||prior.SequenceEqual(roles),"You cannot change your own roles. Another System Administrator must do that.");
             await PreserveAdministrator(user,users,!roles.Contains(Roles.SystemAdmin));
             var other=await users.FindByEmailAsync(email);Safety.Require(other==null||other.Id==id,"Another account already uses this email.");
@@ -79,6 +80,7 @@ static class UserAdministration
             Safety.Require(users.NormalizeEmail(input.ConfirmationEmail?.Trim()??"")==user.NormalizedEmail,"Type the selected account's email to confirm deletion.");
             await PreserveAdministrator(user,users,true);
             var db=context.RequestServices.GetRequiredService<PharmacyDb>();
+            db.AuditCapture?.Note("Staff account",id,"Assigned roles",string.Join(", ",await users.GetRolesAsync(user)),null);
             // Identity relationships are RESTRICT in this database. Remove only account-private
             // children explicitly; clinical/audit/history tables are never deleted here.
             await db.UserClaims.Where(x=>x.UserId==id).ExecuteDeleteAsync();

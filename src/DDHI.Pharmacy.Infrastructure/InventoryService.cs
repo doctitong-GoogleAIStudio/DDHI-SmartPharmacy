@@ -9,14 +9,29 @@ using Microsoft.EntityFrameworkCore;
 namespace DDHI.Pharmacy.Infrastructure;
 public sealed class InventoryService(PharmacyDb db) {
  public static string Hash(string v)=>Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(v)));
- public static string AuditHash(AuditEvent e)=>Hash($"{e.PreviousHash}|{e.Id}|{e.CreatedAt:O}|{e.Actor}|{e.Role}|{e.Workstation}|{e.Action}|{e.RecordId}|{e.Detail}");
- public async Task Audit(Actor actor,string action,string record,string detail) {
+ public static string AuditHash(AuditEvent e) {
+  var legacy=$"{e.PreviousHash}|{e.Id}|{e.CreatedAt:O}|{e.Actor}|{e.Role}|{e.Workstation}|{e.Action}|{e.RecordId}|{e.Detail}";
+  return Hash(e.FormatVersion<=1?legacy:JsonSerializer.Serialize(new{legacy,e.FormatVersion,e.StaffEmail,e.StaffName,e.StaffRoles,e.Computer,e.IpAddress,e.Outcome,e.Changes,e.SessionId}));
+ }
+ public async Task<AuditIdentity> Identity(Actor actor) {
+  var user=await db.Users.AsNoTracking().SingleOrDefaultAsync(u=>u.Id==actor.UserId);
+  var roles=await (from ur in db.UserRoles join role in db.Roles on ur.RoleId equals role.Id where ur.UserId==actor.UserId orderby role.Name select role.Name).ToListAsync();
+  var name=await db.UserClaims.Where(c=>c.UserId==actor.UserId&&c.ClaimType=="ddhi:full_name").Select(c=>c.ClaimValue).FirstOrDefaultAsync();
+  var computer=Guid.TryParse(actor.Workstation,out var station)?await db.Workstations.Where(w=>w.Id==station).Select(w=>w.Name).FirstOrDefaultAsync():actor.Workstation;
+  return new(user?.Email??actor.UserId,name??"",string.Join(", ",roles),computer??"Unregistered workstation ("+actor.Workstation+")");
+ }
+ public async Task Audit(Actor actor,string action,string record,string detail,string outcome="Succeeded",string changes="",AuditIdentity? identity=null) {
+  identity??=await Identity(actor);
   var previous=await db.AuditEvents.OrderByDescending(e=>e.CreatedAt).ThenByDescending(e=>e.Id).Select(e=>e.Hash).FirstOrDefaultAsync()??"GENESIS";
   var lastTime=await db.AuditEvents.MaxAsync(e=>(DateTime?)e.CreatedAt);
-  var e=new AuditEvent{Actor=actor.UserId,Role=actor.Role,Workstation=actor.Workstation,Action=action,RecordId=record,Detail=detail,PreviousHash=previous,CreatedAt=DateTime.UtcNow};
-  // PostgreSQL timestamp resolution is one microsecond. Preserve a strict chain ordering.
+  var e=new AuditEvent{FormatVersion=2,Actor=actor.UserId,Role=actor.Role,Workstation=actor.Workstation,Action=action,RecordId=record,Detail=detail,PreviousHash=previous,CreatedAt=DateTime.UtcNow,
+   StaffEmail=identity.Email,StaffName=identity.Name,StaffRoles=identity.Roles,Computer=identity.Computer,IpAddress=actor.IpAddress,SessionId=actor.SessionId,Outcome=outcome,Changes=changes};
   e.CreatedAt=new DateTime(e.CreatedAt.Ticks-e.CreatedAt.Ticks%10,DateTimeKind.Utc);if(lastTime>=e.CreatedAt)e.CreatedAt=lastTime.Value.AddTicks(10);
   e.Hash=AuditHash(e);db.AuditEvents.Add(e);
+ }
+ public async Task Record(Actor actor,string action,string record,string detail,string outcome="Succeeded") {
+  await using var tx=await db.Database.BeginTransactionAsync();await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(772991001)");
+  await Audit(actor,action,record,detail,outcome);await db.SaveChangesAsync();await tx.CommitAsync();
  }
  public async Task<string> Execute(string key,Actor actor,object request,Func<Task<object>> action) {
   Safety.Require(Guid.TryParse(key,out _),"A UUID Idempotency-Key header is required.");
@@ -26,10 +41,15 @@ public sealed class InventoryService(PharmacyDb db) {
   await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(772991001)");
   var old=await db.OperationKeys.SingleOrDefaultAsync(x=>x.Key==key);
   if(old!=null){Safety.Require(old.PayloadHash==fingerprint&&old.Actor==actor.UserId,"Idempotency key reused for a different request.");return old.Result;}
-  var result=JsonSerializer.Serialize(await action());
-  var detail=JsonSerializer.Serialize(new{request,result});
-  if(detail.Length>1800)detail=JsonSerializer.Serialize(new{Path=request.GetType().GetProperty("Path")?.GetValue(request)?.ToString(),RequestSha256=fingerprint,ResultSha256=Hash(result),Note="Large payload summarized; approved source and operation result retained separately."});
-  await Audit(actor,request.GetType().Name,key,detail);
+  var identity=await Identity(actor);var capture=new AuditChangeCapture();db.AuditCapture=capture;
+  string result;
+  try { result=JsonSerializer.Serialize(await action());capture.Capture(db.ChangeTracker); }
+  finally { db.AuditCapture=null; }
+  var path=request.GetType().GetProperty("Path")?.GetValue(request)?.ToString()??"";
+  var label=request.GetType().GetProperty("Action")?.GetValue(request)?.ToString()??(path.EndsWith("/delete")?"Delete "+path:path.EndsWith("/edit")||path.EndsWith("/trade")||path.EndsWith("/status")||path.EndsWith("/configure")?"Edit "+path:path.EndsWith("/lock")?"Change account access "+path:"Add / execute "+path);
+  var detail=AuditChangeCapture.SafeDetail(request,result,fingerprint);
+  var outcome="Succeeded";if(label.StartsWith("Client file activity: ")){using var fileResult=JsonDocument.Parse(result);outcome=fileResult.RootElement.GetProperty("Outcome").GetString()??outcome;}
+  await Audit(actor,label,key,detail,outcome,changes:capture.Json(),identity:identity);
   db.OperationKeys.Add(new OperationKey{Key=key,Actor=actor.UserId,PayloadHash=fingerprint,Result=result});
   await db.SaveChangesAsync();await tx.CommitAsync();return result;
  }

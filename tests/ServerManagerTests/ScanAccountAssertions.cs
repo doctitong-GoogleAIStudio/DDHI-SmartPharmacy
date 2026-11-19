@@ -40,6 +40,7 @@ internal static class ScanAccountAssertions
         Assert.Equal("QA importer",tradeScan.GetProperty("result").GetProperty("Medicine").GetProperty("ImportedBy").GetString());
         Assert.Equal("QA distributor",tradeScan.GetProperty("result").GetProperty("Medicine").GetProperty("DistributedBy").GetString());
         await GenericReturnAssertions.Exercise(controller,profile,root,client,Post,medicine.GetProperty("Id").GetGuid());
+        await AuditTrailAssertions.Exercise(root,client,Post);
         const string countSql="SELECT (SELECT COUNT(*) FROM \"Medicines\")::text||'|'||(SELECT COUNT(*) FROM \"AspNetUsers\")::text||'|'||(SELECT COUNT(*) FROM \"StockMovements\")::text";
         var before=await new NpgsqlCommand(countSql,db).ExecuteScalarAsync();await db.CloseAsync();
         await controller.ApplyDatabaseUpdates();

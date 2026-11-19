@@ -6,4 +6,4 @@ public static class Roles {
  public static readonly string[] Inventory=[PharmacyAdmin,Chief,Pharmacist,Clerk];
  public static readonly string[] Catalog=[PharmacyAdmin,Chief];
 }
-public record Actor(string UserId,string Role,string Workstation);
+public record Actor(string UserId,string Role,string Workstation,string IpAddress="",string SessionId="");

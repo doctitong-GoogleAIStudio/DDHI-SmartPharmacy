@@ -1,6 +1,6 @@
-# Release status - Server Control 0.8.0 / client 0.5.0 / API 0.3.0
+# Release status - Server installer 0.8.1 / Server Control 0.8.0 / client 0.6.0 / API 0.4.0
 
-Build date: 17 November 2026 (Asia/Manila).
+Build date: 19 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
 Developer: Vicente C. Cavalida Jr. MD.
 Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
@@ -24,7 +24,7 @@ Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
 ## Verified in this development environment
 
 - Latest solution build: zero warnings and zero errors.
-- 55 unit tests passed, 49 real PostgreSQL integration tests passed; 21 further read/audit checks passed against an authenticated restored backup.
+- 246 checks passed: 62 unit, 83 real PostgreSQL integration, 21 restored-database checks, 78 Server Manager checks and 2 client session-switching checks.
 - Tested concurrent final-unit dispensing, negative-stock constraints, role restrictions, wrong medicine, expired/recalled stock, manual-policy blocks, quarantine/returns, transfers, reversal uniqueness, scanner-profile disable, report queries, audit chain and ledger immutability.
 - Published self-contained server tested over HTTPS in Production environment using a pinned, temporary test certificate: migration, bootstrap, staff authentication, catalog, receiving, inventory, audit verification and worker startup succeeded.
 - Encrypted backup authenticated and restored into an isolated database; medicine, ledger and audit counts plus total stock matched before additional restored-database checks.
@@ -67,22 +67,25 @@ The new default workflow is Enable LAN on the server, then automatic discovery a
 
 All 37 Server Manager tests passed. SimpleConnectionSmoke.json and ServerManagerTests.trx record isolated discovery, pinned HTTPS, key rejection, login, data/credential preservation and restart checks. Windows trust stores are not changed. Actual elevated firewall/service/reboot behavior and physical workstation connectivity still need destination-server acceptance; automated loopback tests do not prove those. Live Cerebro remains disabled.
 
-## Database Access and client role navigation — 16 November 2026
+## Database Access and client role navigation â€” 16 November 2026
 
 Server Control 0.5.0 adds Database Access after Activity, with redacted connection details, health checks, application-authenticated read-only records, CSV/JSON snapshots and explicit IT tool launch. Client 0.3.0 displays the signed-in email/role and filters modules/actions using existing API permissions. A 59-test Server Manager suite passed, including new session, role-menu/action, export, real HTTPS login and permission-denial checks. Role sidebars were rendered using actual client XAML and policy data; no real staff authentication was automated. External SQL Shell/pgAdmin operation, destination-server maintenance and physical client acceptance remain pending. API/worker/database schema are unchanged.
 
-## Separate IT PostgreSQL login — Server Control 0.6.0
+## Separate IT PostgreSQL login â€” Server Control 0.6.0
 
 Database Access includes an elevated, original-setup-account wizard for a new ddhi_it_ login with an operator-chosen password and explicit access level. Read-only inventory views are default; pharmacy schema-owner maintenance requires acknowledgement and explicit role selection in SQL. No superuser is granted. Existing users are refused rather than reset. Provisioning is transactional, validates managed namespaces and effective PUBLIC permissions, uses a salted SCRAM verifier instead of cleartext password SQL, and preserves application credentials, stock and ledger data. All 76 Server Manager tests passed, including real PostgreSQL authentication, wrong-password denial, view access, forbidden writes/credential reads, maintenance scoping, duplicate protection, rollback, namespace collision and unsafe PUBLIC-grant rejection. No actual hospital-server IT login was provisioned by these tests. Client 0.3.0 is unchanged; destination-server installation/tool acceptance remains pending. See IT_DATABASE_LOGIN.md.
 
-## Readable scans and staff editing � 0.7.0
+## Readable scans and staff editing — 0.7.0
 
 Scan results display named catalog, package and stock fields with explicit missing encoded data. Exact approved mappings, equivalent zero-padded GTIN aliases, distinct packaging indicators and ambiguous mapping denial share one resolver with dispensing. Image decoding preserves GS1 symbology metadata. User Administration supports editable email/name/phone/multiple roles, clearing optional information, and confirmed account deletion with history retained. Live security-stamp validation revokes changed accounts; stale writes, self-role changes and loss of the last active administrator are rejected. Startup applies DELETE only to five Identity account tables, never stock/audit tables. See SCAN_AND_ACCOUNT_GUIDE.md. Isolated tests and synthetic WPF previews are release evidence; physical scanner/workstation and destination-server upgrade acceptance remain pending.
 
-## Medicine importer and distributor � 0.7.1
+## Medicine importer and distributor — 0.7.1
 
 Optional medicine-level company fields persist in PostgreSQL, appear in the client catalog/export/scan results, and can be added or corrected through catalog-authorized forms. Legacy ten-column and extended twelve-column approved CSV imports are supported. The migration adds empty-default columns while preserving existing catalog and stock. Server status now offers Apply database updates for the selected prepared instance, with a backup/maintenance confirmation and controlled restart. See MEDICINE_IMPORTER_DISTRIBUTOR.md; separate-server service upgrade and physical scanner acceptance remain pending.
 
 ## Generic brands, authorized substitution, mixed-source returns and complete manual - 0.8.0
 
 Generic browsing groups existing product definitions without merging IDs/stock. Catalog staff can add a brand under a selected definition. Brand names now appear in inventory/order selectors and stock reports. Explicit pharmacist substitution requires matching recorded generic/strength/form/route/base unit, verification, approval reference and reason; it retains original and actual product/brand identities and existing stock safeguards. Hospital patient returns require source evidence and an original dispensing line, enforce cumulative limits and quarantine the actual dispensed brand. Outside/uncertain items have append-only custody intake with no inventory/outbox credit. Migrations add recording fields/table with defaults for older rows; older returns are not retrospectively asserted as source-verified. Health reports pending schema updates. The complete bookmarked PDF covers all 19 sidebars, server operation, mixed-source examples and 102 glossary terms. Hospital clinical/physical handling, billing, destination-service lifecycle and clean-machine acceptance remain pending; live Cerebro remains disabled.
+
+
+Audit/timed-session update (19 November 2026): client 0.6.0 and API 0.4.0 add Audit Trail activities, staff/role/computer snapshots, date/time to seconds, safe before/after fields, app file events, timed sessions and daily observed totals in hours/minutes. Server Control remains 0.8.0. Back up the server, install the matching server package, use Server status > Apply database updates as Administrator with the original Windows setup account, then update clients. Existing audit hashes and clinical data are preserved. Session duration is observed connection time, not attendance or active work. Real hospital acceptance remains pending. See COMPLETE_USER_MANUAL.md chapter 21 and AUDIT_TRAIL.md.

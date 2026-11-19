@@ -4,11 +4,12 @@ namespace DDHI.Pharmacy.Contracts;
 public static class ClientAccessPolicy
 {
     public static readonly string[] KnownRoles = ["Read-Only User", "Inventory Clerk", "Pharmacy Assistant", "Pharmacist", "Chief Pharmacist", "Pharmacy Administrator", "Auditor", "System Administrator"];
-    public static readonly string[] AllPages = ["Dashboard", "Scan Medicine", "Medicine Master", "Barcode Registration", "Inventory Receiving", "Inventory Management", "Medication Dispensing", "Stock Transfers", "Returns and Adjustments", "Expiration Monitoring", "Medicine Recalls", "Cerebro Synchronization", "Reports", "Scanner Settings", "Workstation Management", "User Administration", "Audit Logs", "System Settings", "About Application"];
+    public static readonly string[] AllPages = ["Dashboard", "Scan Medicine", "Medicine Master", "Barcode Registration", "Inventory Receiving", "Inventory Management", "Medication Dispensing", "Stock Transfers", "Returns and Adjustments", "Expiration Monitoring", "Medicine Recalls", "Cerebro Synchronization", "Reports", "Scanner Settings", "Workstation Management", "User Administration", "Audit Trail", "System Settings", "About Application"];
     public static bool Has(IEnumerable<string> roles, string policy) => roles.Any(role => policy switch {
         "Catalog" => role is "Chief Pharmacist" or "Pharmacy Administrator",
         "Clinical" => role is "Chief Pharmacist" or "Pharmacist",
         "Inventory" => role is "Chief Pharmacist" or "Pharmacy Administrator" or "Pharmacist" or "Inventory Clerk",
+        "Audit" => role is "System Administrator" or "Chief Pharmacist" or "Pharmacy Administrator" or "Pharmacist" or "Auditor",
         "Report" => role is "Chief Pharmacist" or "Pharmacy Administrator" or "Pharmacist" or "Auditor",
         "Admin" => role == "System Administrator",
         "Chief" => role == "Chief Pharmacist",
@@ -21,7 +22,8 @@ public static class ClientAccessPolicy
         "Inventory Receiving" or "Stock Transfers" => Has(roles,"Inventory"),
         "Medication Dispensing" => Has(roles,"Clinical"),
         "Returns and Adjustments" => Has(roles,"Catalog") || Has(roles,"Clinical"),
-        "Expiration Monitoring" or "Cerebro Synchronization" or "Reports" or "Audit Logs" => Has(roles,"Report"),
+        "Expiration Monitoring" or "Cerebro Synchronization" or "Reports" => Has(roles,"Report"),
+        "Audit Trail" or "Audit Logs" => Has(roles,"Audit"),
         "Workstation Management" or "User Administration" => Has(roles,"Admin"),
         _ => false
     };

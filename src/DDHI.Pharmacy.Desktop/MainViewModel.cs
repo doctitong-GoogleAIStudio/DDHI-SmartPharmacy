@@ -10,6 +10,7 @@ using DDHI.Pharmacy.Contracts;
 namespace DDHI.Pharmacy.Desktop;
 public sealed class MainViewModel:INotifyPropertyChanged {
  public event PropertyChangedEventHandler? PropertyChanged;
+ public event Action? SessionExpired;
  string title="Dashboard",status="Connect to the central server to continue.",footer="";DataView? rows;
  public string Title{get=>title;set{title=value;Changed();}} public string Status{get=>status;set{status=value;Changed();}}
  public string Footer{get=>footer;set{footer=value;Changed();}} public DataView? Rows{get=>rows;set{rows=value;Changed();}}
@@ -20,8 +21,13 @@ public sealed class MainViewModel:INotifyPropertyChanged {
  public string RoleLabel=>Roles.Length==0?"Not signed in":string.Join(" • ",Roles);
  public int SessionVersion {get;private set;}
  internal void ApplyIdentity(string email,IEnumerable<string> roles){StaffEmail=email;Roles=roles.Distinct().ToArray();Pages=ClientAccessPolicy.PagesFor(Roles);Changed(nameof(StaffEmail));Changed(nameof(RoleLabel));Changed(nameof(Pages));}
- public void ClearSession(){SessionVersion++;Client.DefaultRequestHeaders.Authorization=null;Roles=[];Pages=[];StaffEmail="";UserId="";Rows=null;Footer="";Endpoint="";pendingKeys.Clear();Changed(nameof(StaffEmail));Changed(nameof(RoleLabel));Changed(nameof(Pages));}
+ public void ClearSession(){heartbeat.Stop();auditSession="";Client.DefaultRequestHeaders.Remove("X-Audit-Session");SessionVersion++;Client.DefaultRequestHeaders.Authorization=null;Roles=[];Pages=[];StaffEmail="";UserId="";Rows=null;Footer="";Endpoint="";pendingKeys.Clear();Changed(nameof(StaffEmail));Changed(nameof(RoleLabel));Changed(nameof(Pages));}
 
+ readonly System.Windows.Threading.DispatcherTimer heartbeat=new(){Interval=TimeSpan.FromMinutes(1)};
+ string auditSession="";bool heartbeatBusy;
+ public MainViewModel(){heartbeat.Tick+=async(_,_)=>await Heartbeat();}
+ internal async Task Heartbeat(){if(heartbeatBusy||auditSession.Length==0)return;var generation=SessionVersion;heartbeatBusy=true;try{using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(5));using var response=await Client.PostAsJsonAsync("api/sessions/"+auditSession+"/heartbeat",new{},timeout.Token);if(response.StatusCode==System.Net.HttpStatusCode.Unauthorized&&generation==SessionVersion){ClearSession();SessionExpired?.Invoke();}}catch{}finally{heartbeatBusy=false;}}
+ public async Task Logout(){heartbeat.Stop();if(auditSession.Length==0)return;try{using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(5));using var request=new HttpRequestMessage(HttpMethod.Post,"api/sessions/"+auditSession+"/end"){Content=JsonContent.Create(new{})};request.Headers.Add("Idempotency-Key",Guid.NewGuid().ToString());using var response=await Client.SendAsync(request,timeout.Token);}catch{}finally{ClearSession();}}
  public HttpClient Client {get;private set;}=new(){Timeout=TimeSpan.FromSeconds(25)};
  public string WorkstationId {get;private set;}=Environment.MachineName;
  public string[] Roles {get;private set;}=[];
@@ -35,6 +41,7 @@ public sealed class MainViewModel:INotifyPropertyChanged {
   using var response=await Client.PostAsJsonAsync("auth/login",new{email,password});await Ensure(response);using var token=JsonDocument.Parse(await response.Content.ReadAsStringAsync());Client.DefaultRequestHeaders.Authorization=new AuthenticationHeaderValue("Bearer",token.RootElement.GetProperty("accessToken").GetString());
   var workstation=await Post("workstations",new{name=Environment.MachineName});WorkstationId=workstation.GetProperty("Id").GetString()!;Client.DefaultRequestHeaders.Remove("X-Workstation");Client.DefaultRequestHeaders.Add("X-Workstation",WorkstationId);
   var me=await Get("me");UserId=me.TryGetProperty("id",out var accountId)?accountId.GetString()??"":"";ApplyIdentity(me.GetProperty("user").GetString()??email,me.GetProperty("roles").EnumerateArray().Select(x=>x.GetString()!));Footer=$"{email}  ·  {string.Join(", ",Roles)}  ·  {Environment.MachineName}  ·  Asia/Manila";Status="Connected. All transactions require explicit confirmation.";
+  var session=await Post("sessions/start",new{});auditSession=session.GetProperty("Id").GetString()!;Client.DefaultRequestHeaders.Add("X-Audit-Session",auditSession);heartbeat.Start();
   var settings=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DDHI","client.json");Directory.CreateDirectory(Path.GetDirectoryName(settings)!);File.WriteAllText(settings,JsonSerializer.Serialize(new{ApiAddress=address}));
  }
  public static string SavedAddress(){try{using var d=JsonDocument.Parse(File.ReadAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DDHI","client.json")));return d.RootElement.GetProperty("ApiAddress").GetString()??"";}catch{return "";}}

@@ -29,10 +29,11 @@ public partial class MainWindow
         await vm.Load("medicines/"+template+"/brands");CatalogMode(false);vm.Status="Brand added to the generic group. Register its exact package barcode, then receive its stock separately.";
     }
     async void OpenManual(object sender,RoutedEventArgs e)=>await Guard(OpenUserManual);
-    Task OpenUserManual()
+    async Task OpenUserManual()
     {
         var path=System.IO.Path.Combine(AppContext.BaseDirectory,"Documentation","DDHI-SmartPharmacy-Complete-User-Manual.pdf");
         if(!System.IO.File.Exists(path))throw new InvalidOperationException("Install the complete updated client package to open the user manual.");
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path){UseShellExecute=true});return Task.CompletedTask;
+        if(vm.UserId.Length>0)await FileActivity("Open manual","Started",path,0);
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path){UseShellExecute=true});if(vm.UserId.Length>0)await FileActivity("Open manual","Succeeded",path,0);
     }
 }

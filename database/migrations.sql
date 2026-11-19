@@ -1252,3 +1252,119 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "Computer" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "Email" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "EndReason" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "EndedAt" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "LastSeenAt" timestamp with time zone NOT NULL DEFAULT TIMESTAMPTZ '-infinity';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "UserSessions" ADD "Roles" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "Changes" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "Computer" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "FormatVersion" integer NOT NULL DEFAULT 0;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "IpAddress" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "Outcome" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "SessionId" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "StaffEmail" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "StaffName" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    ALTER TABLE "AuditEvents" ADD "StaffRoles" character varying(2000) NOT NULL DEFAULT '';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261119095027_AuditIdentityAndTimedSessions') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261119095027_AuditIdentityAndTimedSessions', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+

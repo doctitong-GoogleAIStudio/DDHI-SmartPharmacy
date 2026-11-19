@@ -2,11 +2,11 @@
 
 Digos Doctors Hospital, Inc.
 
-Client 0.5.0 | Server Control 0.8.0 | API 0.3.0
+Client 0.6.0 | Server Control 0.8.0 | API 0.4.0
 
 Developer: Vicente C. Cavalida Jr. MD
 
-17 November 2026 | Hospital evaluation edition
+19 November 2026 | Hospital evaluation edition
 
 This manual explains the released client screens, the server connection workflow, generic groups and brands, authorized brand substitution, and mixed-source discharge returns. It describes software operation, not prescribing instructions or permission to substitute a medicine. Follow hospital policy, the authorized order and the responsible pharmacist's review. Live Cerebro posting and automatic patient billing/refunds remain disabled. Separate hospital-computer, physical scanner and clean-server acceptance remain pending.
 
@@ -44,7 +44,7 @@ The sidebar depends on the roles assigned to the signed-in email. Multiple roles
 - Chief Pharmacist and Pharmacy Administrator maintain the medicine catalog and barcode mappings. Read-only staff may browse generic groups and their brands but cannot add or change catalog records.
 - Chief Pharmacist, Pharmacy Administrator, Pharmacist and Inventory Clerk can receive stock and transfer it.
 - Chief Pharmacist and Pharmacist perform dispensing and patient return/intake workflows. A technical System Administrator role alone does not authorize those actions.
-- Chief Pharmacist, Pharmacy Administrator, Pharmacist and Auditor can view reports, audit logs, expiration monitoring and Cerebro synchronization records.
+- Chief Pharmacist, Pharmacy Administrator, Pharmacist and Auditor can view reports, audit records, expiration monitoring and Cerebro synchronization records. System Administrators can also view Audit Trail.
 - System Administrator can access Workstation Management and User Administration. Staff creation does not automatically give the creator dispensing authority.
 - System Settings is visible to catalog roles, but the manual dispensing policy action requires Chief Pharmacist authority.
 
@@ -350,15 +350,29 @@ You cannot change your own roles or delete/lock your signed-in account. The last
 
 The current editor does not provide password reset/change or a forced first-login password change. Use the hospital's authorized support process. Repeated failed sign-ins can trigger lockout; do not ask staff to send passwords through chat or email. Application staff passwords are separate from IT PostgreSQL credentials.
 
-## 21. Audit Logs
+## 21. Audit Trail
 
-**Access:** Chief Pharmacist, Pharmacy Administrator, Pharmacist or Auditor.
+**Access:** System Administrator, Chief Pharmacist, Pharmacy Administrator, Pharmacist or Auditor. Other roles cannot open this page. Technical administrators gain audit access without gaining clinical dispensing permission.
 
-Audit records show who acted, under which role, from which workstation, and when. Transaction references and immutable movement history help investigate receiving, dispensing, substitution, patient returns and catalog/account changes.
+### Activities: who, what, where and when
 
-Verify hash chain checks the audit chain for consistency and displays its result. A valid chain supports integrity of recorded audit data; it does not prove that physical counts, package identity, an approval document or a clinical decision were correct. A failed verification requires authorized investigation rather than manual log editing.
+Open Audit Trail, then Activities. Each row shows the server-recorded date and time to seconds in Asia/Manila, staff email/name, assigned roles, computer, activity and outcome. New events preserve identity snapshots, so a later email/role change or account deletion does not rewrite earlier history. Computer names are reported by the client; the server also records the observed network address. They are useful attribution evidence, not hardware authentication.
 
-Export or print loaded logs only for an authorized purpose. Large request payloads may be summarized with hashes rather than copied in full. Deleting a staff login does not remove their historical actions. Do not use SQL tools to edit audit or stock-movement rows to make reports look correct.
+Central actions include additions, edits, account deletion/locking, receiving, dispensing/substitution, returns, adjustments, settings, barcode registration and imports. Successful mutations and their audit entries commit together. Views, denied requests and failed mutations are also recorded when the audit database is available; these auxiliary records cannot be guaranteed during an outage. Failed sign-ins do not disclose passwords or unknown email addresses.
+
+Choose Filter to search dates (yyyy-MM-dd), staff email/name, computer, activity or outcome. Activities and timed-session results use 200 rows per page. Use Previous page and Next page. Outcome can be Succeeded, Denied, Failed, Started or Canceled. Text filters are case-sensitive. Timed-session staff filters match email only. Select a row and View details for the before/after business fields, record IDs, request/result hashes and session reference. Large changes are bounded: OmittedFields identifies fields left out, and a digest represents the full captured change set. Passwords, security stamps, tokens, imported file bodies and private keys are excluded.
+
+### Timed sessions: hours and minutes
+
+Choose Timed sessions to see Started, Last contact, Signed out, roles, computer and Observed duration such as 02h 15m. The client reports contact about once a minute and reports sign-out/window closing when possible. Times come from the server. An abrupt shutdown or lost network leaves the end unconfirmed; duration stops at last contact. Expired or revoked sign-ins require signing in again. The existing authentication lifetime is 20 minutes; separate sign-ins are separate sessions.
+
+Choose Daily totals to combine observed intervals by staff account, computer and Manila calendar date. Overlapping sessions on that same computer count once. Cross-midnight intervals split between dates. The default range is the last 30 days; choose up to 366 days and narrow filters if more than 20,000 sessions match. Totals use hours and minutes, with seconds rounded down after aggregation. These are observed app connection durations, not active typing, attendance, paid hours or evidence that a clinical task was performed.
+
+### App files and verification
+
+CSV imports/exports, report printing, stock-label printing and opening the manual produce client-reported file activity. Only the base filename, page, outcome and row count are sent; local paths and file contents are excluded. A print success means submission to the Windows print system, not verified paper output or PDF delivery. Export/print operates on the currently loaded page only. Transfer reports only for an authorized purpose. The app does not monitor unrelated Windows file edits/deletions.
+
+Choose Verify hash chain to check recorded audit integrity. Existing records retain their original hashes and appear as legacy identities where name snapshots were unavailable. A valid chain does not certify physical stock, an approval document or a clinical decision. Investigate a failure through authorized support; do not edit audit or stock-movement rows. Database triggers and runtime privileges protect audit records from update/deletion; an authorized database superuser can still interfere, so protect credentials and keep verified backups.
 
 ## 22. System Settings
 

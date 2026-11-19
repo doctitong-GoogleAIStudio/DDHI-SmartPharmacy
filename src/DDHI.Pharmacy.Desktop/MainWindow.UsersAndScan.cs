@@ -6,6 +6,11 @@ public partial class MainWindow
 {
     void UserColumns(object? sender,System.Windows.Controls.DataGridAutoGeneratingColumnEventArgs e)
     {
+        if(current=="Audit Trail"){
+            if(new[]{"id","changes","detail","hash","sessionid","ipaddress","identityevidence","meaning"}.Contains(e.PropertyName.ToLowerInvariant())){e.Cancel=true;return;}
+            var label=System.Text.RegularExpressions.Regex.Replace(e.PropertyName,"([A-Z])"," $1").Trim();e.Column.Header=char.ToUpperInvariant(label[0])+label[1..];e.Column.MaxWidth=310;e.Column.MinWidth=75;
+            if(e.Column is System.Windows.Controls.DataGridTextColumn column){var style=new Style(typeof(System.Windows.Controls.TextBlock));style.Setters.Add(new Setter(MarginProperty,new Thickness(7,0,7,0)));style.Setters.Add(new Setter(VerticalAlignmentProperty,VerticalAlignment.Center));style.Setters.Add(new Setter(ToolTipProperty,column.Binding));column.ElementStyle=style;}return;
+        }
         if(current=="Medicine Master"){if(e.PropertyName.Equals("templateMedicineId",StringComparison.OrdinalIgnoreCase)){e.Cancel=true;return;}e.Column.Header=e.PropertyName.ToLowerInvariant() switch{"importedby"=>"Imported by","distributedby"=>"Distributed by","genericname"=>"Generic name","brandname"=>"Brand","brandcount"=>"Brands / unbranded labels","productcount"=>"Separate products","activeproducts"=>"Active products","baseunit"=>"Base unit","dosageform"=>"Dosage form",_=>e.Column.Header};return;}
         if(current!="User Administration")return;
         if(e.PropertyName.Equals("id",StringComparison.OrdinalIgnoreCase)||e.PropertyName.Equals("version",StringComparison.OrdinalIgnoreCase)){e.Cancel=true;return;}

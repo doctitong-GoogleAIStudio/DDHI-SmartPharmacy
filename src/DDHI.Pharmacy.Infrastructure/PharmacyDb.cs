@@ -84,7 +84,9 @@ public sealed class PharmacyDb(DbContextOptions<PharmacyDb> options) : IdentityD
   b.Entity<ScannerConfiguration>().HasIndex(x=>new{x.WorkstationId,x.Name}).IsUnique();
   b.Entity<AuditEvent>().HasIndex(x=>x.CreatedAt);
  }
+ public AuditChangeCapture? AuditCapture {get;set;}
  public override Task<int> SaveChangesAsync(CancellationToken c=default) {
+  AuditCapture?.Capture(ChangeTracker);
   foreach(var e in ChangeTracker.Entries().Where(e=>e.State is EntityState.Modified or EntityState.Deleted))
    if(e.Entity is StockMovement or AuditEvent)throw new InvalidOperationException("Ledger and audit events are immutable.");
   return base.SaveChangesAsync(c);

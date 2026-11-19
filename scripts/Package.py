@@ -59,9 +59,11 @@ def main():
         'integration': test_result('IntegrationTestsFinal.trx'),
         'restoredDatabase': test_result('RestoredDatabaseFinal.trx'),
         'serverManager': test_result('ServerManagerTests.trx'),
+        'clientSessions': test_result('ClientSessionTests.trx'),
     }
     evidence = {}
     for filename, required in {
+        'AuditTrailSmoke.json': ['snapshotsAndDeletion', 'safeChanges', 'deniedAndFailed', 'timedSessionOwnership', 'dailyTotals', 'hashCompatibility', 'presentationReviewed'],
         'GenericReturnSmoke.json': ['genericMultiBrands', 'approvedSubstitution', 'hospitalReturnLinkedToActualBrand', 'externalNoStockOrBillingCredit', 'runtimeIntakeAppendOnly'],
         'CompleteManualReview.json': ['allSidebarSections', 'glossaryPresent', 'allPagesRendered', 'layoutReviewed'],
         'GenericReturnPresentation.json': ['genericBrowseReviewed', 'addBrandReviewed', 'substitutionFieldsReviewed', 'hospitalReturnReviewed', 'externalIntakeReviewed'],
@@ -93,6 +95,9 @@ def main():
             raise RuntimeError(f'Incomplete release evidence: {filename}')
         evidence[filename] = data
     desktop = evidence['DesktopLaunch.json']
+    for key,path in [('clientSha256',executables[0]),('apiSha256',executables[3]),('apiAssemblySha256','Server/Api/DDHI.Pharmacy.Api.dll')]:
+        if evidence['AuditTrailSmoke.json'].get(key,'').lower()!=sha(RELEASE/path):
+            raise RuntimeError('Audit evidence does not match published '+path)
     if evidence['CompleteManualReview.json'].get('pdfSha256', '').lower() != sha(RELEASE / 'Documentation/DDHI-SmartPharmacy-Complete-User-Manual.pdf'):
         raise RuntimeError('Manual review evidence does not match the packaged PDF.')
     if evidence['GenericReturnPresentation.json'].get('clientSha256', '').lower() != sha(RELEASE / executables[0]):
@@ -146,7 +151,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.8.0-generic-brands-manual', 'components': {'client': '0.5.0', 'clientInstaller': '0.5.0', 'api': '0.3.0', 'worker': '0.4.0', 'serverControl': '0.8.0', 'serverInstaller': '0.8.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.8.1-audit-timed-sessions', 'components': {'client': '0.6.0', 'clientInstaller': '0.6.0', 'api': '0.4.0', 'worker': '0.4.0', 'serverControl': '0.8.0', 'serverInstaller': '0.8.1', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,

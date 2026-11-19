@@ -12,13 +12,15 @@ Copy-Item publish\windows-x64\* release\Client -Recurse -Force
 foreach ($project in @('Api','Worker','Tools')) { dotnet publish "src\DDHI.Pharmacy.$project" -c Release -r win-x64 --self-contained true -p:DebugType=None -m:1 -o "release\Server\$project"; Check }
 dotnet publish src\DDHI.Pharmacy.ServerManager -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -m:1 -o release\Server\Manager; Check
 & scripts\Stage-PostgreSQL.ps1
-dotnet test tests\ServerManagerTests -c Release --logger "trx;LogFileName=ServerManagerTests.trx" --results-directory release\Tests -m:1 --disable-build-servers; Check
+dotnet test tests\ServerManagerTests -c Release --filter 'FullyQualifiedName!~AuditSessionClientTests' --logger "trx;LogFileName=ServerManagerTests.trx" --results-directory release\Tests -m:1 --disable-build-servers; Check
+dotnet test tests\ServerManagerTests -c Release --no-build --filter 'FullyQualifiedName~AuditSessionClientTests' --logger "trx;LogFileName=ClientSessionTests.trx" --results-directory release\Tests; Check
 python scripts\Manuals.py; Check
 python scripts\Make-LanConnectionGuide.py; Check
 python scripts\Make-CompleteManual.py; Check
 New-Item -ItemType Directory -Path release\Client\Documentation -Force | Out-Null
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Client\Documentation -Force
 Copy-Item docs\MEDICINE_IMPORTER_DISTRIBUTOR.md release\Client\Documentation -Force
+Copy-Item docs\AUDIT_TRAIL.md release\Client\Documentation -Force
 Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf release\Client\Documentation -Force
 Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf release\Documentation -Force
 Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf "release\Documentation\Pharmacy User Manual.pdf" -Force

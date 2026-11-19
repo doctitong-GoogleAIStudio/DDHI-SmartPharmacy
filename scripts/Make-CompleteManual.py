@@ -30,7 +30,7 @@ def furniture(canvas,doc):
     w,h=A4;canvas.saveState();canvas.setFont('Helvetica',8);canvas.setFillColor(GRAY)
     canvas.drawString(46,h-31,'DDHI SMART PHARMACY | COMPLETE USER MANUAL')
     canvas.setStrokeColor(colors.HexColor('#B8D3C4'));canvas.line(46,h-40,w-46,h-40)
-    canvas.line(46,39,w-46,39);canvas.drawString(46,26,'Client 0.5.0 | Hospital evaluation | Digos Doctors Hospital, Inc.')
+    canvas.line(46,39,w-46,39);canvas.drawString(46,26,'Client 0.6.0 | Hospital evaluation | Digos Doctors Hospital, Inc.')
     canvas.drawRightString(w-46,26,str(doc.page));canvas.restoreState()
 
 class Manual(BaseDocTemplate):
@@ -48,7 +48,7 @@ story=[Spacer(1,25),Image(str(ROOT/'assets/branding/hospital-logo.png'),width=92
        Paragraph('DDHI Smart Pharmacy',styles['ManualTitle']),Paragraph('Complete User Manual',styles['ManualH1']),
        Paragraph('Every sidebar section, generic groups and brands, authorized substitution, patient discharge returns and a glossary.',styles['ManualBody']),Spacer(1,18),
        Paragraph('Digos Doctors Hospital, Inc.',styles['ManualH2']),Paragraph('Developer: Vicente C. Cavalida Jr. MD',styles['ManualBody'])]
-cover=Table([[Paragraph('<b>CLIENT 0.5.0</b><br/>Server Control 0.8.0 | API 0.3.0<br/>17 November 2026',styles['ManualBody'])]],colWidths=[A4[0]-92])
+cover=Table([[Paragraph('<b>CLIENT 0.6.0</b><br/>Server Control 0.8.0 | API 0.4.0<br/>19 November 2026',styles['ManualBody'])]],colWidths=[A4[0]-92])
 cover.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,-1),LIGHT),('BOX',(0,0),(-1,-1),.5,colors.HexColor('#B8D3C4')),('LEFTPADDING',(0,0),(-1,-1),14),('TOPPADDING',(0,0),(-1,-1),12),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
 story += [Spacer(1,18),cover,Spacer(1,22),Paragraph('Hospital evaluation edition',styles['ManualH2']),Paragraph('This manual explains software operation. It does not grant clinical, substitution, quality-release or billing authority. Live Cerebro posting and automatic patient refunds remain disabled. Hospital deployment and physical-device acceptance are pending.',styles['ManualBody']),NextPageTemplate('Body'),PageBreak(),Paragraph('Contents',styles['ManualH1'])]
 toc=TableOfContents();toc.levelStyles=[styles['ManualToc']];toc.dotsMinLevel=0;story += [toc]
