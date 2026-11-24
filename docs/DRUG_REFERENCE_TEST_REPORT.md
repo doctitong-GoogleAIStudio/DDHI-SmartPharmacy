@@ -1,0 +1,13 @@
+# Governed Drug Reference engineering verification
+
+Verified 24 November 2026 in the permanent E: project workspace. Client 0.7.0, API 0.5.0 and Server Control/installer 0.9.0. Worker remains 0.4.0.
+
+277 automated checks passed: 85 unit, 91 PostgreSQL integration, 21 restored-database, 78 Server Manager and 2 client session-switching checks. TRX files and published-runtime smoke evidence are included under release/Tests.
+
+New coverage includes bounded JSON/CSV/ZIP/XLSX imports; malformed/formula/duplicate rejection; independent content review and Chief approval; publication immutability and rollback history; exact ingredient/product mapping; explicit unknown and stale/conditional coverage; declared severity and original evidence; ingredient duplication and documented allergy; dose unit and IV condition validation; reference-only barcode lookup; concurrent deterministic screening; patient/order/actor/workstation/brand/batch/quantity/content/policy binding; hold/proceed gates; one-use assessment and retry idempotency. Fictional fixtures never seed production data.
+
+Published HTTPS tests passed with a pinned test certificate, anonymous denial, staff authentication, receiving and audit-chain verification. Isolated Server Control tests exercised runtime grants and authenticated encrypted pre-migration backup with a protected recovery-key sidecar. The smoke test selects an available loopback port because Windows reserved the previous fixed test port; the application HTTPS port remains unchanged.
+
+Four new actual WPF component layouts, current role sidebars and audit grids were rendered with synthetic identities and visually reviewed. Published native client sign-in and Server Control preparation-only launch were inspected without staff authentication. All 36 complete-manual pages and 11 reference-guide pages were rendered/reviewed; contents, bookmarks, 20 sidebar sections and 112 glossary terms were checked. Previously reviewed unchanged account, trade, generic and return visual components were compared against the prior release source.
+
+This is engineering verification, not clinical acceptance. No licensed interaction corpus, approved monographs, IV compatibility corpus, real-drug validation evidence or external AI is included. Comprehensive clinical content, pharmacist source validation, four physical hospital workstations, scanners, clean-server installation and hospital/privacy acceptance remain pending. See DRUG_REFERENCE_CAPABILITY_MATRIX.md and DRUG_REFERENCE_CLINICAL_VALIDATION.md. Dispensing with incomplete coverage remains disabled until a Chief Pharmacist explicitly authorizes the documented independent-review policy.

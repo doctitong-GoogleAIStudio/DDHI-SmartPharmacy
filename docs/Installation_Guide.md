@@ -17,3 +17,5 @@ On the server click Save connection file. Copy that small file to a client and c
 
 ## Guide and acceptance
 Server Control and the client sign-in screen include Connection guide, and the client Start Menu includes the same PDF. The complete four-page guide covers the simple flow and troubleshooting. TCP 8443 and UDP 8444 are the defaults. Windows certificate trust is not changed; verify readiness in the paired app rather than bypassing browser warnings. Physical workstation, firewall, service/reboot and hospital acceptance remain pending. Live Cerebro is disabled.
+
+The 0.9.0 server / 0.7.0 client Drug Reference foundation adds governed clinical content and a required dispensing-assessment workflow. No clinical knowledge corpus is preapproved. See DRUG_REFERENCE_GUIDE.md for administration, pharmacist steps, updates/rollback, installation and automatic local migration-backup limitations; DRUG_REFERENCE_CLINICAL_VALIDATION.md remains a hospital acceptance gate.

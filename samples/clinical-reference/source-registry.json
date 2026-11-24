@@ -1,0 +1,45 @@
+{
+  "kind": "SourceRegistryOnly",
+  "checkedOn": "2026-11-24",
+  "clinicalRules": 0,
+  "clinicalMonographs": 0,
+  "notice": "Original source-link metadata only. Not an interaction dataset and not importable as an approved clinical package.",
+  "sources": [
+    {
+      "organization": "Philippine FDA",
+      "url": "https://verification.fda.gov.ph/",
+      "publicationRevisionDate": null,
+      "status": "Verify each PH product/registration and permitted reuse."
+    },
+    {
+      "organization": "NLM RxNorm/RxNav",
+      "url": "https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html",
+      "publicationRevisionDate": null,
+      "status": "Terminology terms and attribution; no interaction service."
+    },
+    {
+      "organization": "NLM DailyMed",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/",
+      "publicationRevisionDate": null,
+      "status": "Source-by-source content permission and pharmacist review required."
+    },
+    {
+      "organization": "FDA openFDA",
+      "url": "https://open.fda.gov/terms/",
+      "publicationRevisionDate": null,
+      "status": "Public label data is not comprehensive pairwise interaction coverage."
+    },
+    {
+      "organization": "WHO Collaborating Centre ATC/DDD",
+      "url": "https://atcddd.fhi.no/copyright_disclaimer/416.html",
+      "publicationRevisionDate": null,
+      "status": "Separate terms; no copied complete index supplied."
+    },
+    {
+      "organization": "NIDDK",
+      "url": "https://www.niddk.nih.gov/research-funding/research-programs/kidney-clinical-research-epidemiology/laboratory/ckd-drug-dosing-providers",
+      "publicationRevisionDate": null,
+      "status": "Reference to renal-method limitations; not medication-specific dosing content."
+    }
+  ]
+}

@@ -121,7 +121,7 @@ public partial class MainWindow : Window
         if (PreviewOnly)
         {
             MainTabs.SelectedItem = DatabaseAccessTab;
-            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.8.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true, DatabaseAccessControlsLoaded = true, ItLoginControlsLoaded = true }));
+            await File.WriteAllTextAsync(Path.Combine(Directory.GetParent(ServerProfile.Defaults().DataRoot)!.FullName, "manager-preview.json"), JsonSerializer.Serialize(new { Machine = Environment.MachineName, DesktopWindowLoaded = true, PreparationOnly = true, LocalInitializationDisabled = true, Version = "0.9.0", LanConnectionControlsLoaded = true, ConnectionGuideLoaded = true, SimpleLanControlsLoaded = true, DatabaseAccessControlsLoaded = true, ItLoginControlsLoaded = true }));
             return;
         }
         if (profile.Prepared) await Guard(RefreshStatus);

@@ -19,6 +19,7 @@ public sealed class AuditChangeCapture
         foreach(var entry in tracker.Entries().Where(e=>e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
         {
             var type=entry.Metadata.ClrType.Name;
+            if(type.StartsWith("Clinical")||type is "PharmacistIntervention" or "DrugIngredient" or "ReferencePreference")continue;
             if(type is "AuditEvent" or "OperationKey" or "UserSession" or "IntegrationOutbox" or "IntegrationInbox" or "IntegrationAcknowledgment")continue;
             if(type.StartsWith("IdentityUserToken")||type.StartsWith("IdentityUserLogin"))continue;
             var id=string.Join(",",entry.Properties.Where(p=>p.Metadata.IsPrimaryKey()).Select(p=>p.CurrentValue?.ToString()));

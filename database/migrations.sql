@@ -1368,3 +1368,518 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    ALTER TABLE "DispenseTransactions" ADD "SafetyAssessmentId" uuid;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalContentVersions" (
+        "Id" uuid NOT NULL,
+        "Version" character varying(2000) NOT NULL,
+        "State" character varying(2000) NOT NULL,
+        "Digest" character varying(2000) NOT NULL,
+        "PayloadJson" text NOT NULL,
+        "Author" character varying(2000) NOT NULL,
+        "Reviewer" character varying(2000) NOT NULL,
+        "Approver" character varying(2000) NOT NULL,
+        "ApprovalReference" character varying(2000) NOT NULL,
+        "ReviewedAt" timestamp with time zone,
+        "ApprovedAt" timestamp with time zone,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalContentVersions" PRIMARY KEY ("Id")
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ReferencePreferences" (
+        "Id" uuid NOT NULL,
+        "Actor" character varying(2000) NOT NULL,
+        "MedicineId" uuid NOT NULL,
+        "Favorite" boolean NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ReferencePreferences" PRIMARY KEY ("Id")
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalDrugs" (
+        "Id" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "Name" character varying(2000) NOT NULL,
+        "Strength" character varying(2000) NOT NULL,
+        "Form" character varying(2000) NOT NULL,
+        "Route" character varying(2000) NOT NULL,
+        "SearchText" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalDrugs" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalDrugs_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalPublications" (
+        "Id" uuid NOT NULL,
+        "Revision" bigint NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Actor" character varying(2000) NOT NULL,
+        "Reason" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalPublications" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalPublications_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalReviewRecords" (
+        "Id" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Actor" character varying(2000) NOT NULL,
+        "Action" character varying(2000) NOT NULL,
+        "Reason" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalReviewRecords" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalReviewRecords_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalRuleRecords" (
+        "Id" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "PairKey" character varying(2000) NOT NULL,
+        "Kind" character varying(2000) NOT NULL,
+        "Severity" character varying(2000) NOT NULL,
+        "RuleJson" text NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalRuleRecords" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalRuleRecords_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalSourceRecords" (
+        "Id" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "Organization" character varying(2000) NOT NULL,
+        "Document" character varying(2000) NOT NULL,
+        "Url" character varying(2000) NOT NULL,
+        "LicenseBasis" character varying(2000) NOT NULL,
+        "RevisionDate" date NOT NULL,
+        "RetrievedDate" date NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalSourceRecords" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalSourceRecords_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "DrugIngredients" (
+        "Id" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "Name" character varying(2000) NOT NULL,
+        "SearchText" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_DrugIngredients" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_DrugIngredients_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalMonographRecords" (
+        "Id" uuid NOT NULL,
+        "DrugId" uuid NOT NULL,
+        "SectionsJson" text NOT NULL,
+        "ReviewDue" date NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalMonographRecords" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalMonographRecords_ClinicalDrugs_DrugId" FOREIGN KEY ("DrugId") REFERENCES "ClinicalDrugs" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalProducts" (
+        "Id" uuid NOT NULL,
+        "DrugId" uuid NOT NULL,
+        "VersionId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "Brand" character varying(2000) NOT NULL,
+        "SearchText" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalProducts" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalProducts_ClinicalContentVersions_VersionId" FOREIGN KEY ("VersionId") REFERENCES "ClinicalContentVersions" ("Id") ON DELETE RESTRICT,
+        CONSTRAINT "FK_ClinicalProducts_ClinicalDrugs_DrugId" FOREIGN KEY ("DrugId") REFERENCES "ClinicalDrugs" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalScreenings" (
+        "Id" uuid NOT NULL,
+        "PublicationId" uuid,
+        "Actor" character varying(2000) NOT NULL,
+        "Workstation" character varying(2000) NOT NULL,
+        "EncounterReference" character varying(2000) NOT NULL,
+        "MappingDigest" character varying(2000) NOT NULL,
+        "InputJson" text NOT NULL,
+        "ResolutionJson" text NOT NULL,
+        "ResultJson" text NOT NULL,
+        "Digest" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalScreenings" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalScreenings_ClinicalPublications_PublicationId" FOREIGN KEY ("PublicationId") REFERENCES "ClinicalPublications" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalDrugIngredients" (
+        "Id" uuid NOT NULL,
+        "DrugId" uuid NOT NULL,
+        "IngredientId" uuid NOT NULL,
+        "Amount" numeric(20,6),
+        "Unit" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalDrugIngredients" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalDrugIngredients_ClinicalDrugs_DrugId" FOREIGN KEY ("DrugId") REFERENCES "ClinicalDrugs" ("Id") ON DELETE RESTRICT,
+        CONSTRAINT "FK_ClinicalDrugIngredients_DrugIngredients_IngredientId" FOREIGN KEY ("IngredientId") REFERENCES "DrugIngredients" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "ClinicalPackageRecords" (
+        "Id" uuid NOT NULL,
+        "ProductId" uuid NOT NULL,
+        "Key" character varying(2000) NOT NULL,
+        "Barcode" character varying(2000) NOT NULL,
+        "Packaging" character varying(2000) NOT NULL,
+        "UnitsPerPackage" numeric(20,4) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_ClinicalPackageRecords" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_ClinicalPackageRecords_ClinicalProducts_ProductId" FOREIGN KEY ("ProductId") REFERENCES "ClinicalProducts" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "DrugClinicalMappings" (
+        "Id" uuid NOT NULL,
+        "MedicineId" uuid NOT NULL,
+        "ProductId" uuid NOT NULL,
+        "ApprovedBy" character varying(2000) NOT NULL,
+        "Reason" character varying(2000) NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_DrugClinicalMappings" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_DrugClinicalMappings_ClinicalProducts_ProductId" FOREIGN KEY ("ProductId") REFERENCES "ClinicalProducts" ("Id") ON DELETE RESTRICT,
+        CONSTRAINT "FK_DrugClinicalMappings_Medicines_MedicineId" FOREIGN KEY ("MedicineId") REFERENCES "Medicines" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TABLE "PharmacistInterventions" (
+        "Id" uuid NOT NULL,
+        "Revision" bigint NOT NULL,
+        "ScreenId" uuid NOT NULL,
+        "Actor" character varying(2000) NOT NULL,
+        "Role" character varying(2000) NOT NULL,
+        "Decision" character varying(2000) NOT NULL,
+        "Management" character varying(2000) NOT NULL,
+        "PrescriberClarification" character varying(2000) NOT NULL,
+        "ApprovalReference" character varying(2000) NOT NULL,
+        "ReviewedIncomplete" boolean NOT NULL,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_PharmacistInterventions" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_PharmacistInterventions_ClinicalScreenings_ScreenId" FOREIGN KEY ("ScreenId") REFERENCES "ClinicalScreenings" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_DispenseTransactions_SafetyAssessmentId" ON "DispenseTransactions" ("SafetyAssessmentId") WHERE "SafetyAssessmentId" IS NOT NULL;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalContentVersions_Version" ON "ClinicalContentVersions" ("Version");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalDrugIngredients_DrugId_IngredientId" ON "ClinicalDrugIngredients" ("DrugId", "IngredientId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalDrugIngredients_IngredientId" ON "ClinicalDrugIngredients" ("IngredientId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalDrugs_VersionId_Key" ON "ClinicalDrugs" ("VersionId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalDrugs_VersionId_SearchText" ON "ClinicalDrugs" ("VersionId", "SearchText");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalMonographRecords_DrugId" ON "ClinicalMonographRecords" ("DrugId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalPackageRecords_Barcode" ON "ClinicalPackageRecords" ("Barcode");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalPackageRecords_ProductId_Key" ON "ClinicalPackageRecords" ("ProductId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalProducts_DrugId" ON "ClinicalProducts" ("DrugId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalProducts_VersionId_Key" ON "ClinicalProducts" ("VersionId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalProducts_VersionId_SearchText" ON "ClinicalProducts" ("VersionId", "SearchText");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalPublications_Revision" ON "ClinicalPublications" ("Revision");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalPublications_VersionId" ON "ClinicalPublications" ("VersionId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalReviewRecords_VersionId" ON "ClinicalReviewRecords" ("VersionId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalRuleRecords_VersionId_Key" ON "ClinicalRuleRecords" ("VersionId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalRuleRecords_VersionId_PairKey" ON "ClinicalRuleRecords" ("VersionId", "PairKey");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalScreenings_Actor_CreatedAt" ON "ClinicalScreenings" ("Actor", "CreatedAt");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_ClinicalScreenings_PublicationId" ON "ClinicalScreenings" ("PublicationId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ClinicalSourceRecords_VersionId_Key" ON "ClinicalSourceRecords" ("VersionId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_DrugClinicalMappings_MedicineId" ON "DrugClinicalMappings" ("MedicineId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_DrugClinicalMappings_ProductId" ON "DrugClinicalMappings" ("ProductId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_DrugIngredients_VersionId_Key" ON "DrugIngredients" ("VersionId", "Key");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE INDEX "IX_DrugIngredients_VersionId_SearchText" ON "DrugIngredients" ("VersionId", "SearchText");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_PharmacistInterventions_ScreenId_Revision" ON "PharmacistInterventions" ("ScreenId", "Revision");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE UNIQUE INDEX "IX_ReferencePreferences_Actor_MedicineId" ON "ReferencePreferences" ("Actor", "MedicineId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    ALTER TABLE "DispenseTransactions" ADD CONSTRAINT "FK_DispenseTransactions_ClinicalScreenings_SafetyAssessmentId" FOREIGN KEY ("SafetyAssessmentId") REFERENCES "ClinicalScreenings" ("Id") ON DELETE RESTRICT;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    CREATE TRIGGER immutable_clinical_0 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalSourceRecords" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_1 BEFORE UPDATE OR DELETE OR TRUNCATE ON "DrugIngredients" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_2 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalDrugs" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_3 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalDrugIngredients" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_4 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalProducts" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_5 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalPackageRecords" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_6 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalRuleRecords" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_7 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalMonographRecords" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_8 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalPublications" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_9 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalReviewRecords" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_10 BEFORE UPDATE OR DELETE OR TRUNCATE ON "ClinicalScreenings" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE TRIGGER immutable_clinical_11 BEFORE UPDATE OR DELETE OR TRUNCATE ON "PharmacistInterventions" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+    CREATE FUNCTION ddhi_guard_clinical_version() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+    IF TG_OP='DELETE' OR OLD."State"='Published' OR NEW."PayloadJson" IS DISTINCT FROM OLD."PayloadJson" OR NEW."Digest" IS DISTINCT FROM OLD."Digest" OR NEW."Author" IS DISTINCT FROM OLD."Author" OR NEW."Version" IS DISTINCT FROM OLD."Version" THEN RAISE EXCEPTION 'Clinical content history is immutable'; END IF;
+    RETURN NEW; END; $$;
+    CREATE TRIGGER clinical_version_guard BEFORE UPDATE OR DELETE ON "ClinicalContentVersions" FOR EACH ROW EXECUTE FUNCTION ddhi_guard_clinical_version();
+    CREATE TRIGGER clinical_version_no_truncate BEFORE TRUNCATE ON "ClinicalContentVersions" FOR EACH STATEMENT EXECUTE FUNCTION ddhi_reject_immutable_change();
+
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124084027_GovernedDrugReference') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261124084027_GovernedDrugReference', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124090000_ClinicalIdempotencyResultStorage') THEN
+    ALTER TABLE "OperationKeys" ALTER COLUMN "Result" TYPE text;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261124090000_ClinicalIdempotencyResultStorage') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261124090000_ClinicalIdempotencyResultStorage', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+

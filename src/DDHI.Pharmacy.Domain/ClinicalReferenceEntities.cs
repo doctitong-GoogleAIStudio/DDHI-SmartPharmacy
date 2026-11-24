@@ -1,0 +1,22 @@
+namespace DDHI.Pharmacy.Domain;
+
+public class ClinicalContentVersion:Entity
+{
+    public string Version {get;set;}="";public string State {get;set;}="Draft";public string Digest {get;set;}="";public string PayloadJson {get;set;}="";
+    public string Author {get;set;}="";public string Reviewer {get;set;}="";public string Approver {get;set;}="";public string ApprovalReference {get;set;}="";
+    public DateTime? ReviewedAt {get;set;}public DateTime? ApprovedAt {get;set;}
+}
+public class ClinicalSourceRecord:Entity {public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Key {get;set;}="";public string Organization {get;set;}="";public string Document {get;set;}="";public string Url {get;set;}="";public string LicenseBasis {get;set;}="";public DateOnly RevisionDate {get;set;}public DateOnly RetrievedDate {get;set;}}
+public class DrugIngredient:Entity {public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Key {get;set;}="";public string Name {get;set;}="";public string SearchText {get;set;}="";}
+public class ClinicalDrug:Entity {public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Key {get;set;}="";public string Name {get;set;}="";public string Strength {get;set;}="";public string Form {get;set;}="";public string Route {get;set;}="";public string SearchText {get;set;}="";}
+public class ClinicalDrugIngredient:Entity {public Guid DrugId {get;set;}public ClinicalDrug Drug {get;set;}=null!;public Guid IngredientId {get;set;}public DrugIngredient Ingredient {get;set;}=null!;public decimal? Amount {get;set;}public string Unit {get;set;}="";}
+public class ClinicalProduct:Entity {public Guid DrugId {get;set;}public ClinicalDrug Drug {get;set;}=null!;public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Key {get;set;}="";public string Brand {get;set;}="";public string SearchText {get;set;}="";}
+public class ClinicalPackageRecord:Entity {public Guid ProductId {get;set;}public ClinicalProduct Product {get;set;}=null!;public string Key {get;set;}="";public string Barcode {get;set;}="";public string Packaging {get;set;}="";public decimal UnitsPerPackage {get;set;}}
+public class DrugClinicalMapping:Entity {public Guid MedicineId {get;set;}public Medicine Medicine {get;set;}=null!;public Guid ProductId {get;set;}public ClinicalProduct Product {get;set;}=null!;public string ApprovedBy {get;set;}="";public string Reason {get;set;}="";}
+public class ClinicalRuleRecord:Entity {public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Key {get;set;}="";public string PairKey {get;set;}="";public string Kind {get;set;}="";public string Severity {get;set;}="";public string RuleJson {get;set;}="";}
+public class ClinicalMonographRecord:Entity {public Guid DrugId {get;set;}public ClinicalDrug Drug {get;set;}=null!;public string SectionsJson {get;set;}="";public DateOnly ReviewDue {get;set;}}
+public class ClinicalPublication:Entity {public long Revision {get;set;}public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Actor {get;set;}="";public string Reason {get;set;}="";}
+public class ClinicalReviewRecord:Entity {public Guid VersionId {get;set;}public ClinicalContentVersion Version {get;set;}=null!;public string Actor {get;set;}="";public string Action {get;set;}="";public string Reason {get;set;}="";}
+public class ClinicalScreening:Entity {public Guid? PublicationId {get;set;}public ClinicalPublication? Publication {get;set;}public string Actor {get;set;}="";public string Workstation {get;set;}="";public string EncounterReference {get;set;}="";public string MappingDigest {get;set;}="";public string InputJson {get;set;}="";public string ResolutionJson {get;set;}="";public string ResultJson {get;set;}="";public string Digest {get;set;}="";}
+public class PharmacistIntervention:Entity {public long Revision {get;set;}public Guid ScreenId {get;set;}public ClinicalScreening Screen {get;set;}=null!;public string Actor {get;set;}="";public string Role {get;set;}="";public string Decision {get;set;}="";public string Management {get;set;}="";public string PrescriberClarification {get;set;}="";public string ApprovalReference {get;set;}="";public bool ReviewedIncomplete {get;set;}}
+public class ReferencePreference:Entity {public string Actor {get;set;}="";public Guid MedicineId {get;set;}public bool Favorite {get;set;}}

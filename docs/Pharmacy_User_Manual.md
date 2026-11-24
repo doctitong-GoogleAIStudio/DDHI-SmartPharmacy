@@ -14,3 +14,5 @@ Transfers preserve source status and produce paired ledger entries. Returned dis
 
 ## Reports and uncertainty
 Reports support CSV compatible with Excel and branded printing through the Windows print dialog; choose Microsoft Print to PDF if available. Expiration views include 180, 90, 60 and 30 day filters. Month-only barcode expiry is rejected until an approved hospital policy is implemented. For a timeout inspect movements, orders and reconciliation before retrying. Obtain pharmacist and IT assistance through hospital procedures; no support contact has been invented.
+
+The 0.9.0 server / 0.7.0 client Drug Reference foundation adds governed clinical content and a required dispensing-assessment workflow. No clinical knowledge corpus is preapproved. See DRUG_REFERENCE_GUIDE.md for administration, pharmacist steps, updates/rollback, installation and automatic local migration-backup limitations; DRUG_REFERENCE_CLINICAL_VALIDATION.md remains a hospital acceptance gate.

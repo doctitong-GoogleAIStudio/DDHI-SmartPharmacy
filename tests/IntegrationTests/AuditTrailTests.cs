@@ -67,13 +67,13 @@ public partial class WorkflowTests
     }
     [Fact] public async Task DailyTotalsSplitAtManilaMidnightAndCountOverlapOnce()
     {
-        var station=await AuditStation(reader);var me=await reader.GetFromJsonAsync<JsonElement>("/api/me");var date=DateTime.UtcNow.Date.AddDays(-4);var start=date.AddHours(15); // 23:00 Manila
+        var computer="Audit-totals-"+Guid.NewGuid().ToString("N");var station=await AuditStation(reader);var me=await reader.GetFromJsonAsync<JsonElement>("/api/me");var date=DateTime.UtcNow.Date.AddDays(-4);var start=date.AddHours(15); // 23:00 Manila
         using(var scope=factory.Services.CreateScope()){
             var db=scope.ServiceProvider.GetRequiredService<PharmacyDb>();
-            foreach(var offset in new[]{0,30})db.UserSessions.Add(new DDHI.Pharmacy.Domain.UserSession{UserId=me.GetProperty("id").GetString()!,WorkstationId=station,CreatedAt=start.AddMinutes(offset),LastSeenAt=start.AddHours(2),ExpiresAt=start.AddHours(3),Email="totals@test.invalid",Computer="Audit-totals",Roles=Roles.Reader});
+            foreach(var offset in new[]{0,30})db.UserSessions.Add(new DDHI.Pharmacy.Domain.UserSession{UserId=me.GetProperty("id").GetString()!,WorkstationId=station,CreatedAt=start.AddMinutes(offset),LastSeenAt=start.AddHours(2),ExpiresAt=start.AddHours(3),Email="totals@test.invalid",Computer=computer,Roles=Roles.Reader});
             await db.SaveChangesAsync();
         }
-        var from=date.ToString("yyyy-MM-dd");var to=date.AddDays(1).ToString("yyyy-MM-dd");var result=await admin.GetFromJsonAsync<JsonElement>("/api/audit/session-totals?from="+from+"&to="+to+"&computer=Audit-totals");
+        var from=date.ToString("yyyy-MM-dd");var to=date.AddDays(1).ToString("yyyy-MM-dd");var result=await admin.GetFromJsonAsync<JsonElement>("/api/audit/session-totals?from="+from+"&to="+to+"&computer="+computer);
         var rows=result.GetProperty("rows").EnumerateArray().ToArray();Assert.Equal(2,rows.Length);Assert.All(rows,row=>Assert.Equal("01h 00m",row.GetProperty("observedTotal").GetString()));
         Assert.Equal(HttpStatusCode.Forbidden,(await reader.GetAsync("/api/audit/session-totals")).StatusCode);
         Assert.Equal(HttpStatusCode.Conflict,(await admin.GetAsync("/api/audit/session-totals?from=2020-01-01&to=2026-01-01")).StatusCode);

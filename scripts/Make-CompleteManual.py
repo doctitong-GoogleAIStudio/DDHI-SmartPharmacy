@@ -2,6 +2,7 @@
 from pathlib import Path
 from xml.sax.saxutils import escape
 import re
+import argparse
 from reportlab.platypus import BaseDocTemplate,PageTemplate,Frame,Paragraph,Spacer,PageBreak,NextPageTemplate,Table,TableStyle,Image
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.pagesizes import A4
@@ -9,8 +10,9 @@ from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
 from reportlab.lib import colors
 
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE=ROOT/'docs/COMPLETE_USER_MANUAL.md'
-OUTPUT=ROOT/'docs/DDHI-SmartPharmacy-Complete-User-Manual.pdf'
+parser=argparse.ArgumentParser();parser.add_argument('--source');parser.add_argument('--output');parser.add_argument('--title',default='Complete User Manual');options=parser.parse_args()
+SOURCE=Path(options.source) if options.source else ROOT/'docs/COMPLETE_USER_MANUAL.md'
+OUTPUT=Path(options.output) if options.output else ROOT/'docs/DDHI-SmartPharmacy-Complete-User-Manual.pdf'
 GREEN=colors.HexColor('#103D31');LIGHT=colors.HexColor('#E0F2E7');GRAY=colors.HexColor('#50665B')
 styles=getSampleStyleSheet()
 styles.add(ParagraphStyle(name='ManualTitle',fontName='Helvetica-Bold',fontSize=31,leading=36,textColor=GREEN,spaceAfter=20))
@@ -28,9 +30,9 @@ def inline(text):
 
 def furniture(canvas,doc):
     w,h=A4;canvas.saveState();canvas.setFont('Helvetica',8);canvas.setFillColor(GRAY)
-    canvas.drawString(46,h-31,'DDHI SMART PHARMACY | COMPLETE USER MANUAL')
+    canvas.drawString(46,h-31,'DDHI SMART PHARMACY | '+options.title.upper())
     canvas.setStrokeColor(colors.HexColor('#B8D3C4'));canvas.line(46,h-40,w-46,h-40)
-    canvas.line(46,39,w-46,39);canvas.drawString(46,26,'Client 0.6.0 | Hospital evaluation | Digos Doctors Hospital, Inc.')
+    canvas.line(46,39,w-46,39);canvas.drawString(46,26,'Client 0.7.0 | Hospital evaluation | Digos Doctors Hospital, Inc.')
     canvas.drawRightString(w-46,26,str(doc.page));canvas.restoreState()
 
 class Manual(BaseDocTemplate):
@@ -41,19 +43,19 @@ class Manual(BaseDocTemplate):
             self.notify('TOCEntry',(0,text,self.page,key))
 
 doc=Manual(str(OUTPUT),pagesize=A4,leftMargin=46,rightMargin=46,topMargin=58,bottomMargin=52,
-           title='DDHI Smart Pharmacy - Complete User Manual',author='Digos Doctors Hospital, Inc. / Vicente C. Cavalida Jr. MD')
+           title='DDHI Smart Pharmacy - '+options.title,author='Digos Doctors Hospital, Inc. / Vicente C. Cavalida Jr. MD')
 frame=Frame(46,52,A4[0]-92,A4[1]-110,leftPadding=0,rightPadding=0,topPadding=0,bottomPadding=0)
 doc.addPageTemplates([PageTemplate(id='Cover',frames=[frame]),PageTemplate(id='Body',frames=[frame],onPage=furniture)])
 story=[Spacer(1,25),Image(str(ROOT/'assets/branding/hospital-logo.png'),width=92,height=92),Spacer(1,27),
-       Paragraph('DDHI Smart Pharmacy',styles['ManualTitle']),Paragraph('Complete User Manual',styles['ManualH1']),
-       Paragraph('Every sidebar section, generic groups and brands, authorized substitution, patient discharge returns and a glossary.',styles['ManualBody']),Spacer(1,18),
+       Paragraph('DDHI Smart Pharmacy',styles['ManualTitle']),Paragraph(options.title,styles['ManualH1']),
+       Paragraph('Governed clinical content, central screening, pharmacist review and dataset limitations.' if options.source else 'Every sidebar section, generic groups and brands, authorized substitution, patient discharge returns, governed drug reference and a glossary.',styles['ManualBody']),Spacer(1,18),
        Paragraph('Digos Doctors Hospital, Inc.',styles['ManualH2']),Paragraph('Developer: Vicente C. Cavalida Jr. MD',styles['ManualBody'])]
-cover=Table([[Paragraph('<b>CLIENT 0.6.0</b><br/>Server Control 0.8.0 | API 0.4.0<br/>19 November 2026',styles['ManualBody'])]],colWidths=[A4[0]-92])
+cover=Table([[Paragraph('<b>CLIENT 0.7.0</b><br/>Server Control 0.9.0 | API 0.5.0<br/>24 November 2026',styles['ManualBody'])]],colWidths=[A4[0]-92])
 cover.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,-1),LIGHT),('BOX',(0,0),(-1,-1),.5,colors.HexColor('#B8D3C4')),('LEFTPADDING',(0,0),(-1,-1),14),('TOPPADDING',(0,0),(-1,-1),12),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
 story += [Spacer(1,18),cover,Spacer(1,22),Paragraph('Hospital evaluation edition',styles['ManualH2']),Paragraph('This manual explains software operation. It does not grant clinical, substitution, quality-release or billing authority. Live Cerebro posting and automatic patient refunds remain disabled. Hospital deployment and physical-device acceptance are pending.',styles['ManualBody']),NextPageTemplate('Body'),PageBreak(),Paragraph('Contents',styles['ManualH1'])]
 toc=TableOfContents();toc.levelStyles=[styles['ManualToc']];toc.dotsMinLevel=0;story += [toc]
 
-lines=SOURCE.read_text(encoding='utf8').splitlines();start=next(i for i,line in enumerate(lines) if line.startswith('## 1.'))
+lines=SOURCE.read_text(encoding='utf8').splitlines();start=next(i for i,line in enumerate(lines) if line.startswith('## '))
 i=start;chapters=0
 while i<len(lines):
     line=lines[i].strip()

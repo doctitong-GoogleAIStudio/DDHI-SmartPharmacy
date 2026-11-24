@@ -48,7 +48,7 @@ def main():
             raise RuntimeError(f'Unexpected executable size: {path}')
     for name in ('Installation Guide', 'Administrator Guide', 'Pharmacy User Manual',
                  'Barcode Scanner Setup', 'Cerebro Integration Guide',
-                 'Workstation Deployment Guide', 'Backup Recovery Guide', 'DDHI-Server-and-Client-Connection-Guide', 'DDHI-SmartPharmacy-Complete-User-Manual'):
+                 'Workstation Deployment Guide', 'Backup Recovery Guide', 'DDHI-Server-and-Client-Connection-Guide', 'DDHI-SmartPharmacy-Complete-User-Manual', 'DDHI-Drug-Reference-Guide'):
         with (RELEASE / 'Documentation' / (name + '.pdf')).open('rb') as stream:
             if stream.read(5) != b'%PDF-':
                 raise RuntimeError(f'Invalid PDF: {name}')
@@ -63,6 +63,9 @@ def main():
     }
     evidence = {}
     for filename, required in {
+        'ClinicalReferenceRuntime.json': ['publishedRuntimeRole','noClinicalSeed','localSearch','explicitUnknownCoverage','unmappedMonograph','immutableScreenSaved'],
+        'ClinicalMigrationBackup.json': ['encryptedBeforeMigration','protectedKey','checksumPresent','isolatedServer'],
+        'ClinicalReferenceRelease.json': ['importReviewTestsPassed','screeningAndDispensingTestsPassed','clinicalLayoutsReviewed','guidePagesReviewed','noClinicalDatasetShipped'],
         'AuditTrailSmoke.json': ['snapshotsAndDeletion', 'safeChanges', 'deniedAndFailed', 'timedSessionOwnership', 'dailyTotals', 'hashCompatibility', 'presentationReviewed'],
         'GenericReturnSmoke.json': ['genericMultiBrands', 'approvedSubstitution', 'hospitalReturnLinkedToActualBrand', 'externalNoStockOrBillingCredit', 'runtimeIntakeAppendOnly'],
         'CompleteManualReview.json': ['allSidebarSections', 'glossaryPresent', 'allPagesRendered', 'layoutReviewed'],
@@ -111,8 +114,12 @@ def main():
     if desktop.get('executableSha256', '').lower() != sha(RELEASE / executables[0]):
         raise RuntimeError('Desktop launch evidence does not match the packaged EXE.')
     server_preview = evidence['ServerDesktopPreview.json']
-    if server_preview.get('Version') != '0.8.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
-        raise RuntimeError('Server desktop launch evidence does not match version 0.8.0 and the current EXE.')
+    if server_preview.get('Version') != '0.9.0' or server_preview.get('executableSha256', '').lower() != sha(RELEASE / executables[6]):
+        raise RuntimeError('Server desktop launch evidence does not match version 0.9.0 and the current EXE.')
+    clinical = evidence['ClinicalReferenceRelease.json']
+    for key, name in [('clientSha256',executables[0]), ('apiAssemblySha256','Server/Api/DDHI.Pharmacy.Api.dll'), ('serverControlSha256',executables[6]), ('guideSha256','Documentation/DDHI-Drug-Reference-Guide.pdf')]:
+        if clinical.get(key,'').lower()!=sha(RELEASE/name):
+            raise RuntimeError('Clinical reference evidence does not match '+name)
     installers = evidence['InstallerPayloadSmoke.json']
     for key, name in [('clientInstallerSha256', executables[1]), ('serverInstallerSha256', executables[2])]:
         if installers.get(key, '').lower() != sha(RELEASE / name):
@@ -151,7 +158,7 @@ def main():
     timestamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat()
     manifest = {
         'application': 'DDHI Smart Pharmacy Barcode Manager',
-        'version': '0.8.1-audit-timed-sessions', 'components': {'client': '0.6.0', 'clientInstaller': '0.6.0', 'api': '0.4.0', 'worker': '0.4.0', 'serverControl': '0.8.0', 'serverInstaller': '0.8.1', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
+        'version': '0.9.0-governed-drug-reference', 'components': {'client': '0.7.0', 'clientInstaller': '0.7.0', 'api': '0.5.0', 'worker': '0.4.0', 'serverControl': '0.9.0', 'serverInstaller': '0.9.0', 'postgresql': '17.12'}, 'classification': 'Hospital evaluation build; production acceptance pending',
         'hospital': 'Digos Doctors Hospital, Inc.',
         'developer': 'Vicente C. Cavalida Jr. MD', 'verifiedAtAsiaManila': timestamp,
         'tests': results, 'evidence': evidence,
@@ -159,6 +166,7 @@ def main():
                        'sha256': sha(RELEASE / name)} for name in executables],
         'sourceSha256': sha(source_archive),
         'productionAccepted': False, 'liveCerebroEnabled': False,
+        'clinicalDatasetValidated': False, 'comprehensiveClinicalCoverage': False, 'externalAIEnabled': False,
         'cleanMachineInstallerAcceptance': False, 'physicalScannerAcceptance': False,
     }
     (RELEASE / 'Checksums/ReleaseVerification.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')

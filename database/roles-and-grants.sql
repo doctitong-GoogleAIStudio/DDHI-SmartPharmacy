@@ -20,3 +20,17 @@ DO $$ BEGIN
   REVOKE UPDATE, DELETE, TRUNCATE ON "ExternalReturnIntakes" FROM ddhi_runtime;
  END IF;
 END $$;
+
+-- Governed clinical content and assessments are append-only at runtime.
+DO $$ DECLARE clinical_table text; BEGIN
+ IF to_regclass('public."ClinicalContentVersions"') IS NOT NULL THEN
+  FOREACH clinical_table IN ARRAY ARRAY['ClinicalSourceRecords','DrugIngredients','ClinicalDrugs','ClinicalDrugIngredients','ClinicalProducts','ClinicalPackageRecords','ClinicalRuleRecords','ClinicalMonographRecords','ClinicalPublications','ClinicalReviewRecords','ClinicalScreenings','PharmacistInterventions'] LOOP
+   EXECUTE format('GRANT SELECT, INSERT ON public.%I TO ddhi_runtime', clinical_table);
+   EXECUTE format('REVOKE UPDATE, DELETE, TRUNCATE ON public.%I FROM ddhi_runtime', clinical_table);
+  END LOOP;
+  FOREACH clinical_table IN ARRAY ARRAY['ClinicalContentVersions','DrugClinicalMappings','ReferencePreferences'] LOOP
+   EXECUTE format('GRANT SELECT, INSERT, UPDATE ON public.%I TO ddhi_runtime', clinical_table);
+   EXECUTE format('REVOKE DELETE, TRUNCATE ON public.%I FROM ddhi_runtime', clinical_table);
+  END LOOP;
+ END IF;
+END $$;

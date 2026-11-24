@@ -4,7 +4,7 @@ namespace DDHI.Pharmacy.Contracts;
 public static class ClientAccessPolicy
 {
     public static readonly string[] KnownRoles = ["Read-Only User", "Inventory Clerk", "Pharmacy Assistant", "Pharmacist", "Chief Pharmacist", "Pharmacy Administrator", "Auditor", "System Administrator"];
-    public static readonly string[] AllPages = ["Dashboard", "Scan Medicine", "Medicine Master", "Barcode Registration", "Inventory Receiving", "Inventory Management", "Medication Dispensing", "Stock Transfers", "Returns and Adjustments", "Expiration Monitoring", "Medicine Recalls", "Cerebro Synchronization", "Reports", "Scanner Settings", "Workstation Management", "User Administration", "Audit Trail", "System Settings", "About Application"];
+    public static readonly string[] AllPages = ["Dashboard", "Scan Medicine", "Medicine Master", "Drug Reference", "Barcode Registration", "Inventory Receiving", "Inventory Management", "Medication Dispensing", "Stock Transfers", "Returns and Adjustments", "Expiration Monitoring", "Medicine Recalls", "Cerebro Synchronization", "Reports", "Scanner Settings", "Workstation Management", "User Administration", "Audit Trail", "System Settings", "About Application"];
     public static bool Has(IEnumerable<string> roles, string policy) => roles.Any(role => policy switch {
         "Catalog" => role is "Chief Pharmacist" or "Pharmacy Administrator",
         "Clinical" => role is "Chief Pharmacist" or "Pharmacist",
@@ -17,7 +17,7 @@ public static class ClientAccessPolicy
         _ => false
     });
     public static bool CanView(string page, IEnumerable<string> roles) => page switch {
-        "Dashboard" or "Scan Medicine" or "Medicine Master" or "Inventory Management" or "Medicine Recalls" or "Scanner Settings" or "About Application" => Has(roles,"SignedIn"),
+        "Drug Reference" or "Dashboard" or "Scan Medicine" or "Medicine Master" or "Inventory Management" or "Medicine Recalls" or "Scanner Settings" or "About Application" => Has(roles,"SignedIn"),
         "Barcode Registration" or "System Settings" => Has(roles,"Catalog"),
         "Inventory Receiving" or "Stock Transfers" => Has(roles,"Inventory"),
         "Medication Dispensing" => Has(roles,"Clinical"),
@@ -32,7 +32,7 @@ public static class ClientAccessPolicy
     {
         if (!CanView(page,roles)) return false;
         return page switch {
-            "Medicine Master" => action is "Browse generics" or "View brands" or "All brand products" or "Export CSV / Excel" or "Print / PDF" ? Has(roles,"SignedIn") : Has(roles,"Catalog"),
+            "Medicine Master" => action is "Clinical reference" or "Browse generics" or "View brands" or "All brand products" or "Export CSV / Excel" or "Print / PDF" ? Has(roles,"SignedIn") : Has(roles,"Catalog"),
             "Barcode Registration" => Has(roles,"Catalog"),
             "Inventory Management" => action switch {
                 "Quarantine / release stock" or "Record disposition" or "Add location" => Has(roles,"Catalog"),

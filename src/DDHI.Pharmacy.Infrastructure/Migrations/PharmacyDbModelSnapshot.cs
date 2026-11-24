@@ -178,6 +178,489 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.ToTable("CerebroOrderMappings", (string)null);
                 });
 
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalContentVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovalReference")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Approver")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Digest")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reviewer")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Version")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalContentVersions", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalDrug", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Form")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Route")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SearchText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Strength")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VersionId", "Key")
+                        .IsUnique();
+
+                    b.HasIndex("VersionId", "SearchText");
+
+                    b.ToTable("ClinicalDrugs", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalDrugIngredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("Amount")
+                        .HasPrecision(20, 6)
+                        .HasColumnType("numeric(20,6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DrugId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId");
+
+                    b.HasIndex("DrugId", "IngredientId")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalDrugIngredients", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalMonographRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DrugId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("ReviewDue")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SectionsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DrugId")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalMonographRecords", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalPackageRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Barcode")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Packaging")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("UnitsPerPackage")
+                        .HasPrecision(20, 4)
+                        .HasColumnType("numeric(20,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Barcode");
+
+                    b.HasIndex("ProductId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalPackageRecords", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DrugId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SearchText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DrugId");
+
+                    b.HasIndex("VersionId", "Key")
+                        .IsUnique();
+
+                    b.HasIndex("VersionId", "SearchText");
+
+                    b.ToTable("ClinicalProducts", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalPublication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("Revision")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Revision")
+                        .IsUnique();
+
+                    b.HasIndex("VersionId");
+
+                    b.ToTable("ClinicalPublications", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalReviewRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VersionId");
+
+                    b.ToTable("ClinicalReviewRecords", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalRuleRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PairKey")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RuleJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VersionId", "Key")
+                        .IsUnique();
+
+                    b.HasIndex("VersionId", "PairKey")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalRuleRecords", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalScreening", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Digest")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("EncounterReference")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("InputJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingDigest")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid?>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ResolutionJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResultJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Workstation")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.HasIndex("Actor", "CreatedAt");
+
+                    b.ToTable("ClinicalScreenings", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalSourceRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Document")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("LicenseBasis")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Organization")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateOnly>("RetrievedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("RevisionDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VersionId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("ClinicalSourceRecords", (string)null);
+                });
+
             modelBuilder.Entity("DDHI.Pharmacy.Domain.DispenseOrder", b =>
                 {
                     b.Property<Guid>("Id")
@@ -270,6 +753,9 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.Property<Guid?>("RequestedMedicineId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SafetyAssessmentId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("State")
                         .HasColumnType("integer");
 
@@ -292,6 +778,10 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
 
                     b.HasIndex("Reference")
                         .IsUnique();
+
+                    b.HasIndex("SafetyAssessmentId")
+                        .IsUnique()
+                        .HasFilter("\"SafetyAssessmentId\" IS NOT NULL");
 
                     b.ToTable("DispenseTransactions", (string)null);
                 });
@@ -322,6 +812,78 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.HasIndex("TransactionId");
 
                     b.ToTable("DispenseTransactionLines", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.DrugClinicalMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovedBy")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("MedicineId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicineId")
+                        .IsUnique();
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("DrugClinicalMappings", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.DrugIngredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SearchText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VersionId", "Key")
+                        .IsUnique();
+
+                    b.HasIndex("VersionId", "SearchText");
+
+                    b.ToTable("DrugIngredients", (string)null);
                 });
 
             modelBuilder.Entity("DDHI.Pharmacy.Domain.ExternalReturnIntake", b =>
@@ -779,8 +1341,7 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
 
                     b.Property<string>("Result")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -840,6 +1401,62 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Permissions", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.PharmacistIntervention", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ApprovalReference")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Management")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PrescriberClarification")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("ReviewedIncomplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("Revision")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("ScreenId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScreenId", "Revision")
+                        .IsUnique();
+
+                    b.ToTable("PharmacistInterventions", (string)null);
                 });
 
             modelBuilder.Entity("DDHI.Pharmacy.Domain.PurchaseOrder", b =>
@@ -980,6 +1597,34 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ReconciliationRuns", (string)null);
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ReferencePreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Favorite")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("MedicineId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Actor", "MedicineId")
+                        .IsUnique();
+
+                    b.ToTable("ReferencePreferences", (string)null);
                 });
 
             modelBuilder.Entity("DDHI.Pharmacy.Domain.Return", b =>
@@ -1582,6 +2227,131 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalDrug", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalDrugIngredient", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalDrug", "Drug")
+                        .WithMany()
+                        .HasForeignKey("DrugId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DDHI.Pharmacy.Domain.DrugIngredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Drug");
+
+                    b.Navigation("Ingredient");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalMonographRecord", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalDrug", "Drug")
+                        .WithMany()
+                        .HasForeignKey("DrugId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Drug");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalPackageRecord", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalProduct", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalProduct", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalDrug", "Drug")
+                        .WithMany()
+                        .HasForeignKey("DrugId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Drug");
+
+                    b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalPublication", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalReviewRecord", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalRuleRecord", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalScreening", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalPublication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.ClinicalSourceRecord", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
+                });
+
             modelBuilder.Entity("DDHI.Pharmacy.Domain.DispenseOrder", b =>
                 {
                     b.HasOne("DDHI.Pharmacy.Domain.Medicine", "Medicine")
@@ -1600,6 +2370,11 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalScreening", null)
+                        .WithMany()
+                        .HasForeignKey("SafetyAssessmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Order");
                 });
@@ -1621,6 +2396,36 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                     b.Navigation("Balance");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.DrugClinicalMapping", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalProduct", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Medicine");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.DrugIngredient", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalContentVersion", "Version")
+                        .WithMany()
+                        .HasForeignKey("VersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Version");
                 });
 
             modelBuilder.Entity("DDHI.Pharmacy.Domain.GoodsReceipt", b =>
@@ -1721,6 +2526,17 @@ namespace DDHI.Pharmacy.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Medicine");
+                });
+
+            modelBuilder.Entity("DDHI.Pharmacy.Domain.PharmacistIntervention", b =>
+                {
+                    b.HasOne("DDHI.Pharmacy.Domain.ClinicalScreening", "Screen")
+                        .WithMany()
+                        .HasForeignKey("ScreenId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Screen");
                 });
 
             modelBuilder.Entity("DDHI.Pharmacy.Domain.PurchaseOrder", b =>

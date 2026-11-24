@@ -17,6 +17,8 @@ dotnet test tests\ServerManagerTests -c Release --no-build --filter 'FullyQualif
 python scripts\Manuals.py; Check
 python scripts\Make-LanConnectionGuide.py; Check
 python scripts\Make-CompleteManual.py; Check
+python scripts\Make-CompleteManual.py --source docs/DRUG_REFERENCE_GUIDE.md --output docs/DDHI-Drug-Reference-Guide.pdf --title "Drug Reference & Interaction Checker"; Check
+python scripts\Make-ClinicalTemplates.py; Check
 New-Item -ItemType Directory -Path release\Client\Documentation -Force | Out-Null
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Client\Documentation -Force
 Copy-Item docs\MEDICINE_IMPORTER_DISTRIBUTOR.md release\Client\Documentation -Force
@@ -26,6 +28,13 @@ Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf release\Documentation
 Copy-Item docs\DDHI-SmartPharmacy-Complete-User-Manual.pdf "release\Documentation\Pharmacy User Manual.pdf" -Force
 Copy-Item docs\DDHI-Server-and-Client-Connection-Guide.pdf release\Documentation -Force
 Copy-Item docs\*.md release\Documentation -Force
+Copy-Item docs\DDHI-Drug-Reference-Guide.pdf release\Documentation -Force
+Copy-Item docs\DDHI-Drug-Reference-Guide.pdf release\Client\Documentation -Force
+Copy-Item docs\DRUG_REFERENCE*.md release\Client\Documentation -Force
+New-Item -ItemType Directory -Path release\Documentation\ClinicalTemplates -Force | Out-Null
+Copy-Item samples\clinical-reference\* release\Documentation\ClinicalTemplates -Recurse -Force
+New-Item -ItemType Directory -Path release\Client\Documentation\ClinicalTemplates -Force | Out-Null
+Copy-Item samples\clinical-reference\* release\Client\Documentation\ClinicalTemplates -Recurse -Force
 Copy-Item docs\ThirdParty release\Documentation -Recurse -Force
 Copy-Item docs\ThirdParty release\Client\Licenses -Recurse -Force
 Copy-Item docs\ThirdParty release\Server\Licenses -Recurse -Force

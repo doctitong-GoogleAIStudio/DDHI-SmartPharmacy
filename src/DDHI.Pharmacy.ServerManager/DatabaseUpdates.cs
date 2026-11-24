@@ -11,6 +11,7 @@ public sealed partial class ServerController
         if(profile.ServicesConfigured){await Run(ScExe,["start",PgService],allowFailure:true);await WaitForService(PgService,ServiceControllerStatus.Running);await WaitForDatabase();}
         else await StartPostgres();
         var secrets=ServerSecrets.Load(profile.DataRoot);
+        await BackupBeforeMigration(secrets);
         await Run(ApiExe,["--migrate"],EnvironmentFor(Connection("ddhi_migration",secrets.MigrationPassword),secrets));
         await Start();
         log("Database updates applied; existing records retained and server restarted.");

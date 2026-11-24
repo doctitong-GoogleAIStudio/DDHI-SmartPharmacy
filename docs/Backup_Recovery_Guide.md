@@ -14,3 +14,5 @@ Create an empty isolated database with a name beginning ddhi_restore_. Set PGDAT
 
 ## Disaster recovery and limitations
 Stop normal clinical workflows according to the approved downtime procedure, preserve evidence and restore only under hospital authorization. Recover protected configuration, TLS material and data-protection keys with appropriate ACLs. Reconcile all transactions since the backup before resuming. Development backup/restore tests do not establish off-server storage, power-failure resilience, service recovery or clinical disaster-recovery acceptance.
+
+The 0.9.0 server / 0.7.0 client Drug Reference foundation adds governed clinical content and a required dispensing-assessment workflow. No clinical knowledge corpus is preapproved. See DRUG_REFERENCE_GUIDE.md for administration, pharmacist steps, updates/rollback, installation and automatic local migration-backup limitations; DRUG_REFERENCE_CLINICAL_VALIDATION.md remains a hospital acceptance gate.

@@ -1,6 +1,6 @@
-# Release status - Server installer 0.8.1 / Server Control 0.8.0 / client 0.6.0 / API 0.4.0
+# Release status - Server/installer 0.9.0 / client 0.7.0 / API 0.5.0
 
-Build date: 19 November 2026 (Asia/Manila).
+Build date: 24 November 2026 (Asia/Manila).
 Hospital: Digos Doctors Hospital, Inc.
 Developer: Vicente C. Cavalida Jr. MD.
 Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
@@ -24,7 +24,7 @@ Permanent workspace: E:\ChatGPT Codex\DDHI-SmartPharmacy.
 ## Verified in this development environment
 
 - Latest solution build: zero warnings and zero errors.
-- 246 checks passed: 62 unit, 83 real PostgreSQL integration, 21 restored-database checks, 78 Server Manager checks and 2 client session-switching checks.
+- 277 checks passed: 85 unit, 91 real PostgreSQL integration, 21 restored-database checks, 78 Server Manager checks and 2 client session-switching checks.
 - Tested concurrent final-unit dispensing, negative-stock constraints, role restrictions, wrong medicine, expired/recalled stock, manual-policy blocks, quarantine/returns, transfers, reversal uniqueness, scanner-profile disable, report queries, audit chain and ledger immutability.
 - Published self-contained server tested over HTTPS in Production environment using a pinned, temporary test certificate: migration, bootstrap, staff authentication, catalog, receiving, inventory, audit verification and worker startup succeeded.
 - Encrypted backup authenticated and restored into an isolated database; medicine, ledger and audit counts plus total stock matched before additional restored-database checks.
@@ -85,7 +85,12 @@ Optional medicine-level company fields persist in PostgreSQL, appear in the clie
 
 ## Generic brands, authorized substitution, mixed-source returns and complete manual - 0.8.0
 
-Generic browsing groups existing product definitions without merging IDs/stock. Catalog staff can add a brand under a selected definition. Brand names now appear in inventory/order selectors and stock reports. Explicit pharmacist substitution requires matching recorded generic/strength/form/route/base unit, verification, approval reference and reason; it retains original and actual product/brand identities and existing stock safeguards. Hospital patient returns require source evidence and an original dispensing line, enforce cumulative limits and quarantine the actual dispensed brand. Outside/uncertain items have append-only custody intake with no inventory/outbox credit. Migrations add recording fields/table with defaults for older rows; older returns are not retrospectively asserted as source-verified. Health reports pending schema updates. The complete bookmarked PDF covers all 19 sidebars, server operation, mixed-source examples and 102 glossary terms. Hospital clinical/physical handling, billing, destination-service lifecycle and clean-machine acceptance remain pending; live Cerebro remains disabled.
+Generic browsing groups existing product definitions without merging IDs/stock. Catalog staff can add a brand under a selected definition. Brand names now appear in inventory/order selectors and stock reports. Explicit pharmacist substitution requires matching recorded generic/strength/form/route/base unit, verification, approval reference and reason; it retains original and actual product/brand identities and existing stock safeguards. Hospital patient returns require source evidence and an original dispensing line, enforce cumulative limits and quarantine the actual dispensed brand. Outside/uncertain items have append-only custody intake with no inventory/outbox credit. Migrations add recording fields/table with defaults for older rows; older returns are not retrospectively asserted as source-verified. Health reports pending schema updates. The complete bookmarked PDF covers all 20 sidebars, server operation, mixed-source examples and 112 glossary terms. Hospital clinical/physical handling, billing, destination-service lifecycle and clean-machine acceptance remain pending; live Cerebro remains disabled.
 
 
 Audit/timed-session update (19 November 2026): client 0.6.0 and API 0.4.0 add Audit Trail activities, staff/role/computer snapshots, date/time to seconds, safe before/after fields, app file events, timed sessions and daily observed totals in hours/minutes. Server Control remains 0.8.0. Back up the server, install the matching server package, use Server status > Apply database updates as Administrator with the original Windows setup account, then update clients. Existing audit hashes and clinical data are preserved. Session duration is observed connection time, not attendance or active work. Real hospital acceptance remains pending. See COMPLETE_USER_MANUAL.md chapter 21 and AUDIT_TRAIL.md.
+
+
+## Governed Drug Reference foundation - 24 November 2026
+
+Client 0.7.0 and API 0.5.0 add the central Drug Reference module, 18 inner sections, versioned source/product/ingredient/monograph/rule data, verified inventory mappings, deterministic screening, structured allergy context, pharmacist interventions and exact dispensing-assessment binding. Server Control/installer 0.9.0 adds encrypted pre-schema backup and new least-privilege grants. No real clinical dataset is bundled. Incomplete coverage remains UNKNOWN and its independent-review policy starts disabled. Source licenses, pharmacist clinical validation and hospital acceptance are pending. Advanced calculators, comprehensive licensed interactions/IV data, structured P&T/antibiogram processing and external AI are not enabled. Read DRUG_REFERENCE_GUIDE.md, DRUG_REFERENCE_CAPABILITY_MATRIX.md and DRUG_REFERENCE_CLINICAL_VALIDATION.md.

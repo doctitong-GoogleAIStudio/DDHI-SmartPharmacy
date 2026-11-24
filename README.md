@@ -2,7 +2,7 @@
 
 Digos Doctors Hospital, Inc. | Developer: Vicente C. Cavalida Jr. MD
 
-Server Control 0.8.0, client 0.6.0, worker 0.4.0 and API 0.4.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
+Server Control 0.9.0, client 0.7.0, worker 0.4.0 and API 0.5.0 form a hospital evaluation build. Source, tests, deployment scripts and verified release artifacts live permanently in this E: project. See docs/MASTER_SPECIFICATION.md for the requested target and release/Documentation/RELEASE_STATUS.md for implemented, tested, pending and blocked items. This release must not be represented as hospital-accepted or production-ready.
 
 ## Build
 
@@ -49,3 +49,8 @@ Generic groups now browse several separate brand products, with explicit documen
 
 
 Audit/timed-session update (19 November 2026): client 0.6.0 and API 0.4.0 add Audit Trail activities, staff/role/computer snapshots, date/time to seconds, safe before/after fields, app file events, timed sessions and daily observed totals in hours/minutes. Server Control remains 0.8.0. Back up the server, install this matching server package, use Server status > Apply database updates as Administrator with the original Windows setup account, then update clients. Existing audit hashes and clinical data are preserved. Session duration is observed connection time, not attendance or active work. Real hospital acceptance remains pending. See COMPLETE_USER_MANUAL.md chapter 21 and AUDIT_TRAIL.md.
+
+
+## Governed Drug Reference foundation - 24 November 2026
+
+Client 0.7.0 and API 0.5.0 add the central Drug Reference module, 18 inner sections, versioned source/product/ingredient/monograph/rule data, verified inventory mappings, deterministic screening, structured allergy context, pharmacist interventions and exact dispensing-assessment binding. Server Control/installer 0.9.0 adds encrypted pre-schema backup and new least-privilege grants. No real clinical dataset is bundled. Incomplete coverage remains UNKNOWN and its independent-review policy starts disabled. Source licenses, pharmacist clinical validation and hospital acceptance are pending. Advanced calculators, comprehensive licensed interactions/IV data, structured P&T/antibiogram processing and external AI are not enabled. Read DRUG_REFERENCE_GUIDE.md, DRUG_REFERENCE_CAPABILITY_MATRIX.md and DRUG_REFERENCE_CLINICAL_VALIDATION.md.

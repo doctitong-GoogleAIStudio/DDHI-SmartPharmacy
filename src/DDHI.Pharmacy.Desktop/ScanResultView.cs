@@ -17,6 +17,7 @@ public sealed class ScanResultView : UserControl
     readonly TextBlock warning=new(){TextWrapping=TextWrapping.Wrap,Foreground=Brushes.DarkRed};
     readonly DataGrid stock=new(){IsReadOnly=true,CanUserAddRows=false,AutoGenerateColumns=false,Height=220,HeadersVisibility=DataGridHeadersVisibility.Column};
     ScanLookupResult? result;
+    public Guid? SelectedMedicineId=>result?.Medicine?.Id;
     public Func<string,Task>? LookupRequested { get; set; }
     public ScanResultView()
     {

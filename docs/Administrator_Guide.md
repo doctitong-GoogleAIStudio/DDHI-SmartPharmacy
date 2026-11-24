@@ -14,3 +14,5 @@ Review near-expiry, low-stock, recalls, integration outbox and reconciliation da
 
 ## Boundaries
 Vendor REST and read-only database adapters intentionally fail closed. The maintenance worker expires reservations; it does not post Cerebro billing. Quarantine release requires a Chief Pharmacist approval reference, and recall closure requires zero affected stock. Stock reversals preserve linked immutable movements and reject repeated reversal. Full purchase-order fulfillment and vendor-specific hardware attestation require additional approved workflows. Consult release status for the complete acceptance gap list.
+
+The 0.9.0 server / 0.7.0 client Drug Reference foundation adds governed clinical content and a required dispensing-assessment workflow. No clinical knowledge corpus is preapproved. See DRUG_REFERENCE_GUIDE.md for administration, pharmacist steps, updates/rollback, installation and automatic local migration-backup limitations; DRUG_REFERENCE_CLINICAL_VALIDATION.md remains a hospital acceptance gate.

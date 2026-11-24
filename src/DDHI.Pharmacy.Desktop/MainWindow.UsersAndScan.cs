@@ -47,7 +47,7 @@ public partial class MainWindow
     }
     void EndStaffSession(string message)
     {
-        vm.ClearSession();Toolbar.Children.Clear();Summary.Visibility=Visibility.Collapsed;ScanResultPanel.Reset();ScanResultPanel.Visibility=Visibility.Collapsed;lookups.Clear();Navigation.SelectedIndex=-1;LoginPanel.Visibility=Visibility.Visible;Password.Clear();LoginStatus.Text=message;
+        DrugReferencePanel.Reset();vm.ClearSession();Toolbar.Children.Clear();Summary.Visibility=Visibility.Collapsed;ScanResultPanel.Reset();ScanResultPanel.Visibility=Visibility.Collapsed;lookups.Clear();Navigation.SelectedIndex=-1;LoginPanel.Visibility=Visibility.Visible;Password.Clear();LoginStatus.Text=message;
     }
 }
 public sealed class StaffSessionEndedException(string message):InvalidOperationException(message);

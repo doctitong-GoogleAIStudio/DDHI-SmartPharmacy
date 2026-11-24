@@ -1,7 +1,7 @@
 [Setup]
 AppId={{C477C2FA-2E3B-4310-A7D2-5B6C4020F286}
 AppName=DDHI Smart Pharmacy Server
-AppVersion=0.8.1
+AppVersion=0.9.0
 AppPublisher=Digos Doctors Hospital, Inc.
 DefaultDirName={autopf}\DDHI-SmartPharmacy-Server
 PrivilegesRequired=admin

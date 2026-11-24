@@ -1,6 +1,8 @@
 $ErrorActionPreference='Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 . "$PSScriptRoot\Environment.ps1"
+$listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0)
+$listener.Start();$smokeApiPort=$listener.LocalEndpoint.Port;$listener.Stop()
 $smokeRoot=Join-Path $PWD ('work\published-server-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $smokeRoot -Force | Out-Null
 $rsa=[System.Security.Cryptography.RSA]::Create(2048)
@@ -14,10 +16,10 @@ Add-Type -TypeDefinition @'
 using System;
 using System.Net.Http;
 public static class DdhiPinnedSmokeClient {
- public static HttpClient Create(string thumbprint) {
+ public static HttpClient Create(string thumbprint,int port) {
   var handler=new HttpClientHandler();
   handler.ServerCertificateCustomValidationCallback=(request,cert,chain,errors)=>cert!=null&&string.Equals(cert.Thumbprint,thumbprint,StringComparison.OrdinalIgnoreCase);
-  return new HttpClient(handler){BaseAddress=new Uri("https://127.0.0.1:58443/"),Timeout=TimeSpan.FromSeconds(10)};
+  return new HttpClient(handler){BaseAddress=new Uri("https://127.0.0.1:"+port+"/"),Timeout=TimeSpan.FromSeconds(10)};
  }
 }
 '@
@@ -31,7 +33,7 @@ try {
  & '.\.tools\postgres\pgsql\bin\createdb.exe' $database
  if ($LASTEXITCODE -ne 0) { throw 'Smoke database creation failed.' }
  $env:ConnectionStrings__Pharmacy='Host=127.0.0.1;Port=55432;Database='+$database+';Username=ddhi_test;Password='+$env:PGPASSWORD
- $env:ASPNETCORE_ENVIRONMENT='Production';$env:DOTNET_ENVIRONMENT='Production';$env:ASPNETCORE_URLS='https://127.0.0.1:58443'
+ $env:ASPNETCORE_ENVIRONMENT='Production';$env:DOTNET_ENVIRONMENT='Production';$env:ASPNETCORE_URLS='https://127.0.0.1:'+$smokeApiPort
  $env:DDHI__CertificatePath=$certificatePath;$env:DDHI__CertificatePassword=$certificatePassword
  $env:DDHI__KeyDirectory=Join-Path $smokeRoot 'keys';$env:DDHI__LogDirectory=Join-Path $smokeRoot 'logs'
  $env:Kestrel__Certificates__Default__Path=$certificatePath;$env:Kestrel__Certificates__Default__Password=$certificatePassword
@@ -43,7 +45,7 @@ try {
  & $apiExe --bootstrap *> (Join-Path $smokeRoot 'bootstrap.log')
  if ($LASTEXITCODE -ne 0) { throw "Published bootstrap failed. See $smokeRoot\bootstrap.log" }
  $apiProcess=Start-Process -FilePath $apiExe -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $smokeRoot 'api-stdout.log') -RedirectStandardError (Join-Path $smokeRoot 'api-stderr.log')
- $client=[DdhiPinnedSmokeClient]::Create($certificate.Thumbprint)
+ $client=[DdhiPinnedSmokeClient]::Create($certificate.Thumbprint,$smokeApiPort)
  $ready=$false
  for ($attempt=0;$attempt -lt 40;$attempt++) {
   try { $response=$client.GetAsync('health').GetAwaiter().GetResult();if ($response.IsSuccessStatusCode) {$ready=$true;break} } catch {}

@@ -2,11 +2,11 @@
 
 Digos Doctors Hospital, Inc.
 
-Client 0.6.0 | Server Control 0.8.0 | API 0.4.0
+Client 0.7.0 | Server Control 0.9.0 | API 0.5.0
 
 Developer: Vicente C. Cavalida Jr. MD
 
-19 November 2026 | Hospital evaluation edition
+24 November 2026 | Hospital evaluation edition
 
 This manual explains the released client screens, the server connection workflow, generic groups and brands, authorized brand substitution, and mixed-source discharge returns. It describes software operation, not prescribing instructions or permission to substitute a medicine. Follow hospital policy, the authorized order and the responsible pharmacist's review. Live Cerebro posting and automatic patient billing/refunds remain disabled. Separate hospital-computer, physical scanner and clean-server acceptance remain pending.
 
@@ -394,7 +394,51 @@ Open complete user manual opens this PDF from the installed client Documentation
 
 When reporting an issue, include client and Server Control versions, which sidebar/action was used, the visible error and a non-sensitive transaction reference. Do not provide passwords, private keys, full patient charts or unnecessary personal information.
 
-## 24. Server Control companion guide
+## 24. Drug Reference and governed medication safety
+
+**Reference access:** all existing staff roles. **Author/review/intervention:** Chief Pharmacist or Pharmacist. **Clinical approval/publication/policy:** Chief Pharmacist. Authors cannot review/approve their own content. Technical administration does not grant clinical approval.
+
+### Start with coverage, not a safety assumption
+
+Drug Reference is integrated with the same central server, accounts, logo, inventory IDs and barcode mappings. All workstations see the same published version. Internet access is not needed, but the hospital server must be reachable. This foundation release has no licensed clinical monographs, interaction corpus or validated IV compatibility dataset. The included source registry is metadata-only. Missing/unmapped/conditional/stale information stays UNKNOWN. Read the capability matrix; this is not a comprehensive clinical reference.
+
+The inner navigation includes Drug Search, Generic Drug Directory, Brand Directory, Therapeutic Classification, Drug Interaction Checker, Drug Allergy Checker, Drug-Disease Checker, Dosage Reference, Renal Dosage Guide, Hepatic Dosage Guide, Pregnancy and Lactation, Antibiotic Reference, IV Compatibility, DDHI Hospital Formulary, AI Drug Assistant, Drug Safety Alerts, Database Administration, and Clinical References and Updates. Restricted administration/alert views are role-filtered.
+
+### Search and read
+
+Search generic/brand/ingredient/synonym/class/manufacturer/registration/indication text or an approved barcode. Spelling suggestions never auto-select or map ingredients. Choose the stock filter if needed; final stock/reservation checks still apply. Results are bounded; narrow a broad search. Double-click or Open monograph, then use Concise / expanded or Reading window. Current stock, missing sections, review dates, source metadata and version are shown. Inventory cost is not selling price. International terminology does not establish Philippine registration or hospital formulary approval. Favorites belong to the signed-in account; recent searches clear at sign-out.
+
+Scan Medicine > Open drug reference and Medicine Master > Clinical reference open the same module. Scanners remain optional. Reference-only products do not create inventory stock.
+
+### Govern the database
+
+Use Database Administration > Import / preview package with the empty templates in samples/clinical-reference. JSON, typed CSV, CSV-bundle ZIP and literal-value .xlsx inputs convert to one validated package format. All clinical records need real source references and lawful-use attestations. Formulas/macros/external links are rejected. Preview checks SHA256, records, keys, dates, references, reversed duplicates and conditions. Stage creates a Draft transactionally; it does not approve the information.
+
+Submit the draft. Another pharmacist must Review it. A Chief Pharmacist other than the author must Approve it, then Publish. A reviewing Chief can also approve. Empty/source-only and overdue content cannot publish. Editing creates a new version; published content/history cannot be overwritten. Restore publication creates a new pointer to an earlier reviewed publication without deleting history.
+
+Map an inventory medicine only after verifying its generic/approved synonym, brand, strength, form, route and package/ingredient evidence. The server rejects mismatches. New versions need current mappings; unknown medicines never silently skip screening. Do not copy unlicensed MIMS or other proprietary clinical data. See the source/licensing guide.
+
+### Screen and document a decision
+
+Add medicines to the screening list and choose Run safety check. Include the actual reconciled current therapy, outside/OTC/supplement use, and minimal encounter reference. Old dispensing is not assumed active. Enter optional daily dose with explicit units, route/frequency, allergy history/details, conditions and relevant rule factors. Daily dose differs from stock quantity. Undocumented conditions/allergies remain unknown. Class cross-reactivity and IV compatibility are never assumed.
+
+The deterministic server engine resolves current verified combination ingredients and checks all entered pairs. It flags ingredient duplication and exact documented allergies/intolerance, and applies published ingredient/class/disease/food/supplement rules. Missing conditions or overdue data retain UNKNOWN plus potential severity. Directional effects retain their orientation regardless of entry order. NoKnownInteractionFound, when supported by an explicit reviewed rule, is limited to its cited scope and never guarantees safety.
+
+The summary lists medicines/pairs/severity counts and incomplete assessments. Findings show original severity, evidence, mechanism/consequences, management/monitoring, supported guidance, conditions, review dates and references. Contraindicated/major findings are prominent, moderate amber, minor/unknown neutral. Print/PDF and report export include the visible uncertainty/version context.
+
+A pharmacist records Hold, Escalate or Proceed with documented review. Management and authorization reference are required. Incomplete coverage cannot proceed until a Chief Pharmacist approves the hospital's written manual-review policy and the pharmacist explicitly performs independent review. This policy starts disabled on a new server. Contraindicated or potentially contraindicated findings additionally require prescriber clarification/authorized escalation. AI does not approve, modify, cancel or substitute orders.
+
+### Dispensing, special tools and limits
+
+Verify and dispense opens the new context/review steps for the actual issue brand. Cancel/Hold/Escalate commits no stock movement. Existing clinical/stock/barcode/expiry/recall/reservation/substitution checks remain. The assessment expires after 15 minutes and is bound to pharmacist, workstation, encounter, exact order/batch/quantity, content version, policy and mappings. Changes require re-screening. Each committed issue uses one assessment; idempotent retries preserve the original result. Old clients missing the assessment are refused.
+
+Special-population, dosage, pregnancy/lactation, antibiotic and formulary pages display sourced approved sections only. Validated dose/renal/hepatic/infusion calculators, cumulative exposure, structured P&T restriction enforcement, antibiogram processing, clinical photos and external AI are not enabled in this foundation. IV rules require exact concentrations/units, diluent, temperature, container and contact conditions; no dataset is supplied. AI Drug Assistant is approved-source lookup with external AI disabled, not generated clinical advice.
+
+Server Control 0.9.0 creates an authenticated encrypted local backup before Apply database updates. Keep its protected key folder/original setup account and an independent disaster-recovery backup. Clinical publications, screenings and interventions retain audit history. No live Cerebro clinical integration or direct Cerebro writes are added.
+
+Read DDHI-Drug-Reference-Guide.pdf for detailed workflows and the capability/clinical-validation checklist. Hospital pharmacist validation, source permissions, four real workstations and hospital/privacy acceptance remain pending.
+
+## 25. Server Control companion guide
 
 ### Existing server upgrade
 
@@ -420,7 +464,7 @@ Application staff login, Windows login and PostgreSQL login are different accoun
 
 Clients use HTTPS, normally TCP 8443; local-subnet discovery uses UDP 8444. PostgreSQL stays on the server's loopback address, normally port 55433 in the bundled setup. Hospital IT controls network/firewall scope. Keep outside/uncertain held medicines physically separate even though their intake documentation is stored on the central server.
 
-## 25. Troubleshooting and recovery
+## 26. Troubleshooting and recovery
 
 | Symptom | What to check |
 | --- | --- |
@@ -440,7 +484,7 @@ Clients use HTTPS, normally TCP 8443; local-subnet discovery uses UDP 8444. Post
 
 If a transaction's outcome is uncertain after a network failure, refresh and reconcile before retrying. For serious discrepancies, record the reference, preserve logs and escalate to authorized staff. Do not delete balances, ledger entries or the database to clear an error.
 
-## 26. Daily checklists and worked workflow
+## 27. Daily checklists and worked workflow
 
 ### Start of shift
 
@@ -458,7 +502,7 @@ Receive the presented items into a controlled review process. Separate verified 
 
 Refresh open work, investigate uncertain transaction results and hand over unresolved references. Secure exported files, labels and physically held items. Verify that authorized server backups and monitoring are assigned to responsible staff. Sign out of the client and do not shut down the dedicated server merely because a workstation is closing.
 
-## 27. Glossary
+## 28. Glossary
 
 - **Active product:** A catalog product enabled for relevant new stock/clinical actions. Inactivation preserves its history and stock.
 - **Adjustment:** A documented stock-count correction with a reason; not a substitute for receiving or patient return provenance.
@@ -562,3 +606,14 @@ Refresh open work, investigate uncertain transaction results and hand over unres
 - **Unused verification:** Pharmacist confirmation that presented hospital items match the original dispensing and unused quantity assessment.
 - **Worker:** The background server process supporting maintenance such as reservation expiry and local discovery.
 - **Workstation:** A registered client-computer identity used in audit records, distinct from the staff user.
+
+- **Clinical publication:** A governed immutable content version selected for all workstations; draft data is excluded from screening.
+- **Conditional rule:** A sourced rule requiring specified context; missing/invalid context keeps the assessment unknown.
+- **Coverage gap:** Missing rules, mappings, monographs or patient information; it is not a negative interaction result.
+- **Ingredient mapping:** Verified relationship between an existing inventory product and all ingredients in a published clinical drug.
+- **Medication reconciliation:** Verification of current actual therapy, including outside/OTC products; dispensing history alone is insufficient.
+- **Pharmacist intervention:** The recorded clinical management/hold/escalation decision tied to a screening assessment.
+- **Prescriber clarification:** Documented authorized clarification/escalation required for contraindicated or potentially contraindicated findings.
+- **Reference-only product:** Published clinical information without creating or implying hospital inventory stock.
+- **Safety assessment:** Immutable evaluation of entered medicines/context, pinned to a dataset version and, for dispensing, the exact issue details.
+- **Source attestation:** Operator's recorded lawful-use basis; it is not an automatic copyright or clinical approval decision.

@@ -129,6 +129,6 @@
 </StackPanel></ScrollViewer></TabItem>
 </TabControl>
 
-<TextBlock Grid.Row="3" Text="Server Control 0.8.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
+<TextBlock Grid.Row="3" Text="Server Control 0.9.0 · Closing this window leaves started server processes running · Clinical data remains in the central database." Foreground="#617D6D" Margin="0,14,0,0" TextWrapping="Wrap"/>
 
 </Grid></Window>

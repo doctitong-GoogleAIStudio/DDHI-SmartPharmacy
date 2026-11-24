@@ -39,6 +39,21 @@ public sealed class PharmacyDb(DbContextOptions<PharmacyDb> options) : IdentityD
  public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
  public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
  public DbSet<OperationKey> OperationKeys => Set<OperationKey>();
+ public DbSet<ClinicalContentVersion> ClinicalContentVersions => Set<ClinicalContentVersion>();
+ public DbSet<ClinicalSourceRecord> ClinicalSourceRecords => Set<ClinicalSourceRecord>();
+ public DbSet<DrugIngredient> DrugIngredients => Set<DrugIngredient>();
+ public DbSet<ClinicalDrug> ClinicalDrugs => Set<ClinicalDrug>();
+ public DbSet<ClinicalDrugIngredient> ClinicalDrugIngredients => Set<ClinicalDrugIngredient>();
+ public DbSet<ClinicalProduct> ClinicalProducts => Set<ClinicalProduct>();
+ public DbSet<ClinicalPackageRecord> ClinicalPackageRecords => Set<ClinicalPackageRecord>();
+ public DbSet<DrugClinicalMapping> DrugClinicalMappings => Set<DrugClinicalMapping>();
+ public DbSet<ClinicalRuleRecord> ClinicalRuleRecords => Set<ClinicalRuleRecord>();
+ public DbSet<ClinicalMonographRecord> ClinicalMonographRecords => Set<ClinicalMonographRecord>();
+ public DbSet<ClinicalPublication> ClinicalPublications => Set<ClinicalPublication>();
+ public DbSet<ClinicalReviewRecord> ClinicalReviewRecords => Set<ClinicalReviewRecord>();
+ public DbSet<ClinicalScreening> ClinicalScreenings => Set<ClinicalScreening>();
+ public DbSet<PharmacistIntervention> PharmacistInterventions => Set<PharmacistIntervention>();
+ public DbSet<ReferencePreference> ReferencePreferences => Set<ReferencePreference>();
  protected override void OnModelCreating(ModelBuilder b) {
   base.OnModelCreating(b);
   foreach(var type in b.Model.GetEntityTypes().Where(t=>typeof(Entity).IsAssignableFrom(t.ClrType))) {
@@ -83,12 +98,14 @@ public sealed class PharmacyDb(DbContextOptions<PharmacyDb> options) : IdentityD
   b.Entity<OperationKey>().HasIndex(x=>x.Key).IsUnique();
   b.Entity<ScannerConfiguration>().HasIndex(x=>new{x.WorkstationId,x.Name}).IsUnique();
   b.Entity<AuditEvent>().HasIndex(x=>x.CreatedAt);
+  ClinicalModel.Configure(b);
  }
  public AuditChangeCapture? AuditCapture {get;set;}
  public override Task<int> SaveChangesAsync(CancellationToken c=default) {
+  foreach(var entry in ChangeTracker.Entries<ClinicalContentVersion>())if(entry.State is EntityState.Modified or EntityState.Deleted) {if(entry.OriginalValues.GetValue<string>("State")=="Published"||entry.Property(x=>x.PayloadJson).IsModified||entry.Property(x=>x.Digest).IsModified)throw new InvalidOperationException("Clinical content is immutable. Stage a new version.");}
   AuditCapture?.Capture(ChangeTracker);
   foreach(var e in ChangeTracker.Entries().Where(e=>e.State is EntityState.Modified or EntityState.Deleted))
-   if(e.Entity is StockMovement or AuditEvent)throw new InvalidOperationException("Ledger and audit events are immutable.");
+   if(e.Entity is StockMovement or AuditEvent||ClinicalModel.Immutable.Contains(e.Metadata.ClrType))throw new InvalidOperationException("Ledger and audit events are immutable.");
   return base.SaveChangesAsync(c);
  }
 }
